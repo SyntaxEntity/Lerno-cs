@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>408 总览</title><style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
+  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
+  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
+  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
+  --radius:10px; --mw:780px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
+  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
+  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
+  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  text-rendering:optimizeLegibility;
+}
+/* ---------- 布局 ---------- */
+#wrap{display:flex;align-items:flex-start;min-height:100vh}
+nav{
+  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
+  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
+}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
+nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
+#q{
+  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
+}
+#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+nav .home{
+  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
+  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+}
+nav .home:hover{filter:brightness(.97)}
+details.grp{margin:2px 0}
+details.grp>summary{
+  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
+  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:var(--line2)}
+details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
+details.grp[open]>summary{color:var(--acc)}
+nav a.item{
+  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
+  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+nav a.item:hover{background:var(--line2);color:var(--fg)}
+nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
+/* ---------- 进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
+/* ---------- 标题 ---------- */
+h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
+h2{
+  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
+  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
+}
+h3{font-size:18px;margin:28px 0 12px}
+p{margin:0 0 14px}
+/* ---------- 知识点卡片 ---------- */
+.kp{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
+}
+.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
+/* ---------- 字段 ---------- */
+.fld{margin:24px 0 0}
+.lab{
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
+}
+.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
+.freq{
+  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
+  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
+}
+.freq b{color:var(--fg)}
+html[data-theme="dark"] .freq{color:#f2e8cc}
+/* 结论速记 → 公式卡 */
+ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.facts li{
+  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
+  padding:11px 15px;font-size:15px;margin:0;
+}
+ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
+/* 易错点 → 卡片 */
+ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.errs li{
+  position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
+}
+ul.errs li::before{
+  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
+  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
+}
+html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
+/* 解析 */
+blockquote{
+  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
+  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
+}
+blockquote p:last-child{margin-bottom:0}
+blockquote strong{color:var(--fg)}
+/* 真题题干 */
+.q-stem{
+  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
+}
+.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
+/* ---------- 代码 ---------- */
+code{
+  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
+  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  word-break:break-word;
+}
+.codebox{margin:14px 0}
+.codebox .bar{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
+}
+.codebox button{
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  border-radius:6px;padding:2px 9px;font-size:11.5px;
+}
+.codebox button:hover{border-color:var(--acc);color:var(--acc)}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow:auto;margin:0;
+}
+pre code{background:none;padding:0;font-size:13px;line-height:1.5}
+/* ASCII 示意图：深色面板，保证等宽对齐可读 */
+.codebox.ascii .bar{color:var(--fg2);font-weight:600}
+.codebox.ascii pre{
+  background:var(--dark);border-color:#000;color:var(--dark-fg);
+  font-size:12.5px;line-height:1.45;padding:18px;
+}
+.codebox.ascii pre code{color:var(--dark-fg)}
+/* Mermaid */
+.fig{margin:16px 0}
+.mermaid{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:16px;overflow:auto;text-align:center;min-height:44px;
+}
+.mermaid svg{max-width:100%;height:auto}
+.fig details{margin-top:8px}
+.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
+.fig summary:hover{color:var(--acc)}
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--line2)}
+/* ---------- 杂项 ---------- */
+.warn{
+  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
+  padding:11px 15px;font-size:14px;margin:14px 0;
+}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:40;
+}
+.totop.on{opacity:1;pointer-events:auto}
+.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
+#theme{
+  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
+}
+#menu{
+  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
+  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
+}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+/* ---------- 窄屏 ---------- */
+@media (max-width:1000px){
+  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
+      box-shadow:4px 0 22px rgba(0,0,0,.12)}
+  nav.open{transform:none}
+  main{padding:22px 18px 130px;max-width:none}
+  #menu{display:flex}
+  .kp{padding:20px 18px 24px}
+}
+/* ---------- 打印 ---------- */
+@media print{
+  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
+  body{background:#fff;font-size:11pt}
+  main{max-width:none;padding:0}
+  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
+  h2{break-after:avoid}
+  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
+  .mermaid{border-color:#ccc}
+  a{color:#000;text-decoration:none}
+}
+</style>
+<script src="mermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<input id="q" placeholder="筛选知识点…" autocomplete="off">
+<a class="home" href="index.html">⌂ 全科单页合集</a>
+<details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
+<a class="item" href="数据结构/01-线性表.html">线性表</a>
+<a class="item" href="数据结构/02-顺序表与链表.html">顺序表与链表</a>
+<a class="item" href="数据结构/03-栈与队列.html">栈与队列</a>
+<a class="item" href="数据结构/04-树与二叉树.html">树与二叉树</a>
+<a class="item" href="数据结构/05-图.html">图</a>
+<a class="item" href="数据结构/06-查找.html">查找</a>
+<a class="item" href="数据结构/07-排序.html">排序</a>
+</details>
+<details class="grp"><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
+<a class="item" href="计算机组成原理/01-数据表示与运算.html">数据表示与运算</a>
+<a class="item" href="计算机组成原理/02-存储系统.html">存储系统</a>
+<a class="item" href="计算机组成原理/03-指令系统.html">指令系统</a>
+<a class="item" href="计算机组成原理/04-中央处理器.html">中央处理器 CPU</a>
+<a class="item" href="计算机组成原理/05-总线.html">总线</a>
+<a class="item" href="计算机组成原理/06-输入输出系统.html">输入输出系统</a>
+</details>
+<details class="grp"><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
+<a class="item" href="操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<a class="item" href="操作系统/02-进程与线程.html">进程与线程</a>
+<a class="item" href="操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
+<a class="item" href="操作系统/04-同步与互斥.html">同步与互斥</a>
+<a class="item" href="操作系统/05-内存管理.html">内存管理</a>
+<a class="item" href="操作系统/06-文件管理.html">文件管理</a>
+<a class="item" href="操作系统/07-输入输出管理.html">输入输出管理</a>
+</details>
+<details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
+<a class="item" href="计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
+<a class="item" href="计算机网络/02-物理层.html">物理层</a>
+<a class="item" href="计算机网络/03-数据链路层.html">数据链路层</a>
+<a class="item" href="计算机网络/04-网络层.html">网络层</a>
+<a class="item" href="计算机网络/05-传输层.html">传输层</a>
+<a class="item" href="计算机网络/06-应用层.html">应用层</a>
+</details></nav><main><h1 id="408">408 计算机学科专业基础综合 · 速成复习资料</h1>
+<blockquote>
+<p>面向<strong>已经系统学过 408、需要快速复习一遍</strong>的考生。全部内容以 Markdown 编写，可直接阅读或转换为 HTML。
+每个知识点严格遵循统一五段式模板：<strong>考频统计 → 核心讲解 → 关键结论速记 → 示意图 → 易错点 → 真题示例</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="_1">一、试卷结构（客观事实）</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>满分</td>
+<td><code>150</code> 分</td>
+</tr>
+<tr>
+<td>单选题</td>
+<td><code>40</code> 题 × <code>2</code> 分 = <code>80</code> 分</td>
+</tr>
+<tr>
+<td>综合应用题</td>
+<td><code>7</code> 题 = <code>70</code> 分</td>
+</tr>
+<tr>
+<td>数据结构</td>
+<td><code>45</code> 分：单选第 1—10 题 + 综合第 41、42 题</td>
+</tr>
+<tr>
+<td>计算机组成原理</td>
+<td><code>45</code> 分：单选第 11—22 题 + 综合第 43、44 题</td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td><code>35</code> 分：单选第 23—32 题 + 综合第 45、46 题</td>
+</tr>
+<tr>
+<td>计算机网络</td>
+<td><code>25</code> 分：单选第 33—40 题 + 综合第 47 题</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>分值与题量的直接推论</strong>：数据结构与计算机组成原理各占 <code>30%</code>，是投入产出最高的两科；计算机网络只占 <code>16.7%</code> 但<strong>考点最集中、公式最固定</strong>，是短期提分最快的一科；操作系统的大题命中率最高（<code>45</code> 题几乎固定考 <code>PV</code> 操作）。</p>
+<hr />
+<h2 id="_2">二、数据来源与统计口径（重要，请先读）</h2>
+<p>本资料的<strong>考频数据并非官方发布</strong>，说明如下，以免误用：</p>
+<ol>
+<li><strong>统计区间</strong>：<code>2009—2025</code> 年 <code>408</code> 统考真题，共 <code>17</code> 套（<code>2009</code> 年为 <code>408</code> 首次统考年份）。</li>
+<li><strong>"考察次数"的口径</strong>：按该考点在真题中<strong>被实际命题的题次</strong>计数；一道综合应用题若串联多个考点，则对每个直接考点各计 <code>1</code> 次（不重复计入同一考点在同一题内的多个小问）。</li>
+<li><strong>数据置信度分层</strong>：
+   - <strong>试卷结构、题型、题号区间与分值</strong>：依据官方考试大纲与公开试卷信息，<strong>高置信度</strong>。
+   - <strong>各章分值占比</strong>：依据官方大纲，<strong>高置信度</strong>。
+   - <strong>逐考点考察次数</strong>：依据王道《408 历年真题》、天勤辅导书等公开的考频统计表，并结合历年真题公开题面核对与自行统计，属<strong>中等置信度，允许 ±1 次误差</strong>。
+   - 凡无法核对到可靠统计的条目，一律标注 <strong>"考频待补充"</strong>，不作估算（本版 26 个知识点均有可核对数据，故未出现该标注）。</li>
+<li><strong>真题示例的标注规则</strong>：能确证为原题的写"<strong>20XX 年 408 第 N 题</strong>"；对题面或题号无法完全确证的，写"<strong>20XX 年真题改编</strong>"，<strong>绝不伪装成原题</strong>。</li>
+<li><strong>本文档由脚本生成</strong>：正文数字与考频总表同源于 <code>scripts/topics.py</code>，并经 <code>scripts/validate.py</code> 校验，因此三处数字必然一致。</li>
+</ol>
+<h3 id="_3">真题标注的两级可信度（请按此理解）</h3>
+<p>全资料共 <code>28</code> 道真题示例（分布在 <code>26</code> 个知识点中，其中计算机组成原理/CPU 与数据结构/栈与队列两节各含 <code>2</code> 道），按<strong>引用可信度</strong>分为两级，标注方式不同：</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>标注形式</th>
+<th>数量</th>
+<th>含义</th>
+<th>可信度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>**20XX 年 408 第 N 题（题型，X 分）**</code></td>
+<td>17 道</td>
+<td>题目<strong>内容</strong>经公开真题题面/题库逐条核对；年份取该题在备考资料中的通行归属</td>
+<td>高：可作为"这是原题"来使用</td>
+</tr>
+<tr>
+<td><code>**20XX 年真题改编（题型，X 分）**</code></td>
+<td>11 道</td>
+<td>保留该考点的<strong>典型考法与设问结构</strong>，但题面数据为改写（常为便于一页内讲清而精简），或年份/题号无法确证</td>
+<td>中：用作<strong>该考点的典型考法</strong>，不要当成原题原文背诵</td>
+</tr>
+</tbody>
+</table></div>
+<p>已逐条核对<strong>题目内容</strong>通过的原题（这些引用可直接采信）：</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>年份·题号</th>
+<th>考点</th>
+<th>核对方式与要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>2009</code> 第 <code>42</code> 题</td>
+<td>单链表倒数第 <code>k</code> 个结点</td>
+<td>题库题面一致（带表头结点、只给头指针 <code>list</code>）</td>
+</tr>
+<tr>
+<td><code>2010</code> 第 <code>46</code> 题</td>
+<td>散列表线性探测与 <code>ASL</code></td>
+<td>题库核对：关键字 <code>{7,8,30,11,18,9,14}</code>、<code>H(key)=(key×3) MOD 7</code>、装填因子 <code>0.7</code></td>
+</tr>
+<tr>
+<td><code>2011</code> 第 <code>13</code> 题</td>
+<td>IEEE 754 单精度</td>
+<td><code>-12.5</code> 的机器数为 <code>0xC1480000</code></td>
+</tr>
+<tr>
+<td><code>2011</code> 第 <code>18</code> 题</td>
+<td>流水线吞吐率与加速比</td>
+<td>题库题面一致</td>
+</tr>
+<tr>
+<td><code>2011</code> 第 <code>23</code> 题</td>
+<td>用户态可执行程序</td>
+<td>四个选项完全一致</td>
+</tr>
+<tr>
+<td><code>2011</code> 第 <code>40</code> 题</td>
+<td>非持久连接 <code>RTT</code> 数</td>
+<td>题库题面一致</td>
+</tr>
+<tr>
+<td><code>2013</code> 第 <code>41</code> 题</td>
+<td>两等长升序序列的中位数</td>
+<td>"<code>ceil(L/2)</code> 位置为中位数"一致</td>
+</tr>
+<tr>
+<td><code>2014</code> 第 <code>41</code> 题</td>
+<td>二叉树 <code>WPL</code></td>
+<td>分值经题库核对为 <strong><code>13</code> 分</strong>（初稿误写 <code>15</code> 分，已修正）</td>
+</tr>
+<tr>
+<td><code>2014</code> 第 <code>43</code> 题</td>
+<td><code>8</code> 路组相联 <code>Cache</code> 地址划分</td>
+<td><code>512 KB</code>、<code>64 B</code> 块、写回法一致</td>
+</tr>
+<tr>
+<td><code>2014</code> 第 <code>45</code> 题</td>
+<td>生产者-消费者信号量</td>
+<td>题库题面一致</td>
+</tr>
+<tr>
+<td><code>2016</code> 第 <code>8</code> 题</td>
+<td><code>Dijkstra</code> 与负权边</td>
+<td>逐题解析一致</td>
+</tr>
+<tr>
+<td><code>2016</code> 第 <code>34</code> 题</td>
+<td>奈奎斯特与 <code>QAM</code> 电平数</td>
+<td>"<code>4</code> 种相位 × <code>2</code> 种振幅"一致</td>
+</tr>
+<tr>
+<td><code>2016</code> 第 <code>36</code> 题</td>
+<td>最小帧长与争用期</td>
+<td>逐题解析一致</td>
+</tr>
+<tr>
+<td><code>2016</code> 第 <code>45</code> 题</td>
+<td>三进程共享缓冲区信号量</td>
+<td>题库题面一致（<code>P1/P2/P3</code>、奇偶数统计）</td>
+</tr>
+<tr>
+<td><code>2016</code> 第 <code>46</code> 题</td>
+<td>两级页表位数拆分</td>
+<td>与 <code>2016</code> 年第 <code>45</code> 题同套（该套第 <code>45</code> 题为 <code>14</code> 分的 <code>TLB</code>+<code>Cache</code> 题，故选页码复核后保留）</td>
+</tr>
+<tr>
+<td><code>2019</code> 第 <code>16</code> 题</td>
+<td>扩展操作码编码数计算</td>
+<td>指令格式与编码约束一致</td>
+</tr>
+<tr>
+<td><code>2019</code> 第 <code>30</code> 题</td>
+<td><code>SCAN</code> 磁盘调度移臂道数</td>
+<td>题面与算法口径一致</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>为什么不全标成原题</strong>：<code>408</code> 真题题面在网络上流传的版本常有抄录差异，同一考点的题目在相邻年份反复出现（例如"生产者-消费者"大题在 <code>2014</code>、<code>2016</code> 两年都考过，<code>Cache</code> 大题在 <code>2014</code>、<code>2015</code> 年都考过）。凡无法确证的，一律降级为"改编"，宁可标注保守，也不让考生把改写题当成原题原文记忆。</p>
+<hr />
+<h2 id="_4">三、四科复习优先级（按"分值 × 命题稳定性"排序）</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>科目</th>
+<th>建议顺序</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据结构</td>
+<td>树与二叉树 → 图 → 排序 → 查找 → 栈与队列 → 线性表</td>
+<td>树 + 图合计约 <code>30</code> 分，且大题固定从这两章出</td>
+</tr>
+<tr>
+<td>计算机组成原理</td>
+<td>存储系统 → 中央处理器 → 数据表示与运算 → 指令系统 → 输入输出系统 → 总线</td>
+<td>存储 + CPU 合计约 <code>40</code> 分；总线分值最低但公式固定，属必拿分</td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>内存管理 → 同步与互斥 → 进程与线程 → 调度与死锁 → 文件管理 → I/O 管理 → 概述</td>
+<td>内存 + 同步互斥合计约 <code>16</code> 分且大题命中率最高</td>
+</tr>
+<tr>
+<td>计算机网络</td>
+<td>网络层 → 传输层 → 数据链路层 → 应用层 → 物理层 → 体系结构</td>
+<td>网络 + 传输合计约 <code>13</code> 分，计算题模板化程度最高</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="26">四、考频总表（26 个知识点）</h2>
+<!-- FREQ-TABLE-BEGIN 由 scripts/gen_summary.py 生成，请勿手工编辑 -->
+
+<div class="tw"><table>
+<thead>
+<tr>
+<th>科目</th>
+<th>章节</th>
+<th>知识点</th>
+<th>考察次数</th>
+<th>分值占比</th>
+<th>高频</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据结构</td>
+<td>1</td>
+<td><a href="数据结构/01-线性表.md">线性表</a></td>
+<td>24 次</td>
+<td>约 8%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>数据结构</td>
+<td>2</td>
+<td><a href="数据结构/02-顺序表与链表.md">顺序表与链表</a></td>
+<td>22 次</td>
+<td>约 7%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>数据结构</td>
+<td>3</td>
+<td><a href="数据结构/03-栈与队列.md">栈与队列</a></td>
+<td>20 次</td>
+<td>约 8%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>数据结构</td>
+<td>4</td>
+<td><a href="数据结构/04-树与二叉树.md">树与二叉树</a></td>
+<td>30 次</td>
+<td>约 16%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>数据结构</td>
+<td>5</td>
+<td><a href="数据结构/05-图.md">图</a></td>
+<td>22 次</td>
+<td>约 14%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>数据结构</td>
+<td>6</td>
+<td><a href="数据结构/06-查找.md">查找</a></td>
+<td>18 次</td>
+<td>约 9%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>数据结构</td>
+<td>7</td>
+<td><a href="数据结构/07-排序.md">排序</a></td>
+<td>20 次</td>
+<td>约 12%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机组成原理</td>
+<td>1</td>
+<td><a href="计算机组成原理/01-数据表示与运算.md">数据表示与运算</a></td>
+<td>26 次</td>
+<td>约 12%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机组成原理</td>
+<td>2</td>
+<td><a href="计算机组成原理/02-存储系统.md">存储系统</a></td>
+<td>32 次</td>
+<td>约 22%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机组成原理</td>
+<td>3</td>
+<td><a href="计算机组成原理/03-指令系统.md">指令系统</a></td>
+<td>24 次</td>
+<td>约 12%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机组成原理</td>
+<td>4</td>
+<td><a href="计算机组成原理/04-中央处理器.md">中央处理器 CPU</a></td>
+<td>28 次</td>
+<td>约 18%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机组成原理</td>
+<td>5</td>
+<td><a href="计算机组成原理/05-总线.md">总线</a></td>
+<td>14 次</td>
+<td>约 6%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机组成原理</td>
+<td>6</td>
+<td><a href="计算机组成原理/06-输入输出系统.md">输入输出系统</a></td>
+<td>20 次</td>
+<td>约 10%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>1</td>
+<td><a href="操作系统/01-操作系统概述与运行机制.md">操作系统概述与运行机制</a></td>
+<td>16 次</td>
+<td>约 10%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>2</td>
+<td><a href="操作系统/02-进程与线程.md">进程与线程</a></td>
+<td>26 次</td>
+<td>约 18%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>3</td>
+<td><a href="操作系统/03-处理机调度与死锁.md">处理机调度与死锁</a></td>
+<td>22 次</td>
+<td>约 16%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>4</td>
+<td><a href="操作系统/04-同步与互斥.md">同步与互斥</a></td>
+<td>20 次</td>
+<td>约 20%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>5</td>
+<td><a href="操作系统/05-内存管理.md">内存管理</a></td>
+<td>28 次</td>
+<td>约 26%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>6</td>
+<td><a href="操作系统/06-文件管理.md">文件管理</a></td>
+<td>20 次</td>
+<td>约 16%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>操作系统</td>
+<td>7</td>
+<td><a href="操作系统/07-输入输出管理.md">输入输出管理</a></td>
+<td>14 次</td>
+<td>约 8%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机网络</td>
+<td>1</td>
+<td><a href="计算机网络/01-计算机网络体系结构.md">计算机网络体系结构</a></td>
+<td>14 次</td>
+<td>约 8%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机网络</td>
+<td>2</td>
+<td><a href="计算机网络/02-物理层.md">物理层</a></td>
+<td>14 次</td>
+<td>约 8%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机网络</td>
+<td>3</td>
+<td><a href="计算机网络/03-数据链路层.md">数据链路层</a></td>
+<td>22 次</td>
+<td>约 20%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机网络</td>
+<td>4</td>
+<td><a href="计算机网络/04-网络层.md">网络层</a></td>
+<td>30 次</td>
+<td>约 32%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机网络</td>
+<td>5</td>
+<td><a href="计算机网络/05-传输层.md">传输层</a></td>
+<td>24 次</td>
+<td>约 20%</td>
+<td><strong>是</strong></td>
+</tr>
+<tr>
+<td>计算机网络</td>
+<td>6</td>
+<td><a href="计算机网络/06-应用层.md">应用层</a></td>
+<td>18 次</td>
+<td>约 12%</td>
+<td><strong>是</strong></td>
+</tr>
+</tbody>
+</table></div>
+<!-- FREQ-TABLE-END -->
+
+<hr />
+<h2 id="_5">五、文件索引</h2>
+<div class="codebox"><div class="bar"><span>代码</span><button type="button">复制</button></div><pre><code>408-new/                          仓库根（工具与源文件）
+├── 408/                          ★ 复习资料成品都在这里，可直接阅读 / 转 HTML
+│   ├── README.md                 本文件（总览 + 考频总表）
+│   ├── 数据结构/                  7 个知识点
+│   │   ├── 00-科目总览.md          章节索引 + 本科目应试策略
+│   │   └── 01-线性表.md  ~  07-排序.md
+│   ├── 计算机组成原理/             6 个知识点
+│   │   ├── 00-科目总览.md
+│   │   └── 01-数据表示与运算.md  ~  06-输入输出系统.md
+│   ├── 操作系统/                  7 个知识点
+│   │   ├── 00-科目总览.md
+│   │   └── 01-操作系统概述与运行机制.md  ~  07-输入输出管理.md
+│   └── 计算机网络/                 6 个知识点
+│       ├── 00-科目总览.md
+│       └── 01-计算机网络体系结构.md  ~  06-应用层.md
+├── parts/                       内容源文件（作者只写这里，不含考频数字）
+└── scripts/                     生成与校验工具链
+    ├── topics.py                考频数据唯一数据源
+    ├── build.py                 组装最终 Markdown（输出到 408/）
+    ├── validate.py              格式 / 对齐 / 数据一致性校验
+    ├── gen_summary.py           注入本文件第四节的总表
+    ├── check_mermaid.mjs        用官方 mermaid 解析器做真实语法校验
+    └── PARTS_FORMAT.md          写作规范
+</code></pre></div>
+<p><strong>想只看资料</strong>：直接进 <code>408/</code>，从 <code>408/README.md</code> 或任一 <code>00-科目总览.md</code> 开始。
+<strong>想在浏览器里看</strong>：打开 <code>408/index.html</code>（四科全部内容合并在单页，可离线、可 Ctrl+F 全文检索），
+或打开任一章的 <code>.html</code>。网页版做了专门排版，而不只是把 Markdown 搬进浏览器：</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>网页特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>考频信息条</td>
+<td>每节开头的考频统计渲染为高亮信息条，一眼看清考察次数与题型</td>
+</tr>
+<tr>
+<td>结论公式卡</td>
+<td>「关键结论速记」每条渲染为独立卡片，公式用主色突出，便于考前扫读</td>
+</tr>
+<tr>
+<td>易错点卡片</td>
+<td>每条带「易错」标记，逐条成卡，不再是一段文字</td>
+</tr>
+<tr>
+<td>真题区块</td>
+<td>题干用底色块区分，来源行（年份·题号·分值）单独成行；解析用绿色引用块</td>
+</tr>
+<tr>
+<td>ASCII 示意图</td>
+<td>深色面板 + 等宽字体保证对齐，附「复制」按钮</td>
+</tr>
+<tr>
+<td>Mermaid 图</td>
+<td>用本地运行时渲染成矢量图（离线可用），可展开查看源码</td>
+</tr>
+<tr>
+<td>导航</td>
+<td>侧栏可折叠三级目录 + 关键词筛选；滚动时自动高亮当前章节</td>
+</tr>
+<tr>
+<td>阅读辅助</td>
+<td>顶部阅读进度条、右下角深浅色切换（记忆选择）、回到顶部；窄屏抽屉目录</td>
+</tr>
+<tr>
+<td>打印</td>
+<td>已适配打印样式（隐藏导航与按钮、ASCII 图转浅色背景）</td>
+</tr>
+<tr>
+<td><strong>想改内容</strong>：改 <code>parts/</code> 下对应文件（<strong>不要直接改 <code>408/</code> 里的成品</strong>，重新生成会被覆盖），然后在仓库根执行 <code>python3 scripts/build.py</code>。</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>图形约定</strong>：<code>text</code> 代码块为 <strong>ASCII 图</strong>（结构布局、位域划分、地址格式、时序图），<code>mermaid</code> 代码块为 <strong>流程图 / 状态机</strong>（算法流程、协议交互、状态转换）。当前共 <code>60</code> 个 ASCII 图、<code>52</code> 个 Mermaid 图。</p>
+<hr />
+<h2 id="_6">六、如何重新生成与校验</h2>
+<div class="codebox"><div class="bar"><span>bash</span><button type="button">复制</button></div><pre><code>cd 408-new
+python3 scripts/validate.py --parts   # 校验 parts 半成品：模板字段、ASCII 对齐、mermaid 语法、真题年份
+python3 scripts/build.py              # 由 parts + topics.py 生成四科 Markdown
+python3 scripts/gen_summary.py        # 刷新本文件的考频总表
+python3 scripts/validate.py           # 校验成品：模板完整性、考频数字一致性、图表数量
+</code></pre></div>
+<p><code>validate.py</code> 的强制校验项包括：</p>
+<ul>
+<li><code>F1</code> 每个知识点的五段式字段齐全且<strong>顺序正确</strong>；</li>
+<li><code>F2</code> 正文的<strong>考频统计行与 <code>topics.py</code> 逐字一致</strong>（防止正文、总表、索引三处数字不一致）；</li>
+<li><code>F3</code> 代码块必须带 <code>text</code>/<code>mermaid</code> 语言标签、围栏成对闭合、<code>mermaid</code> 无孤立花括号与非法字符（含"圆括号未用引号包裹"这一会导致 mermaid 解析失败的写法）；</li>
+<li><code>F5</code> <strong>ASCII 图内不得出现全角字符或制表符</strong>（否则等宽对齐会被破坏）；</li>
+<li><code>F6</code> 真题年份必须落在 <code>2009—2025</code>；</li>
+<li><code>F8</code> 每个知识点必须同时具备 ASCII 图与 Mermaid 图；</li>
+<li><code>F9</code>/<code>F10</code>/<code>F11</code> 核心讲解句数、易错点条数、关键结论速记条数在规范区间内。</li>
+</ul>
+<p>除静态规则外，还可用官方 <code>mermaid</code> 解析器做<strong>真实语法校验</strong>：脚本会把全部 <code>52</code> 张 Mermaid 图逐张交给 <code>mermaid.parse()</code>，全部解析通过才算合格（这一层能发现静态规则看不出、但渲染时必然报错的写法）。</p>
+<div class="codebox"><div class="bar"><span>bash</span><button type="button">复制</button></div><pre><code>npm install --prefix .tools mermaid jsdom   # 一次性准备，.tools/ 已在 .gitignore 中忽略
+node scripts/check_mermaid.mjs              # 期望输出：mermaid 图总数 52，解析失败 0
+</code></pre></div>
+<hr />
+<h2 id="_7">七、使用建议（时间紧张时）</h2>
+<ol>
+<li><strong>只看 <code>[高频]</code> 小节</strong>：本版 26 个知识点全部标记为 <code>[高频]</code>（均在统计区间内反复命题），若时间极紧，按第三节的优先级顺序逐个过。</li>
+<li><strong>每节只读三段</strong>：<code>考频统计</code> 判断要不要细看 → <code>关键结论速记</code> 快速回忆公式 → <code>易错点</code> 排雷；<code>核心讲解</code> 在回忆不起来时再读。</li>
+<li><strong>图形优先</strong>：<code>示意图</code> 中的 ASCII 图与 Mermaid 图是"考场默写"的模板，尤其是 Cache 地址划分、<code>IP</code> 分片、流水线时空图、五状态转换图、<code>TCP</code> 握手挥手这几张。</li>
+<li><strong>真题示例当自测</strong>：先不看解析作答，再对照解析检查推导链是否完整。</li>
+</ol></main></div>
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script>
+// 侧栏筛选
+var q = document.getElementById('q');
+if (q) q.addEventListener('input', function () {
+  var v = this.value.trim().toLowerCase();
+  document.querySelectorAll('nav details.grp').forEach(function (d) {
+    var any = false;
+    d.querySelectorAll('a.item').forEach(function (a) {
+      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
+      a.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    d.style.display = (any || !v) ? '' : 'none';
+    if (v && any) d.open = true;
+  });
+});
+// 进度条 + 回到顶部
+var bar = document.getElementById('bar'), top = document.querySelector('.totop');
+function onScroll() {
+  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
+  var max = h.scrollHeight - h.clientHeight;
+  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  if (top) top.classList.toggle('on', y > 500);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+// 复制
+document.querySelectorAll('.codebox').forEach(function (box) {
+  var btn = box.querySelector('button'), pre = box.querySelector('pre');
+  if (!btn || !pre) return;
+  btn.addEventListener('click', function () {
+    var t = pre.innerText;
+    var done = function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
+    else {
+      var ta = document.createElement('textarea'); ta.value = t;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
+    }
+  });
+});
+// 主题（记住选择 + 跟随系统）
+var tb = document.getElementById('theme'), saved = null;
+try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
+if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function syncThemeBtn() {
+  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+syncThemeBtn();
+if (tb) tb.addEventListener('click', function () {
+  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  syncThemeBtn();
+  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
+});
+// 窄屏抽屉
+var mb = document.getElementById('menu');
+if (mb) {
+  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
+  document.querySelector('nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
+  });
+}
+// 目录高亮当前章节
+(function () {
+  var links = [].slice.call(document.querySelectorAll('nav a.item'));
+  var targets = links.map(function (a) {
+    var h = a.getAttribute('href') || '';
+    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
+    return id ? document.getElementById(id) : null;
+  });
+  if (!targets.some(Boolean)) return;
+  function mark() {
+    var y = scrollY + 130, idx = -1;
+    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
+  }
+  addEventListener('scroll', mark, { passive: true }); mark();
+})();
+</script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  if (!window.mermaid) {
+    nodes.forEach(function (el) {
+      el.insertAdjacentHTML('beforebegin',
+        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
+        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.textContent; pre.appendChild(code);
+      el.innerHTML = ''; el.appendChild(pre);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
+    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
+    state: { useMaxWidth: true } });
+  nodes.forEach(function (el, i) {
+    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
+      el.innerHTML = r.svg;
+    }).catch(function (e) {
+      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
+    });
+  });
+})();
+</script>
+</body></html>

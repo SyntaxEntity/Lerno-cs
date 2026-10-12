@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数据结构 · 线性表</title><style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
+  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
+  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
+  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
+  --radius:10px; --mw:780px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
+  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
+  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
+  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  text-rendering:optimizeLegibility;
+}
+/* ---------- 布局 ---------- */
+#wrap{display:flex;align-items:flex-start;min-height:100vh}
+nav{
+  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
+  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
+}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
+nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
+#q{
+  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
+}
+#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+nav .home{
+  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
+  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+}
+nav .home:hover{filter:brightness(.97)}
+details.grp{margin:2px 0}
+details.grp>summary{
+  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
+  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:var(--line2)}
+details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
+details.grp[open]>summary{color:var(--acc)}
+nav a.item{
+  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
+  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+nav a.item:hover{background:var(--line2);color:var(--fg)}
+nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
+/* ---------- 进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
+/* ---------- 标题 ---------- */
+h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
+h2{
+  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
+  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
+}
+h3{font-size:18px;margin:28px 0 12px}
+p{margin:0 0 14px}
+/* ---------- 知识点卡片 ---------- */
+.kp{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
+}
+.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
+/* ---------- 字段 ---------- */
+.fld{margin:24px 0 0}
+.lab{
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
+}
+.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
+.freq{
+  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
+  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
+}
+.freq b{color:var(--fg)}
+html[data-theme="dark"] .freq{color:#f2e8cc}
+/* 结论速记 → 公式卡 */
+ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.facts li{
+  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
+  padding:11px 15px;font-size:15px;margin:0;
+}
+ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
+/* 易错点 → 卡片 */
+ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.errs li{
+  position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
+}
+ul.errs li::before{
+  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
+  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
+}
+html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
+/* 解析 */
+blockquote{
+  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
+  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
+}
+blockquote p:last-child{margin-bottom:0}
+blockquote strong{color:var(--fg)}
+/* 真题题干 */
+.q-stem{
+  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
+}
+.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
+/* ---------- 代码 ---------- */
+code{
+  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
+  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  word-break:break-word;
+}
+.codebox{margin:14px 0}
+.codebox .bar{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
+}
+.codebox button{
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  border-radius:6px;padding:2px 9px;font-size:11.5px;
+}
+.codebox button:hover{border-color:var(--acc);color:var(--acc)}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow:auto;margin:0;
+}
+pre code{background:none;padding:0;font-size:13px;line-height:1.5}
+/* ASCII 示意图：深色面板，保证等宽对齐可读 */
+.codebox.ascii .bar{color:var(--fg2);font-weight:600}
+.codebox.ascii pre{
+  background:var(--dark);border-color:#000;color:var(--dark-fg);
+  font-size:12.5px;line-height:1.45;padding:18px;
+}
+.codebox.ascii pre code{color:var(--dark-fg)}
+/* Mermaid */
+.fig{margin:16px 0}
+.mermaid{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:16px;overflow:auto;text-align:center;min-height:44px;
+}
+.mermaid svg{max-width:100%;height:auto}
+.fig details{margin-top:8px}
+.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
+.fig summary:hover{color:var(--acc)}
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--line2)}
+/* ---------- 杂项 ---------- */
+.warn{
+  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
+  padding:11px 15px;font-size:14px;margin:14px 0;
+}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:40;
+}
+.totop.on{opacity:1;pointer-events:auto}
+.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
+#theme{
+  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
+}
+#menu{
+  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
+  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
+}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+/* ---------- 窄屏 ---------- */
+@media (max-width:1000px){
+  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
+      box-shadow:4px 0 22px rgba(0,0,0,.12)}
+  nav.open{transform:none}
+  main{padding:22px 18px 130px;max-width:none}
+  #menu{display:flex}
+  .kp{padding:20px 18px 24px}
+}
+/* ---------- 打印 ---------- */
+@media print{
+  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
+  body{background:#fff;font-size:11pt}
+  main{max-width:none;padding:0}
+  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
+  h2{break-after:avoid}
+  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
+  .mermaid{border-color:#ccc}
+  a{color:#000;text-decoration:none}
+}
+</style>
+<script src="../mermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<input id="q" placeholder="筛选知识点…" autocomplete="off">
+<a class="home" href="../index.html">⌂ 全科单页合集</a>
+<details class="grp" open><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
+<a class="item cur" href="../数据结构/01-线性表.html">线性表</a>
+<a class="item" href="../数据结构/02-顺序表与链表.html">顺序表与链表</a>
+<a class="item" href="../数据结构/03-栈与队列.html">栈与队列</a>
+<a class="item" href="../数据结构/04-树与二叉树.html">树与二叉树</a>
+<a class="item" href="../数据结构/05-图.html">图</a>
+<a class="item" href="../数据结构/06-查找.html">查找</a>
+<a class="item" href="../数据结构/07-排序.html">排序</a>
+</details>
+<details class="grp"><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
+<a class="item" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算</a>
+<a class="item" href="../计算机组成原理/02-存储系统.html">存储系统</a>
+<a class="item" href="../计算机组成原理/03-指令系统.html">指令系统</a>
+<a class="item" href="../计算机组成原理/04-中央处理器.html">中央处理器 CPU</a>
+<a class="item" href="../计算机组成原理/05-总线.html">总线</a>
+<a class="item" href="../计算机组成原理/06-输入输出系统.html">输入输出系统</a>
+</details>
+<details class="grp"><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
+<a class="item" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<a class="item" href="../操作系统/02-进程与线程.html">进程与线程</a>
+<a class="item" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
+<a class="item" href="../操作系统/04-同步与互斥.html">同步与互斥</a>
+<a class="item" href="../操作系统/05-内存管理.html">内存管理</a>
+<a class="item" href="../操作系统/06-文件管理.html">文件管理</a>
+<a class="item" href="../操作系统/07-输入输出管理.html">输入输出管理</a>
+</details>
+<details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
+<a class="item" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
+<a class="item" href="../计算机网络/02-物理层.html">物理层</a>
+<a class="item" href="../计算机网络/03-数据链路层.html">数据链路层</a>
+<a class="item" href="../计算机网络/04-网络层.html">网络层</a>
+<a class="item" href="../计算机网络/05-传输层.html">传输层</a>
+<a class="item" href="../计算机网络/06-应用层.html">应用层</a>
+</details></nav><main><h1>数据结构 ｜ 线性表</h1><h1 id="_1">数据结构 · 线性表</h1>
+<h2 id="_2" id="kp">线性表 [高频]</h2>
+<p class="freq"><b>考频</b>　考察次数 24 次；涉及年份：2009—2025 年多次出现，其中 2010、2013、2016、2019、2021、2023 年为典型年份；分数占比约 8%；主要题型：选择题为主，偶见于综合应用题背景。</p>
+<p class="lab">核心讲解</p>
+<p>线性表是 <code>n</code> 个数据元素的有限序列，元素之间是<strong>一对一</strong>的逻辑关系，除首尾外每个元素有且仅有一个直接前驱和一个直接后继。顺序存储把逻辑相邻的元素放在物理相邻的存储单元，因而支持<strong>随机存取</strong>：<code>LOC(a_i) = LOC(a_1) + (i-1) * L</code>，其中 <code>L</code> 是单个元素占用的字节数。设表长 <code>n</code>、数组容量 <code>MaxSize</code>，则<strong>长度是实际元素个数、容量是数组能容纳的最大个数</strong>，两者不可混用。插入的合法位置是 <code>1..n+1</code>，在第 <code>i</code> 个位置插入需把第 <code>i..n</code> 个元素整体后移，移动次数为 <code>n-i+1</code>；</p>
+<p>等概率（<code>p_i = 1/(n+1)</code>）下平均移动次数为 <code>n/2</code>。删除的合法位置是 <code>1..n</code>，删除第 <code>i</code> 个元素需把第 <code>i+1..n</code> 个元素整体前移，移动次数为 <code>n-i</code>；等概率（<code>p_i = 1/n</code>）下平均移动次数为 <code>(n-1)/2</code>。因为插入删除都可能搬动近乎全部元素，顺序表插入与删除的时间复杂度均为 <code>O(n)</code>；而按位查找是 <code>O(1)</code>，按值查找在无序表中是 <code>O(n)</code>。</p>
+<p class="lab">关键结论速记</p><ul class="facts">
+<li><code>LOC(a_i) = LOC(a_1) + (i-1) * L</code> —— 顺序表随机存取的根据；位序 <code>i</code> 从 1 开始，数组下标从 0 开始，故下标为 <code>i-1</code>。</li>
+<li><code>插入移动次数 = n - i + 1</code>（<code>1 &lt;= i &lt;= n+1</code>），等概率平均 <code>n/2</code> —— 插入位置越靠前移动越多。</li>
+<li><code>删除移动次数 = n - i</code>（<code>1 &lt;= i &lt;= n</code>），等概率平均 <code>(n-1)/2</code> —— 删除位置越靠前移动越多。</li>
+<li><code>顺序表按位查找 O(1)、按值查找 O(n)</code> —— "随机存取"只针对按位访问，不等于查找快。</li>
+<li><code>表长 length 与容量 MaxSize 是两个量</code> —— 判空看 <code>length == 0</code>，判满看 <code>length == MaxSize</code>。</li>
+</ul>
+<p class="lab">示意图</p>
+<p>顺序表在内存中是一段连续空间，<code>data[0..length-1]</code> 有效，尾部是未使用区；插入是"从后往前搬"，删除是"从前往后搬"。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>sequential list: data[0..MaxSize-1], length = 5, MaxSize = 8
+
+   index    0     1     2     3     4     5     6     7
+          +-----+-----+-----+-----+-----+-----+-----+-----+
+   data   | a1  | a2  | a3  | a4  | a5  |     |     |     |
+          +-----+-----+-----+-----+-----+-----+-----+-----+
+          |&lt;------- length = 5 -------&gt;|&lt;-- free space ---&gt;|
+          ^
+          LOC(a1) = base
+          LOC(ai) = base + (i-1) * L
+
+insert x at position 3 (n = 5): move a3,a4,a5 right, count = n-i+1 = 3
+
+   before: | a1 | a2 | a3 | a4 | a5 |    |
+   step1 : | a1 | a2 | a3 | a4 |    | a5 |
+   step2 : | a1 | a2 | a3 |    | a4 | a5 |
+   step3 : | a1 | a2 |    | a3 | a4 | a5 |
+   write : | a1 | a2 | x  | a3 | a4 | a5 |   length = 6
+
+delete position 3 (n = 5): move a4,a5 left, count = n-i = 2
+
+   before: | a1 | a2 | a3 | a4 | a5 |
+   step1 : | a1 | a2 | a4 | a4 | a5 |
+   step2 : | a1 | a2 | a4 | a5 | a5 |
+   write : | a1 | a2 | a4 | a5 |    |   length = 4
+</code></pre></div>
+<p>顺序表与链表的选择不是"哪个更好"，而是按操作分布决定；下图给出考场判断路径。</p>
+<div class="fig"><div class="mermaid" data-src="flowchart TD
+    Start[&quot;需要选存储结构&quot;] --&gt; Q1{&quot;主要操作是哪种&quot;}
+    Q1 --&gt;|按位访问多 且 表长可预估| A1[&quot;顺序表 随机存取 O(1)&quot;]
+    Q1 --&gt;|频繁插入删除 且 表长变化大| Q2{&quot;能否预先知道大致规模&quot;}
+    Q2 --&gt;|能 且 改动集中在尾部| A1
+    Q2 --&gt;|不能 或 改动在头部中间| A2[&quot;链表 插入删除 O(1) 但需先定位&quot;]
+    A1 --&gt; Q3{&quot;是否需要按值频繁查找&quot;}
+    A2 --&gt; Q3
+    Q3 --&gt;|是 且 有序| A3[&quot;顺序表加折半查找 O(log n)&quot;]
+    Q3 --&gt;|是 且 无序| A4[&quot;两者都 O(n) 按空间与实现难度选&quot;]
+    Q3 --&gt;|否| A5[&quot;按插入删除位置分布决定&quot;]
+">flowchart TD
+    Start[&quot;需要选存储结构&quot;] --&gt; Q1{&quot;主要操作是哪种&quot;}
+    Q1 --&gt;|按位访问多 且 表长可预估| A1[&quot;顺序表 随机存取 O(1)&quot;]
+    Q1 --&gt;|频繁插入删除 且 表长变化大| Q2{&quot;能否预先知道大致规模&quot;}
+    Q2 --&gt;|能 且 改动集中在尾部| A1
+    Q2 --&gt;|不能 或 改动在头部中间| A2[&quot;链表 插入删除 O(1) 但需先定位&quot;]
+    A1 --&gt; Q3{&quot;是否需要按值频繁查找&quot;}
+    A2 --&gt; Q3
+    Q3 --&gt;|是 且 有序| A3[&quot;顺序表加折半查找 O(log n)&quot;]
+    Q3 --&gt;|是 且 无序| A4[&quot;两者都 O(n) 按空间与实现难度选&quot;]
+    Q3 --&gt;|否| A5[&quot;按插入删除位置分布决定&quot;]
+</div><details><summary>查看该图 mermaid 源码</summary><pre><code>flowchart TD
+    Start[&quot;需要选存储结构&quot;] --&gt; Q1{&quot;主要操作是哪种&quot;}
+    Q1 --&gt;|按位访问多 且 表长可预估| A1[&quot;顺序表 随机存取 O(1)&quot;]
+    Q1 --&gt;|频繁插入删除 且 表长变化大| Q2{&quot;能否预先知道大致规模&quot;}
+    Q2 --&gt;|能 且 改动集中在尾部| A1
+    Q2 --&gt;|不能 或 改动在头部中间| A2[&quot;链表 插入删除 O(1) 但需先定位&quot;]
+    A1 --&gt; Q3{&quot;是否需要按值频繁查找&quot;}
+    A2 --&gt; Q3
+    Q3 --&gt;|是 且 有序| A3[&quot;顺序表加折半查找 O(log n)&quot;]
+    Q3 --&gt;|是 且 无序| A4[&quot;两者都 O(n) 按空间与实现难度选&quot;]
+    Q3 --&gt;|否| A5[&quot;按插入删除位置分布决定&quot;]
+</code></pre></details></div>
+<p class="lab">易错点</p><ul class="errs">
+<li>位序与下标混用：题目说"第 <code>i</code> 个位置"时 <code>i</code> 从 1 开始，而代码里数组下标是 <code>i-1</code>；套公式时若直接代下标，移动次数会整体差 1，插入位置范围也会错写成 <code>0..n</code>。</li>
+<li>把顺序表的插入删除说成 <code>O(1)</code>：只有当插入/删除固定发生在表尾时才是 <code>O(1)</code>；等概率一般位置的平均移动次数是 <code>n/2</code> 与 <code>(n-1)/2</code>，时间复杂度是 <code>O(n)</code>。</li>
+<li>混淆"长度"与"容量"：<code>length</code> 是当前元素个数（决定合法位序范围与遍历边界），<code>MaxSize</code> 是数组容量（决定上溢条件）；判满条件是 <code>length == MaxSize</code>，不是 <code>length == MaxSize - 1</code>。</li>
+<li>误认为"随机存取"等于"查找快"：随机存取指用一次地址计算就能定位第 <code>i</code> 个元素，因此<strong>按位查找</strong>是 <code>O(1)</code>；按值查找仍需从头比较，无序表为 <code>O(n)</code>。</li>
+</ul>
+<p class="lab">真题示例</p>
+<p class="q-stem"><span class="q-src">2013 年 408 第 41 题（综合应用题，15 分）</span></p>
+<p>一个长度为 <code>L</code>（<code>L &gt;= 1</code>）的升序序列 <code>S</code>，处在第 <code>ceil(L/2)</code> 个位置的元素称为 <code>S</code> 的中位数。例如序列 <code>S1 = (11, 13, 15, 17, 19)</code> 的中位数是 15，两个序列的中位数是含它们所有元素的升序序列的中位数。现在有两个等长升序序列 <code>A</code> 和 <code>B</code>，设计一个在时间和空间两方面都尽可能高效的算法，找出两个序列 <code>A</code> 和 <code>B</code> 的中位数。要求：给出算法的基本设计思想；用 C 或 C++ 描述算法，关键之处给出注释；说明你所设计算法的时间复杂度与空间复杂度。</p>
+<blockquote>
+<p>解析：取 <code>A</code>、<code>B</code> 各自的中位数 <code>a = A[midA]</code>、<code>b = B[midB]</code>（<code>mid</code> 为 <code>ceil</code> 意义上的中间位置）。若 <code>a == b</code>，该值即为所求，结束。若 <code>a &lt; b</code>，则所求中位数只可能落在 <code>A</code> 的右半段与 <code>B</code> 的左半段（<code>A</code> 左半段与 <code>B</code> 右半段分别被排除，且两段被排除的元素个数相等，故中位数位置不变），于是令 <code>A</code> 的查找范围收缩为右半段、<code>B</code> 收缩为左半段；<code>a &gt; b</code> 时对称处理。每轮两个序列的候选长度都减半，故时间复杂度 <code>O(log n)</code>；只用若干下标与临时变量，空间复杂度 <code>O(1)</code>。这就是本题的满分答案框架：<strong>折半缩小两个有序序列的候选区间</strong>。</p>
+</blockquote>
+<hr /></main></div>
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script>
+// 侧栏筛选
+var q = document.getElementById('q');
+if (q) q.addEventListener('input', function () {
+  var v = this.value.trim().toLowerCase();
+  document.querySelectorAll('nav details.grp').forEach(function (d) {
+    var any = false;
+    d.querySelectorAll('a.item').forEach(function (a) {
+      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
+      a.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    d.style.display = (any || !v) ? '' : 'none';
+    if (v && any) d.open = true;
+  });
+});
+// 进度条 + 回到顶部
+var bar = document.getElementById('bar'), top = document.querySelector('.totop');
+function onScroll() {
+  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
+  var max = h.scrollHeight - h.clientHeight;
+  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  if (top) top.classList.toggle('on', y > 500);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+// 复制
+document.querySelectorAll('.codebox').forEach(function (box) {
+  var btn = box.querySelector('button'), pre = box.querySelector('pre');
+  if (!btn || !pre) return;
+  btn.addEventListener('click', function () {
+    var t = pre.innerText;
+    var done = function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
+    else {
+      var ta = document.createElement('textarea'); ta.value = t;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
+    }
+  });
+});
+// 主题（记住选择 + 跟随系统）
+var tb = document.getElementById('theme'), saved = null;
+try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
+if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function syncThemeBtn() {
+  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+syncThemeBtn();
+if (tb) tb.addEventListener('click', function () {
+  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  syncThemeBtn();
+  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
+});
+// 窄屏抽屉
+var mb = document.getElementById('menu');
+if (mb) {
+  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
+  document.querySelector('nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
+  });
+}
+// 目录高亮当前章节
+(function () {
+  var links = [].slice.call(document.querySelectorAll('nav a.item'));
+  var targets = links.map(function (a) {
+    var h = a.getAttribute('href') || '';
+    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
+    return id ? document.getElementById(id) : null;
+  });
+  if (!targets.some(Boolean)) return;
+  function mark() {
+    var y = scrollY + 130, idx = -1;
+    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
+  }
+  addEventListener('scroll', mark, { passive: true }); mark();
+})();
+</script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  if (!window.mermaid) {
+    nodes.forEach(function (el) {
+      el.insertAdjacentHTML('beforebegin',
+        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
+        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.textContent; pre.appendChild(code);
+      el.innerHTML = ''; el.appendChild(pre);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
+    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
+    state: { useMaxWidth: true } });
+  nodes.forEach(function (el, i) {
+    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
+      el.innerHTML = r.svg;
+    }).catch(function (e) {
+      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
+    });
+  });
+})();
+</script>
+</body></html>

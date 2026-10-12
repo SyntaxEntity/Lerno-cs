@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数据结构 · 树与二叉树</title><style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
+  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
+  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
+  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
+  --radius:10px; --mw:780px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
+  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
+  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
+  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  text-rendering:optimizeLegibility;
+}
+/* ---------- 布局 ---------- */
+#wrap{display:flex;align-items:flex-start;min-height:100vh}
+nav{
+  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
+  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
+}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
+nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
+#q{
+  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
+}
+#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+nav .home{
+  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
+  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+}
+nav .home:hover{filter:brightness(.97)}
+details.grp{margin:2px 0}
+details.grp>summary{
+  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
+  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:var(--line2)}
+details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
+details.grp[open]>summary{color:var(--acc)}
+nav a.item{
+  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
+  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+nav a.item:hover{background:var(--line2);color:var(--fg)}
+nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
+/* ---------- 进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
+/* ---------- 标题 ---------- */
+h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
+h2{
+  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
+  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
+}
+h3{font-size:18px;margin:28px 0 12px}
+p{margin:0 0 14px}
+/* ---------- 知识点卡片 ---------- */
+.kp{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
+}
+.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
+/* ---------- 字段 ---------- */
+.fld{margin:24px 0 0}
+.lab{
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
+}
+.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
+.freq{
+  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
+  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
+}
+.freq b{color:var(--fg)}
+html[data-theme="dark"] .freq{color:#f2e8cc}
+/* 结论速记 → 公式卡 */
+ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.facts li{
+  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
+  padding:11px 15px;font-size:15px;margin:0;
+}
+ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
+/* 易错点 → 卡片 */
+ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.errs li{
+  position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
+}
+ul.errs li::before{
+  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
+  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
+}
+html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
+/* 解析 */
+blockquote{
+  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
+  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
+}
+blockquote p:last-child{margin-bottom:0}
+blockquote strong{color:var(--fg)}
+/* 真题题干 */
+.q-stem{
+  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
+}
+.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
+/* ---------- 代码 ---------- */
+code{
+  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
+  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  word-break:break-word;
+}
+.codebox{margin:14px 0}
+.codebox .bar{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
+}
+.codebox button{
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  border-radius:6px;padding:2px 9px;font-size:11.5px;
+}
+.codebox button:hover{border-color:var(--acc);color:var(--acc)}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow:auto;margin:0;
+}
+pre code{background:none;padding:0;font-size:13px;line-height:1.5}
+/* ASCII 示意图：深色面板，保证等宽对齐可读 */
+.codebox.ascii .bar{color:var(--fg2);font-weight:600}
+.codebox.ascii pre{
+  background:var(--dark);border-color:#000;color:var(--dark-fg);
+  font-size:12.5px;line-height:1.45;padding:18px;
+}
+.codebox.ascii pre code{color:var(--dark-fg)}
+/* Mermaid */
+.fig{margin:16px 0}
+.mermaid{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:16px;overflow:auto;text-align:center;min-height:44px;
+}
+.mermaid svg{max-width:100%;height:auto}
+.fig details{margin-top:8px}
+.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
+.fig summary:hover{color:var(--acc)}
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--line2)}
+/* ---------- 杂项 ---------- */
+.warn{
+  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
+  padding:11px 15px;font-size:14px;margin:14px 0;
+}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:40;
+}
+.totop.on{opacity:1;pointer-events:auto}
+.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
+#theme{
+  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
+}
+#menu{
+  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
+  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
+}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+/* ---------- 窄屏 ---------- */
+@media (max-width:1000px){
+  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
+      box-shadow:4px 0 22px rgba(0,0,0,.12)}
+  nav.open{transform:none}
+  main{padding:22px 18px 130px;max-width:none}
+  #menu{display:flex}
+  .kp{padding:20px 18px 24px}
+}
+/* ---------- 打印 ---------- */
+@media print{
+  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
+  body{background:#fff;font-size:11pt}
+  main{max-width:none;padding:0}
+  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
+  h2{break-after:avoid}
+  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
+  .mermaid{border-color:#ccc}
+  a{color:#000;text-decoration:none}
+}
+</style>
+<script src="../mermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<input id="q" placeholder="筛选知识点…" autocomplete="off">
+<a class="home" href="../index.html">⌂ 全科单页合集</a>
+<details class="grp" open><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
+<a class="item" href="../数据结构/01-线性表.html">线性表</a>
+<a class="item" href="../数据结构/02-顺序表与链表.html">顺序表与链表</a>
+<a class="item" href="../数据结构/03-栈与队列.html">栈与队列</a>
+<a class="item cur" href="../数据结构/04-树与二叉树.html">树与二叉树</a>
+<a class="item" href="../数据结构/05-图.html">图</a>
+<a class="item" href="../数据结构/06-查找.html">查找</a>
+<a class="item" href="../数据结构/07-排序.html">排序</a>
+</details>
+<details class="grp"><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
+<a class="item" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算</a>
+<a class="item" href="../计算机组成原理/02-存储系统.html">存储系统</a>
+<a class="item" href="../计算机组成原理/03-指令系统.html">指令系统</a>
+<a class="item" href="../计算机组成原理/04-中央处理器.html">中央处理器 CPU</a>
+<a class="item" href="../计算机组成原理/05-总线.html">总线</a>
+<a class="item" href="../计算机组成原理/06-输入输出系统.html">输入输出系统</a>
+</details>
+<details class="grp"><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
+<a class="item" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<a class="item" href="../操作系统/02-进程与线程.html">进程与线程</a>
+<a class="item" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
+<a class="item" href="../操作系统/04-同步与互斥.html">同步与互斥</a>
+<a class="item" href="../操作系统/05-内存管理.html">内存管理</a>
+<a class="item" href="../操作系统/06-文件管理.html">文件管理</a>
+<a class="item" href="../操作系统/07-输入输出管理.html">输入输出管理</a>
+</details>
+<details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
+<a class="item" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
+<a class="item" href="../计算机网络/02-物理层.html">物理层</a>
+<a class="item" href="../计算机网络/03-数据链路层.html">数据链路层</a>
+<a class="item" href="../计算机网络/04-网络层.html">网络层</a>
+<a class="item" href="../计算机网络/05-传输层.html">传输层</a>
+<a class="item" href="../计算机网络/06-应用层.html">应用层</a>
+</details></nav><main><h1>数据结构 ｜ 树与二叉树</h1><h1 id="_1">数据结构 · 树与二叉树</h1>
+<h2 id="_2" id="kp">树与二叉树 [高频]</h2>
+<p class="freq"><b>考频</b>　考察次数 30 次；涉及年份：2009—2025 年几乎年年出现，2010、2014、2017、2019、2021、2022、2024 年为典型年份；分数占比约 16%；主要题型：选择题 + 综合应用题（41 题常考树/树的性质与算法）。</p>
+<p class="lab">核心讲解</p>
+<p>二叉树是每个结点至多两棵子树、且子树有左右之分的树；<strong>二叉树不是度为 2 的有序树</strong>，它允许结点只有右孩子而没有左孩子，这种形态在有序树中不存在。核心性质：非空二叉树第 <code>i</code> 层至多有 <code>2^(i-1)</code> 个结点；高度为 <code>h</code> 的二叉树至多有 <code>2^h - 1</code> 个结点；对任何非空二叉树有 <code>n0 = n2 + 1</code>（叶子数 = 度为 2 的结点数 + 1），该式由"结点总数 = <code>n0 + n1 + n2</code>"与"边数 = <code>n - 1 = n1 + 2*n2</code>"联立得到。</p>
+<p><strong>完全二叉树</strong>是只有最下层可以不满、且结点集中在左侧的二叉树，它最适合顺序存储：编号为 <code>i</code> 的结点，左孩子是 <code>2i</code>、右孩子是 <code>2i+1</code>、双亲是 <code>floor(i/2)</code>（<code>i &gt; 1</code>）。含 <code>n</code> 个结点的完全二叉树高度为 <code>h = floor(log2 n) + 1</code>，也等于 <code>ceil(log2(n+1))</code>，两式恒等。四种遍历中，<strong>中序</strong>最关键：中序遍历的访问次序是"左子树—根—右子树"，所以<strong>已知中序 + 前序（或后序、或层序）可以唯一确定二叉树，而前序 + 后序不能唯一确定</strong>。</p>
+<p>中序线索二叉树中，结点的前驱是"左子树最右下结点"（无左孩子时指向其前驱），后继是"右子树最左下结点"，这正是把递归遍历改成非递归、并实现 <code>O(1)</code> 空间找前驱后继的依据。树转二叉树的口诀是<strong>"左孩子右兄弟"</strong>：每个结点左指针指向第一个孩子，右指针指向下一个兄弟，于是树的先根遍历对应二叉树的先序遍历，树的后根遍历对应二叉树的中序遍历。哈夫曼树是带权路径长度 <code>WPL = sum(w_i * l_i)</code> 最小的二叉树，构造法是反复取两个最小权值合并，其<strong>不存在度为 1 的结点</strong>，故 <code>n</code> 个叶子的哈夫曼树共有 <code>2n - 1</code> 个结点。</p>
+<p class="lab">关键结论速记</p><ul class="facts">
+<li><code>n0 = n2 + 1</code> —— 用于"已知叶子数求度为 2 的结点数"，也用于判断某序列能否构成二叉树。</li>
+<li><code>完全二叉树高度 = floor(log2 n) + 1 = ceil(log2(n+1))</code> —— 两式等价，用来由结点数直接推高度。</li>
+<li><code>顺序存储下标关系：左 2i、右 2i+1、双亲 floor(i/2)</code> —— 仅对完全二叉树（或把一般二叉树按完全二叉树补空）成立。</li>
+<li><code>前序 + 中序 / 后序 + 中序 / 层序 + 中序 可唯一确定，前序 + 后序 不可</code> —— 中序提供左右子树的划分依据。</li>
+<li><code>哈夫曼树无度为 1 的结点</code> —— <code>n</code> 个叶子必有 <code>n-1</code> 个度为 2 的结点，总结点数 <code>2n-1</code>；编码不唯一，但 <code>WPL</code> 唯一。</li>
+<li><code>树转二叉树：左孩子右兄弟</code> —— 树的先根/后根遍历分别对应二叉树的先序/中序遍历。</li>
+</ul>
+<p class="lab">示意图</p>
+<p><strong>二叉树与完全二叉树的顺序存储</strong>：把结点按层、从左到右编号 1 开始，完全二叉树的编号连续无空洞，一般二叉树需补空占位。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>binary tree                        level-order numbering (1-based)
+            A  --------- depth 1      index:  1   2   3   4   5   6   7
+          /   \                            +---+---+---+---+---+---+---+
+         B     C  ------ depth 2     data: | A | B | C | D | E | F | G |
+        / \   / \                          +---+---+---+---+---+---+---+
+       D   E F   G  ---- depth 3     parent(i) = floor(i/2)
+                                     left(i)   = 2i
+  n = 7  n0 = 4  n1 = 0  n2 = 3      right(i)  = 2i + 1
+  check: n0 = n2 + 1  -&gt;  4 = 3 + 1
+
+four traversal orders of the same tree
+  preorder   A B D E C F G      root first
+  inorder    D B E A F C G      left root right
+  postorder  D E B F G C A      root last
+  level      A B C D E F G      queue based
+
+inorder threaded binary tree (dashed = thread, points to predecessor/successor)
+
+        D &lt;··· B ···&gt; E &lt;··· A ···&gt; F &lt;··· C ···&gt; G
+              /   \             /   \
+             D     E           F     G
+  first node of inorder = D (leftmost), last = G (rightmost)
+  node with no left child stores its predecessor in lchild
+  node with no right child stores its successor in rchild
+</code></pre></div>
+<p><strong>由前序 + 中序唯一还原二叉树</strong>的递归流程：前序首元素定根，中序中该元素的位置划分左右子树，两序列的左右段长度一一对应。</p>
+<div class="fig"><div class="mermaid" data-src="flowchart TD
+    S0[&quot;输入 pre 区间与 in 区间&quot;] --&gt; S1{&quot;区间为空&quot;}
+    S1 --&gt;|是| S2[&quot;返回空结点&quot;]
+    S1 --&gt;|否| S3[&quot;取 pre 首元素 r 作为根&quot;]
+    S3 --&gt; S4[&quot;在 in 中定位 r 得到下标 k&quot;]
+    S4 --&gt; S5[&quot;左子树长度 L = k - in_lo&quot;]
+    S5 --&gt; S6[&quot;pre 左段 in 左段 递归建左子树&quot;]
+    S5 --&gt; S7[&quot;pre 右段 in 右段 递归建右子树&quot;]
+    S6 --&gt; S8[&quot;根的左右指针接上 返回根&quot;]
+    S7 --&gt; S8
+">flowchart TD
+    S0[&quot;输入 pre 区间与 in 区间&quot;] --&gt; S1{&quot;区间为空&quot;}
+    S1 --&gt;|是| S2[&quot;返回空结点&quot;]
+    S1 --&gt;|否| S3[&quot;取 pre 首元素 r 作为根&quot;]
+    S3 --&gt; S4[&quot;在 in 中定位 r 得到下标 k&quot;]
+    S4 --&gt; S5[&quot;左子树长度 L = k - in_lo&quot;]
+    S5 --&gt; S6[&quot;pre 左段 in 左段 递归建左子树&quot;]
+    S5 --&gt; S7[&quot;pre 右段 in 右段 递归建右子树&quot;]
+    S6 --&gt; S8[&quot;根的左右指针接上 返回根&quot;]
+    S7 --&gt; S8
+</div><details><summary>查看该图 mermaid 源码</summary><pre><code>flowchart TD
+    S0[&quot;输入 pre 区间与 in 区间&quot;] --&gt; S1{&quot;区间为空&quot;}
+    S1 --&gt;|是| S2[&quot;返回空结点&quot;]
+    S1 --&gt;|否| S3[&quot;取 pre 首元素 r 作为根&quot;]
+    S3 --&gt; S4[&quot;在 in 中定位 r 得到下标 k&quot;]
+    S4 --&gt; S5[&quot;左子树长度 L = k - in_lo&quot;]
+    S5 --&gt; S6[&quot;pre 左段 in 左段 递归建左子树&quot;]
+    S5 --&gt; S7[&quot;pre 右段 in 右段 递归建右子树&quot;]
+    S6 --&gt; S8[&quot;根的左右指针接上 返回根&quot;]
+    S7 --&gt; S8
+</code></pre></details></div>
+<p class="lab">易错点</p><ul class="errs">
+<li>把"二叉树"当成"度为 2 的有序树"：度为 2 的有序树要求每个结点要么没有孩子要么有两个孩子，而二叉树的结点可以有 1 个孩子且区分左右；<code>n0 = n2 + 1</code> 只对二叉树成立。</li>
+<li>由遍历序列还原时用错组合：只有含<strong>中序</strong>的组合才能唯一确定；前序 + 后序无法区分"只有左孩子"与"只有右孩子"的结点，必须结合中序或层序。</li>
+<li>完全二叉树高度公式记错：<code>h = floor(log2 n) + 1</code>；若误写成 <code>ceil(log2 n)</code>，在 <code>n = 8</code> 时会得到 3（正确是 4）。</li>
+<li>混淆树与对应二叉树的遍历对应关系：树的<strong>先根</strong>遍历对应二叉树<strong>先序</strong>，树的后根遍历对应二叉树<strong>中序</strong>；把"后根对应后序"记成对应关系是最常见的失分点。</li>
+</ul>
+<p class="lab">真题示例</p>
+<p class="q-stem"><span class="q-src">2014 年 408 第 41 题（综合应用题，13 分）</span></p>
+<p>二叉树的带权路径长度（WPL）是二叉树中所有叶结点的带权路径长度之和。给定一棵二叉树 <code>T</code>，采用二叉链表存储，结点结构为 <code>[left | weight | right]</code>，请设计求 <code>T</code> 的 WPL 的算法。要求：给出算法的基本设计思想；使用 C 或 C++ 给出二叉树结点的数据类型定义；根据设计思想，采用 C 或 C++ 描述算法，关键之处给出注释。</p>
+<blockquote>
+<p>解析：设计思想是<strong>递归传递深度</strong>——叶结点的带权路径长度是"权值 × 从根到该叶结点的边数（深度）"，因此递归时携带当前深度 <code>deep</code>，遇到叶子就累加 <code>weight * deep</code>，否则分别递归左右子树并把 <code>deep</code> 加 1。结点类型定义为 <code>typedef struct BiTNode { int weight; struct BiTNode *left, *right; } BiTNode, *BiTree;</code>。算法用引用型累加变量 <code>wpl</code>：若 <code>T</code> 为空返回；若 <code>T-&gt;left == NULL &amp;&amp; T-&gt;right == NULL</code> 则 <code>wpl += T-&gt;weight * deep</code>；否则递归 <code>T-&gt;left</code> 与 <code>T-&gt;right</code>，深度参数传入 <code>deep + 1</code>。时间复杂度 <code>O(n)</code>（每个结点访问一次），空间复杂度 <code>O(h)</code>（递归栈深度为树高 <code>h</code>）。<strong>判分要点是"深度由参数携带"而不是在结点里存层次，以及只对叶结点累加。</strong></p>
+</blockquote>
+<hr /></main></div>
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script>
+// 侧栏筛选
+var q = document.getElementById('q');
+if (q) q.addEventListener('input', function () {
+  var v = this.value.trim().toLowerCase();
+  document.querySelectorAll('nav details.grp').forEach(function (d) {
+    var any = false;
+    d.querySelectorAll('a.item').forEach(function (a) {
+      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
+      a.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    d.style.display = (any || !v) ? '' : 'none';
+    if (v && any) d.open = true;
+  });
+});
+// 进度条 + 回到顶部
+var bar = document.getElementById('bar'), top = document.querySelector('.totop');
+function onScroll() {
+  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
+  var max = h.scrollHeight - h.clientHeight;
+  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  if (top) top.classList.toggle('on', y > 500);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+// 复制
+document.querySelectorAll('.codebox').forEach(function (box) {
+  var btn = box.querySelector('button'), pre = box.querySelector('pre');
+  if (!btn || !pre) return;
+  btn.addEventListener('click', function () {
+    var t = pre.innerText;
+    var done = function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
+    else {
+      var ta = document.createElement('textarea'); ta.value = t;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
+    }
+  });
+});
+// 主题（记住选择 + 跟随系统）
+var tb = document.getElementById('theme'), saved = null;
+try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
+if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function syncThemeBtn() {
+  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+syncThemeBtn();
+if (tb) tb.addEventListener('click', function () {
+  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  syncThemeBtn();
+  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
+});
+// 窄屏抽屉
+var mb = document.getElementById('menu');
+if (mb) {
+  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
+  document.querySelector('nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
+  });
+}
+// 目录高亮当前章节
+(function () {
+  var links = [].slice.call(document.querySelectorAll('nav a.item'));
+  var targets = links.map(function (a) {
+    var h = a.getAttribute('href') || '';
+    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
+    return id ? document.getElementById(id) : null;
+  });
+  if (!targets.some(Boolean)) return;
+  function mark() {
+    var y = scrollY + 130, idx = -1;
+    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
+  }
+  addEventListener('scroll', mark, { passive: true }); mark();
+})();
+</script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  if (!window.mermaid) {
+    nodes.forEach(function (el) {
+      el.insertAdjacentHTML('beforebegin',
+        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
+        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.textContent; pre.appendChild(code);
+      el.innerHTML = ''; el.appendChild(pre);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
+    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
+    state: { useMaxWidth: true } });
+  nodes.forEach(function (el, i) {
+    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
+      el.innerHTML = r.svg;
+    }).catch(function (e) {
+      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
+    });
+  });
+})();
+</script>
+</body></html>

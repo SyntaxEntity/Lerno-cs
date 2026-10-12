@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>数据结构 · 排序</title><style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
+  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
+  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
+  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
+  --radius:10px; --mw:780px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
+  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
+  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
+  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  text-rendering:optimizeLegibility;
+}
+/* ---------- 布局 ---------- */
+#wrap{display:flex;align-items:flex-start;min-height:100vh}
+nav{
+  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
+  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
+}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
+nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
+#q{
+  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
+}
+#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+nav .home{
+  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
+  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+}
+nav .home:hover{filter:brightness(.97)}
+details.grp{margin:2px 0}
+details.grp>summary{
+  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
+  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:var(--line2)}
+details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
+details.grp[open]>summary{color:var(--acc)}
+nav a.item{
+  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
+  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+nav a.item:hover{background:var(--line2);color:var(--fg)}
+nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
+/* ---------- 进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
+/* ---------- 标题 ---------- */
+h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
+h2{
+  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
+  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
+}
+h3{font-size:18px;margin:28px 0 12px}
+p{margin:0 0 14px}
+/* ---------- 知识点卡片 ---------- */
+.kp{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
+}
+.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
+/* ---------- 字段 ---------- */
+.fld{margin:24px 0 0}
+.lab{
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
+}
+.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
+.freq{
+  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
+  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
+}
+.freq b{color:var(--fg)}
+html[data-theme="dark"] .freq{color:#f2e8cc}
+/* 结论速记 → 公式卡 */
+ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.facts li{
+  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
+  padding:11px 15px;font-size:15px;margin:0;
+}
+ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
+/* 易错点 → 卡片 */
+ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.errs li{
+  position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
+}
+ul.errs li::before{
+  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
+  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
+}
+html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
+/* 解析 */
+blockquote{
+  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
+  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
+}
+blockquote p:last-child{margin-bottom:0}
+blockquote strong{color:var(--fg)}
+/* 真题题干 */
+.q-stem{
+  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
+}
+.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
+/* ---------- 代码 ---------- */
+code{
+  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
+  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  word-break:break-word;
+}
+.codebox{margin:14px 0}
+.codebox .bar{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
+}
+.codebox button{
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  border-radius:6px;padding:2px 9px;font-size:11.5px;
+}
+.codebox button:hover{border-color:var(--acc);color:var(--acc)}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow:auto;margin:0;
+}
+pre code{background:none;padding:0;font-size:13px;line-height:1.5}
+/* ASCII 示意图：深色面板，保证等宽对齐可读 */
+.codebox.ascii .bar{color:var(--fg2);font-weight:600}
+.codebox.ascii pre{
+  background:var(--dark);border-color:#000;color:var(--dark-fg);
+  font-size:12.5px;line-height:1.45;padding:18px;
+}
+.codebox.ascii pre code{color:var(--dark-fg)}
+/* Mermaid */
+.fig{margin:16px 0}
+.mermaid{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:16px;overflow:auto;text-align:center;min-height:44px;
+}
+.mermaid svg{max-width:100%;height:auto}
+.fig details{margin-top:8px}
+.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
+.fig summary:hover{color:var(--acc)}
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--line2)}
+/* ---------- 杂项 ---------- */
+.warn{
+  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
+  padding:11px 15px;font-size:14px;margin:14px 0;
+}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:40;
+}
+.totop.on{opacity:1;pointer-events:auto}
+.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
+#theme{
+  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
+}
+#menu{
+  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
+  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
+}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+/* ---------- 窄屏 ---------- */
+@media (max-width:1000px){
+  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
+      box-shadow:4px 0 22px rgba(0,0,0,.12)}
+  nav.open{transform:none}
+  main{padding:22px 18px 130px;max-width:none}
+  #menu{display:flex}
+  .kp{padding:20px 18px 24px}
+}
+/* ---------- 打印 ---------- */
+@media print{
+  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
+  body{background:#fff;font-size:11pt}
+  main{max-width:none;padding:0}
+  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
+  h2{break-after:avoid}
+  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
+  .mermaid{border-color:#ccc}
+  a{color:#000;text-decoration:none}
+}
+</style>
+<script src="../mermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<input id="q" placeholder="筛选知识点…" autocomplete="off">
+<a class="home" href="../index.html">⌂ 全科单页合集</a>
+<details class="grp" open><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
+<a class="item" href="../数据结构/01-线性表.html">线性表</a>
+<a class="item" href="../数据结构/02-顺序表与链表.html">顺序表与链表</a>
+<a class="item" href="../数据结构/03-栈与队列.html">栈与队列</a>
+<a class="item" href="../数据结构/04-树与二叉树.html">树与二叉树</a>
+<a class="item" href="../数据结构/05-图.html">图</a>
+<a class="item" href="../数据结构/06-查找.html">查找</a>
+<a class="item cur" href="../数据结构/07-排序.html">排序</a>
+</details>
+<details class="grp"><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
+<a class="item" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算</a>
+<a class="item" href="../计算机组成原理/02-存储系统.html">存储系统</a>
+<a class="item" href="../计算机组成原理/03-指令系统.html">指令系统</a>
+<a class="item" href="../计算机组成原理/04-中央处理器.html">中央处理器 CPU</a>
+<a class="item" href="../计算机组成原理/05-总线.html">总线</a>
+<a class="item" href="../计算机组成原理/06-输入输出系统.html">输入输出系统</a>
+</details>
+<details class="grp"><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
+<a class="item" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<a class="item" href="../操作系统/02-进程与线程.html">进程与线程</a>
+<a class="item" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
+<a class="item" href="../操作系统/04-同步与互斥.html">同步与互斥</a>
+<a class="item" href="../操作系统/05-内存管理.html">内存管理</a>
+<a class="item" href="../操作系统/06-文件管理.html">文件管理</a>
+<a class="item" href="../操作系统/07-输入输出管理.html">输入输出管理</a>
+</details>
+<details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
+<a class="item" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
+<a class="item" href="../计算机网络/02-物理层.html">物理层</a>
+<a class="item" href="../计算机网络/03-数据链路层.html">数据链路层</a>
+<a class="item" href="../计算机网络/04-网络层.html">网络层</a>
+<a class="item" href="../计算机网络/05-传输层.html">传输层</a>
+<a class="item" href="../计算机网络/06-应用层.html">应用层</a>
+</details></nav><main><h1>数据结构 ｜ 排序</h1><h1 id="_1">数据结构 · 排序</h1>
+<h2 id="_2" id="kp">排序 [高频]</h2>
+<p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2009、2010、2012、2014、2016、2018、2020、2022、2024、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（外部排序、堆、快排过程）。</p>
+<p class="lab">核心讲解</p>
+<p>排序算法按思想分为五类：<strong>插入类</strong>（直接插入、折半插入、希尔）、<strong>交换类</strong>（冒泡、快速）、<strong>选择类</strong>（简单选择、堆）、<strong>归并类</strong>、<strong>基数类</strong>。直接插入排序把第 <code>i</code> 个元素插入前面已排好的子序列，最好情况（已有序）比较 <code>n-1</code> 次、移动 0 次即 <code>O(n)</code>，最坏与平均为 <code>O(n^2)</code>，稳定，且<strong>比较次数与初始序列有关</strong>。</p>
+<p>希尔排序按增量分组做插入排序，增量逐次折半到 1，平均约 <code>O(n^1.3)</code>，<strong>不稳定</strong>，且时间与增量序列的选取有关。冒泡排序每趟把最大元素"冒"到末尾，最好 <code>O(n)</code>（设置交换标志）、最坏 <code>O(n^2)</code>，稳定。<strong>快速排序</strong>每趟以枢轴划分，平均 <code>O(n log n)</code>、最坏 <code>O(n^2)</code>（当序列<strong>基本有序</strong>或枢轴总取到最值时），平均与最好空间 <code>O(log n)</code>（递归栈）、最坏 <code>O(n)</code>，<strong>不稳定</strong>；</p>
+<p>快排是所有内部排序中平均性能最优的，但退化时不如堆排序。<strong>堆排序</strong>先把数组建成大根堆（建堆时间 <code>O(n)</code>），再反复"取堆顶与末尾交换 + 向下调整"，每次调整 <code>O(log n)</code>，总时间 <code>O(n log n)</code>（最好、最坏、平均都一样），空间 <code>O(1)</code>，<strong>不稳定</strong>；堆是"完全二叉树的顺序存储"，<code>i</code> 的左右孩子是 <code>2i</code> 与 <code>2i+1</code>。<strong>归并排序</strong>自底向上或自顶向下合并有序段，时间恒为 <code>O(n log n)</code>、需要 <code>O(n)</code> 辅助空间、<strong>稳定</strong>。<strong>基数排序</strong>按位从低位到高位分配与收集，时间 <code>O(d(n+r))</code>、空间 <code>O(r)</code>、<strong>稳定</strong>。</p>
+<p><strong>外部排序</strong>受内存限制，核心是减少归并趟数 <code>S = ceil(log_k m)</code>（<code>m</code> 为初始归并段数、<code>k</code> 为归并路数）：用<strong>置换-选择排序</strong>生成更长的初始归并段以减少 <code>m</code>，用<strong>败者树</strong>把 <code>k</code> 路归并中每次选最小的比较次数从 <code>k-1</code> 降到 <code>ceil(log2 k)</code>，用<strong>最佳归并树</strong>（哈夫曼思想）为长度不等的归并段安排归并次序以最小化读写次数，并可通过增加虚段构造严格的 <code>k</code> 叉哈夫曼树。</p>
+<p class="lab">关键结论速记</p><ul class="facts">
+<li><code>不稳定的排序：快排、希尔、简单选择、堆</code> —— 口诀"快些选堆"；插入、冒泡、归并、基数排序稳定。</li>
+<li><code>与初始序列有关的：插入、冒泡、快排、希尔</code> —— 堆排序、归并排序、基数排序的时间与初始序列无关。</li>
+<li><code>快排最坏 O(n^2) 出现在基本有序时，空间最坏 O(n)</code> —— 枢轴选最值导致划分极不平衡。</li>
+<li><code>堆排序建堆 O(n)、单次调整 O(log n)、总计 O(n log n)、空间 O(1)</code> —— 建堆不是 <code>O(n log n)</code>，这是常考细节。</li>
+<li><code>归并 O(n log n) 稳定但需 O(n) 空间</code> —— 是"稳定 + 最坏也是 O(n log n)"的首选；基数排序 <code>O(d(n+r))</code> 稳定，但要求关键字可分解为有限位。</li>
+<li><code>外部排序：S = ceil(log_k m)</code>、败者树使单次选最小的比较次数降为 ceil(log2 k)<code>—— 减少</code>S<code>的两条路是增大</code>k<code>或减少</code>m`。</li>
+</ul>
+<p class="lab">示意图</p>
+<p><strong>大根堆的数组表示与"筛选（向下调整）"过程</strong>：堆在数组中按下标 <code>1..n</code> 存储，<code>i</code> 的孩子为 <code>2i</code>、<code>2i+1</code>；输出堆顶后把末尾元素放到根，再与较大的孩子交换，逐层下沉。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>array (1-based):  [ 87, 45, 78, 32, 17, 65, 53 ]
+index:              1   2   3   4   5   6   7
+
+tree view:
+                  87(1)
+                /       \
+            45(2)       78(3)
+            /    \      /    \
+        32(4)  17(5) 65(6)  53(7)
+
+after swapping root 87 with last element 53, then sift down
+
+  step 0:      53          step 1:     78           step 2:     78
+             /    \                  /    \                   /    \
+           45      78              45      53               45      65
+          /  \    /               /  \    /                /  \    /
+        32   17  65              32   17 65               32   17  53
+  (53 &lt; 78, swap)          (53 &lt; 65, swap)          heap restored
+
+heapsort = build heap O(n) + n-1 times (swap + sift down) each O(log n)
+</code></pre></div>
+<p><strong>快速排序的一趟划分（Hoare 划分）</strong>：枢轴暂存后，右指针左移找小于枢轴的元素填到左坑，左指针右移找大于枢轴的元素填到右坑，直到两指针相遇，把枢轴放入该位置。</p>
+<div class="fig"><div class="mermaid" data-src="flowchart TD
+    Q0[&quot;取区间首元素为枢轴 pivot 暂存&quot;] --&gt; Q1[&quot;low 指向区间首 high 指向区间尾&quot;]
+    Q1 --&gt; Q2{&quot;low 小于 high&quot;}
+    Q2 --&gt;|否| Q7[&quot;把 pivot 放入 low 位置 返回 low&quot;]
+    Q2 --&gt;|是| Q3[&quot;high 左移 直到 data high 小于 pivot 或 low 等于 high&quot;]
+    Q3 --&gt; Q4[&quot;data low 等于 data high&quot;]
+    Q4 --&gt; Q5[&quot;low 右移 直到 data low 大于等于 pivot 或 low 等于 high&quot;]
+    Q5 --&gt; Q6[&quot;data high 等于 data low&quot;]
+    Q6 --&gt; Q2
+    Q7 --&gt; Q8[&quot;对左右两个子区间递归划分&quot;]
+">flowchart TD
+    Q0[&quot;取区间首元素为枢轴 pivot 暂存&quot;] --&gt; Q1[&quot;low 指向区间首 high 指向区间尾&quot;]
+    Q1 --&gt; Q2{&quot;low 小于 high&quot;}
+    Q2 --&gt;|否| Q7[&quot;把 pivot 放入 low 位置 返回 low&quot;]
+    Q2 --&gt;|是| Q3[&quot;high 左移 直到 data high 小于 pivot 或 low 等于 high&quot;]
+    Q3 --&gt; Q4[&quot;data low 等于 data high&quot;]
+    Q4 --&gt; Q5[&quot;low 右移 直到 data low 大于等于 pivot 或 low 等于 high&quot;]
+    Q5 --&gt; Q6[&quot;data high 等于 data low&quot;]
+    Q6 --&gt; Q2
+    Q7 --&gt; Q8[&quot;对左右两个子区间递归划分&quot;]
+</div><details><summary>查看该图 mermaid 源码</summary><pre><code>flowchart TD
+    Q0[&quot;取区间首元素为枢轴 pivot 暂存&quot;] --&gt; Q1[&quot;low 指向区间首 high 指向区间尾&quot;]
+    Q1 --&gt; Q2{&quot;low 小于 high&quot;}
+    Q2 --&gt;|否| Q7[&quot;把 pivot 放入 low 位置 返回 low&quot;]
+    Q2 --&gt;|是| Q3[&quot;high 左移 直到 data high 小于 pivot 或 low 等于 high&quot;]
+    Q3 --&gt; Q4[&quot;data low 等于 data high&quot;]
+    Q4 --&gt; Q5[&quot;low 右移 直到 data low 大于等于 pivot 或 low 等于 high&quot;]
+    Q5 --&gt; Q6[&quot;data high 等于 data low&quot;]
+    Q6 --&gt; Q2
+    Q7 --&gt; Q8[&quot;对左右两个子区间递归划分&quot;]
+</code></pre></details></div>
+<p class="lab">易错点</p><ul class="errs">
+<li>把堆排序说成稳定：堆排序在"堆顶与末尾交换"时会跨越多个元素，等值元素的相对次序被破坏，属于<strong>不稳定</strong>排序；稳定且 <code>O(n log n)</code> 的只有归并排序（基数排序对位数有限制）。</li>
+<li>认为快排最坏情况与初始序列无关：快排最坏 <code>O(n^2)</code> 恰好发生在<strong>初始序列基本有序</strong>（或逆序）时，此时每次划分都极不平衡；而堆排序、归并排序的时间与初始序列无关。</li>
+<li>混淆"建堆"与"排序"的复杂度：自底向上建堆只要 <code>O(n)</code>（从 <code>floor(n/2)</code> 号开始向前调整），但对每个元素做一次 <code>O(log n)</code> 的调整为 <code>O(n log n)</code>；若把建堆写成 <code>O(n log n)</code> 就会误判总复杂度。</li>
+<li>外部排序归并趟数忘记向上取整：<code>S = ceil(log_k m)</code>，且为减少 <code>S</code> 可以<strong>增大 k 或减少 m</strong>；用败者树可让 <code>k</code> 路归并每次选最小的比较次数为 <code>ceil(log2 k)</code> 而不是 <code>k-1</code>。</li>
+</ul>
+<p class="lab">真题示例</p>
+<p class="q-stem"><span class="q-src">2016 年真题改编（综合应用题，15 分）</span></p>
+<p>已知由 <code>n</code>（<code>n &gt;= 2</code>）个正整数构成的集合 <code>A = {a_k | 0 &lt;= k &lt; n}</code>，将其所有元素依次划分成两个子集 <code>A1</code> 和 <code>A2</code>，且 <code>A1</code> 中元素个数为 <code>n1</code>。设计一个尽可能高效的划分算法，满足 <code>|n1 - n2|</code> 最小且 <code>|sum(A1) - sum(A2)|</code> 最大，要求：给出算法的基本设计思想；根据设计思想，采用 C 或 C++ 描述算法，关键之处给出注释；说明你所设计算法的时间复杂度和空间复杂度。</p>
+<blockquote>
+<p>解析：<strong>先排序、再对半分</strong>是最直接的满足两个条件的做法：排序后取前 <code>floor(n/2)</code> 个元素作为 <code>A1</code>、其余作为 <code>A2</code>，则两子集元素个数之差最小（<code>n</code> 为偶数时为 0，为奇数时为 1），且由于序列有序，"最小的一半之和"与"最大的一半之和"之差达到最大。用快速排序实现时平均时间复杂度 <code>O(n log n)</code>、空间复杂度 <code>O(log n)</code>。<strong>更高分的做法是基于快排划分的"部分选择"</strong>：只要求出中位数位置并保证其左侧元素都不大于右侧即可，只需一次递归的单侧划分，期望时间 <code>O(n)</code>（最坏 <code>O(n^2)</code>）、空间 <code>O(1)</code>；这体现了"不需要完全有序、只需第 <code>floor(n/2)</code> 位置就位"的优化思想，是本题的满分思路。</p>
+</blockquote>
+<hr /></main></div>
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script>
+// 侧栏筛选
+var q = document.getElementById('q');
+if (q) q.addEventListener('input', function () {
+  var v = this.value.trim().toLowerCase();
+  document.querySelectorAll('nav details.grp').forEach(function (d) {
+    var any = false;
+    d.querySelectorAll('a.item').forEach(function (a) {
+      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
+      a.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    d.style.display = (any || !v) ? '' : 'none';
+    if (v && any) d.open = true;
+  });
+});
+// 进度条 + 回到顶部
+var bar = document.getElementById('bar'), top = document.querySelector('.totop');
+function onScroll() {
+  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
+  var max = h.scrollHeight - h.clientHeight;
+  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  if (top) top.classList.toggle('on', y > 500);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+// 复制
+document.querySelectorAll('.codebox').forEach(function (box) {
+  var btn = box.querySelector('button'), pre = box.querySelector('pre');
+  if (!btn || !pre) return;
+  btn.addEventListener('click', function () {
+    var t = pre.innerText;
+    var done = function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
+    else {
+      var ta = document.createElement('textarea'); ta.value = t;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
+    }
+  });
+});
+// 主题（记住选择 + 跟随系统）
+var tb = document.getElementById('theme'), saved = null;
+try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
+if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function syncThemeBtn() {
+  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+syncThemeBtn();
+if (tb) tb.addEventListener('click', function () {
+  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  syncThemeBtn();
+  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
+});
+// 窄屏抽屉
+var mb = document.getElementById('menu');
+if (mb) {
+  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
+  document.querySelector('nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
+  });
+}
+// 目录高亮当前章节
+(function () {
+  var links = [].slice.call(document.querySelectorAll('nav a.item'));
+  var targets = links.map(function (a) {
+    var h = a.getAttribute('href') || '';
+    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
+    return id ? document.getElementById(id) : null;
+  });
+  if (!targets.some(Boolean)) return;
+  function mark() {
+    var y = scrollY + 130, idx = -1;
+    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
+  }
+  addEventListener('scroll', mark, { passive: true }); mark();
+})();
+</script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  if (!window.mermaid) {
+    nodes.forEach(function (el) {
+      el.insertAdjacentHTML('beforebegin',
+        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
+        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.textContent; pre.appendChild(code);
+      el.innerHTML = ''; el.appendChild(pre);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
+    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
+    state: { useMaxWidth: true } });
+  nodes.forEach(function (el, i) {
+    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
+      el.innerHTML = r.svg;
+    }).catch(function (e) {
+      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
+    });
+  });
+})();
+</script>
+</body></html>

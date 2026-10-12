@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>操作系统 · 同步与互斥</title><style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
+  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
+  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
+  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
+  --radius:10px; --mw:780px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
+  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
+  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
+  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  text-rendering:optimizeLegibility;
+}
+/* ---------- 布局 ---------- */
+#wrap{display:flex;align-items:flex-start;min-height:100vh}
+nav{
+  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
+  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
+}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
+nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
+#q{
+  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
+}
+#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+nav .home{
+  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
+  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+}
+nav .home:hover{filter:brightness(.97)}
+details.grp{margin:2px 0}
+details.grp>summary{
+  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
+  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:var(--line2)}
+details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
+details.grp[open]>summary{color:var(--acc)}
+nav a.item{
+  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
+  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+nav a.item:hover{background:var(--line2);color:var(--fg)}
+nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
+/* ---------- 进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
+/* ---------- 标题 ---------- */
+h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
+h2{
+  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
+  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
+}
+h3{font-size:18px;margin:28px 0 12px}
+p{margin:0 0 14px}
+/* ---------- 知识点卡片 ---------- */
+.kp{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
+}
+.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
+/* ---------- 字段 ---------- */
+.fld{margin:24px 0 0}
+.lab{
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
+}
+.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
+.freq{
+  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
+  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
+}
+.freq b{color:var(--fg)}
+html[data-theme="dark"] .freq{color:#f2e8cc}
+/* 结论速记 → 公式卡 */
+ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.facts li{
+  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
+  padding:11px 15px;font-size:15px;margin:0;
+}
+ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
+/* 易错点 → 卡片 */
+ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.errs li{
+  position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
+}
+ul.errs li::before{
+  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
+  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
+}
+html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
+/* 解析 */
+blockquote{
+  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
+  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
+}
+blockquote p:last-child{margin-bottom:0}
+blockquote strong{color:var(--fg)}
+/* 真题题干 */
+.q-stem{
+  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
+}
+.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
+/* ---------- 代码 ---------- */
+code{
+  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
+  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  word-break:break-word;
+}
+.codebox{margin:14px 0}
+.codebox .bar{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
+}
+.codebox button{
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  border-radius:6px;padding:2px 9px;font-size:11.5px;
+}
+.codebox button:hover{border-color:var(--acc);color:var(--acc)}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow:auto;margin:0;
+}
+pre code{background:none;padding:0;font-size:13px;line-height:1.5}
+/* ASCII 示意图：深色面板，保证等宽对齐可读 */
+.codebox.ascii .bar{color:var(--fg2);font-weight:600}
+.codebox.ascii pre{
+  background:var(--dark);border-color:#000;color:var(--dark-fg);
+  font-size:12.5px;line-height:1.45;padding:18px;
+}
+.codebox.ascii pre code{color:var(--dark-fg)}
+/* Mermaid */
+.fig{margin:16px 0}
+.mermaid{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:16px;overflow:auto;text-align:center;min-height:44px;
+}
+.mermaid svg{max-width:100%;height:auto}
+.fig details{margin-top:8px}
+.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
+.fig summary:hover{color:var(--acc)}
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--line2)}
+/* ---------- 杂项 ---------- */
+.warn{
+  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
+  padding:11px 15px;font-size:14px;margin:14px 0;
+}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:40;
+}
+.totop.on{opacity:1;pointer-events:auto}
+.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
+#theme{
+  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
+}
+#menu{
+  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
+  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
+}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+/* ---------- 窄屏 ---------- */
+@media (max-width:1000px){
+  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
+      box-shadow:4px 0 22px rgba(0,0,0,.12)}
+  nav.open{transform:none}
+  main{padding:22px 18px 130px;max-width:none}
+  #menu{display:flex}
+  .kp{padding:20px 18px 24px}
+}
+/* ---------- 打印 ---------- */
+@media print{
+  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
+  body{background:#fff;font-size:11pt}
+  main{max-width:none;padding:0}
+  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
+  h2{break-after:avoid}
+  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
+  .mermaid{border-color:#ccc}
+  a{color:#000;text-decoration:none}
+}
+</style>
+<script src="../mermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<input id="q" placeholder="筛选知识点…" autocomplete="off">
+<a class="home" href="../index.html">⌂ 全科单页合集</a>
+<details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
+<a class="item" href="../数据结构/01-线性表.html">线性表</a>
+<a class="item" href="../数据结构/02-顺序表与链表.html">顺序表与链表</a>
+<a class="item" href="../数据结构/03-栈与队列.html">栈与队列</a>
+<a class="item" href="../数据结构/04-树与二叉树.html">树与二叉树</a>
+<a class="item" href="../数据结构/05-图.html">图</a>
+<a class="item" href="../数据结构/06-查找.html">查找</a>
+<a class="item" href="../数据结构/07-排序.html">排序</a>
+</details>
+<details class="grp"><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
+<a class="item" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算</a>
+<a class="item" href="../计算机组成原理/02-存储系统.html">存储系统</a>
+<a class="item" href="../计算机组成原理/03-指令系统.html">指令系统</a>
+<a class="item" href="../计算机组成原理/04-中央处理器.html">中央处理器 CPU</a>
+<a class="item" href="../计算机组成原理/05-总线.html">总线</a>
+<a class="item" href="../计算机组成原理/06-输入输出系统.html">输入输出系统</a>
+</details>
+<details class="grp" open><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
+<a class="item" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<a class="item" href="../操作系统/02-进程与线程.html">进程与线程</a>
+<a class="item" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
+<a class="item cur" href="../操作系统/04-同步与互斥.html">同步与互斥</a>
+<a class="item" href="../操作系统/05-内存管理.html">内存管理</a>
+<a class="item" href="../操作系统/06-文件管理.html">文件管理</a>
+<a class="item" href="../操作系统/07-输入输出管理.html">输入输出管理</a>
+</details>
+<details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
+<a class="item" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
+<a class="item" href="../计算机网络/02-物理层.html">物理层</a>
+<a class="item" href="../计算机网络/03-数据链路层.html">数据链路层</a>
+<a class="item" href="../计算机网络/04-网络层.html">网络层</a>
+<a class="item" href="../计算机网络/05-传输层.html">传输层</a>
+<a class="item" href="../计算机网络/06-应用层.html">应用层</a>
+</details></nav><main><h1>操作系统 ｜ 同步与互斥</h1><h1 id="_1">操作系统 · 同步与互斥</h1>
+<h2 id="_2" id="kp">同步与互斥 [高频]</h2>
+<p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2013、2015、2017、2018、2020、2022、2023、2025；分数占比约 20%；主要题型：综合应用题为主（45 题几乎固定考 PV 操作）。</p>
+<p class="lab">核心讲解</p>
+<p><strong>临界区</strong>是进程中访问临界资源的那段代码，实现互斥必须满足四条准则：<strong>空闲让进、忙则等待、有限等待、让权等待</strong>（前两条必须满足，后两条尽量避免"饥饿"与"忙等"）。软件方案中 <strong><code>Peterson</code> 算法</strong>用 <code>flag[]</code> 与 <code>turn</code> 两个变量实现两个进程的互斥，满足空闲让进、忙则等待与有限等待，但<strong>不满足让权等待</strong>（等待时仍占用 <code>CPU</code> 空转）；硬件方案中<strong>中断屏蔽</strong>最简单但只适用于单处理机且风险高，<strong><code>TestAndSet</code>（<code>TS</code>）与 <code>Swap</code> 指令</strong>是原子的，但同样属于忙等。<strong>信号量机制</strong>是 408 的核心考点：<strong>整型信号量</strong>的 <code>wait(S)</code> 是 <code>while (S &lt;= 0); S--;</code>，属于<strong>忙等</strong>；</p>
+<p><strong>记录型信号量</strong>用 <code>value</code> 与等待队列 <code>L</code> 描述，<code>wait(S)</code> 为 <code>S.value--; if (S.value &lt; 0) block(S.L);</code>，<code>signal(S)</code> 为 <code>S.value++; if (S.value &lt;= 0) wakeup(S.L);</code>。注意 <code>value</code> 的<strong>物理意义</strong>：<code>value &gt; 0</code> 表示当前可用资源数，<code>value &lt; 0</code> 表示<strong>在该信号量队列上阻塞的进程数</strong>；因此 <code>wait</code> 是"先减后判"、<code>signal</code> 是"先加后判"，判据是 <code>&lt; 0</code> 与 <code>&lt;= 0</code>。用信号量实现互斥时初值为 <code>1</code>，实现同步时初值为"可用资源数"（如缓冲区空位数），而"前驱关系"则用初值为 <code>0</code> 的信号量让后继进程先 <code>wait</code> 前驱进程的 <code>signal</code>。</p>
+<p><strong>生产者-消费者</strong>问题需要<strong>两个同步信号量 <code>empty</code>（初值 <code>n</code>）与 <code>full</code>（初值 <code>0</code>）加一个互斥信号量 <code>mutex</code>（初值 <code>1</code>）</strong>，且<strong>必须先对同步信号量 <code>wait</code> 再对 <code>mutex</code> 进行 <code>wait</code></strong>，否则当缓冲区满/空时进程会抱着互斥锁睡眠，导致另一进程无法推进而死锁。<strong>读者-写者</strong>问题中"读者优先"方案用一个 <code>count</code> 统计读者数并配 <code>mutex</code> 保护 <code>count</code>，第一个读者进入时对 <code>rw</code> 加锁、最后一个读者离开时释放 <code>rw</code>，从而允许读者并发。</p>
+<p><strong>哲学家进餐</strong>问题的死锁根源是"每个人都先拿左筷再等右筷"形成循环等待，解决办法包括：至多允许 4 人同时取筷（用初值 <code>4</code> 的信号量）、奇数号先拿左偶数号先拿右（破坏循环等待）、或用 <code>AND</code> 型信号量一次性申请两只筷子。<strong>管程</strong>把共享变量与操作封装在一起，同一时刻只允许一个进程在管程内活动，用<strong>条件变量</strong>的 <code>wait</code>/<code>signal</code> 实现等待与唤醒，把同步的复杂性交给编译器处理。</p>
+<p class="lab">关键结论速记</p><ul class="facts">
+<li><code>记录型信号量：wait 先减后判 value &lt; 0 则阻塞，signal 先加后判 value &lt;= 0 则唤醒</code> —— 判据符号写反是最常见错误。</li>
+<li><code>信号量 value 的物理意义：正值 = 可用资源数，负值绝对值 = 阻塞进程数</code> —— 由此可反推被阻塞的进程个数。</li>
+<li><code>互斥信号量初值 1，同步信号量初值 = 资源数，前驱关系信号量初值 0</code> —— 三种用途的初值必须分清。</li>
+<li><code>生产者-消费者：empty 初值 n、full 初值 0、mutex 初值 1；先 wait 同步再 wait 互斥</code> —— 顺序颠倒会死锁。</li>
+<li><code>读者优先：第一个读者锁 rw，最后一个读者解锁 rw，中间读者只改 count</code> —— 只要有读者在读，写者就一直等待。</li>
+<li><code>哲学家进餐的三种解法都指向破坏循环等待或限制并发数</code> —— 单独"先左后右"必然可能死锁。</li>
+</ul>
+<p class="lab">示意图</p>
+<p><strong>生产者-消费者模型的缓冲区与信号量协作</strong>：<code>empty</code> 与 <code>full</code> 是一对"互补计数"，任何时刻 <code>empty + full = n</code>，<code>mutex</code> 只保护对缓冲区的实际读写。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>circular buffer with 3 semaphores (n = 4 slots)
+
+   empty (initial 4)            full (initial 0)
+   counts free slots            counts filled slots
+        |                              |
+        v                              v
+   +----+----+----+----+          +----+----+----+
+   | 4  | 3  | 2  | 1  |  ...     | 0  | 1  | 2  | ...
+   +----+----+----+----+          +----+----+----+
+   invariant: empty + full = n = 4
+
+   buffer (n = 4 slots), in = producer position, out = consumer position
+
+   +------+------+------+------+
+   | d0   | d1   |      |      |
+   +------+------+------+------+
+      ^           ^
+      |           |
+     out         in        filled = 2, empty = 2
+
+producer                          consumer
+  wait(empty)     -- may block     wait(full)     -- may block
+  wait(mutex)     -- enter CS      wait(mutex)    -- enter CS
+  buffer[in] = item                item = buffer[out]
+  in = (in+1) mod n                out = (out+1) mod n
+  signal(mutex)   -- leave CS      signal(mutex)  -- leave CS
+  signal(full)                     signal(empty)
+
+  KEY: wait(empty) BEFORE wait(mutex).
+  If reversed, a producer holding mutex may block on empty,
+  and the consumer can never enter the CS to free a slot =&gt; deadlock.
+</code></pre></div>
+<p><strong><code>wait</code>/<code>signal</code> 在记录型信号量上的状态转换</strong>：只有 <code>value</code> 减到负数才阻塞，只有加回非正数才需要唤醒。</p>
+<div class="fig"><div class="mermaid" data-src="flowchart TD
+    P0[&quot;进程执行 wait(S)&quot;] --&gt; P1[&quot;S.value 减 1&quot;]
+    P1 --&gt; P2{&quot;S.value 小于 0&quot;}
+    P2 --&gt;|否 仍有资源| P3[&quot;进程继续进入临界区&quot;]
+    P2 --&gt;|是 无资源| P4[&quot;把进程插入 S.L 等待队列&quot;]
+    P4 --&gt; P5[&quot;调用 block 原语 进程转入阻塞态&quot;]
+    P5 --&gt; P6[&quot;调度其他进程运行&quot;]
+
+    V0[&quot;进程执行 signal(S)&quot;] --&gt; V1[&quot;S.value 加 1&quot;]
+    V1 --&gt; V2{&quot;S.value 小于等于 0&quot;}
+    V2 --&gt;|否 无等待者| V3[&quot;进程继续执行&quot;]
+    V2 --&gt;|是 有等待者| V4[&quot;从 S.L 取一个进程&quot;]
+    V4 --&gt; V5[&quot;调用 wakeup 原语 该进程转入就绪态&quot;]
+    V5 --&gt; V6[&quot;被唤醒进程等待重新调度获得 CPU&quot;]
+">flowchart TD
+    P0[&quot;进程执行 wait(S)&quot;] --&gt; P1[&quot;S.value 减 1&quot;]
+    P1 --&gt; P2{&quot;S.value 小于 0&quot;}
+    P2 --&gt;|否 仍有资源| P3[&quot;进程继续进入临界区&quot;]
+    P2 --&gt;|是 无资源| P4[&quot;把进程插入 S.L 等待队列&quot;]
+    P4 --&gt; P5[&quot;调用 block 原语 进程转入阻塞态&quot;]
+    P5 --&gt; P6[&quot;调度其他进程运行&quot;]
+
+    V0[&quot;进程执行 signal(S)&quot;] --&gt; V1[&quot;S.value 加 1&quot;]
+    V1 --&gt; V2{&quot;S.value 小于等于 0&quot;}
+    V2 --&gt;|否 无等待者| V3[&quot;进程继续执行&quot;]
+    V2 --&gt;|是 有等待者| V4[&quot;从 S.L 取一个进程&quot;]
+    V4 --&gt; V5[&quot;调用 wakeup 原语 该进程转入就绪态&quot;]
+    V5 --&gt; V6[&quot;被唤醒进程等待重新调度获得 CPU&quot;]
+</div><details><summary>查看该图 mermaid 源码</summary><pre><code>flowchart TD
+    P0[&quot;进程执行 wait(S)&quot;] --&gt; P1[&quot;S.value 减 1&quot;]
+    P1 --&gt; P2{&quot;S.value 小于 0&quot;}
+    P2 --&gt;|否 仍有资源| P3[&quot;进程继续进入临界区&quot;]
+    P2 --&gt;|是 无资源| P4[&quot;把进程插入 S.L 等待队列&quot;]
+    P4 --&gt; P5[&quot;调用 block 原语 进程转入阻塞态&quot;]
+    P5 --&gt; P6[&quot;调度其他进程运行&quot;]
+
+    V0[&quot;进程执行 signal(S)&quot;] --&gt; V1[&quot;S.value 加 1&quot;]
+    V1 --&gt; V2{&quot;S.value 小于等于 0&quot;}
+    V2 --&gt;|否 无等待者| V3[&quot;进程继续执行&quot;]
+    V2 --&gt;|是 有等待者| V4[&quot;从 S.L 取一个进程&quot;]
+    V4 --&gt; V5[&quot;调用 wakeup 原语 该进程转入就绪态&quot;]
+    V5 --&gt; V6[&quot;被唤醒进程等待重新调度获得 CPU&quot;]
+</code></pre></details></div>
+<p class="lab">易错点</p><ul class="errs">
+<li><code>wait</code>/<code>signal</code> 的判据符号写反：记录型信号量中 <code>wait</code> 里判 <code>value &lt; 0</code>（减 1 之后），<code>signal</code> 里判 <code>value &lt;= 0</code>（加 1 之后）；写成 <code>&lt;= 0</code> 与 <code>&lt; 0</code> 会导致阻塞/唤醒时机整体错位。</li>
+<li>生产者-消费者中先 <code>wait(mutex)</code> 再 <code>wait(empty)</code>：这样当缓冲区满时生产者会<strong>持有互斥锁</strong>进入睡眠，消费者无法进入临界区取走数据，双方互相等待形成<strong>死锁</strong>；必须"先同步后互斥"。</li>
+<li>混淆同步信号量与互斥信号量的初值：互斥信号量初值恒为 <code>1</code>（表示"临界区可用"），同步信号量初值等于可用资源数（生产者-消费者的 <code>empty</code> 为 <code>n</code>、<code>full</code> 为 <code>0</code>）；把 <code>full</code> 也设成 <code>n</code> 会让消费者一开始就去读空缓冲区。</li>
+<li>认为读者-写者问题中读者与写者可以同时进入：只要存在读者在读，写者就必须等待（<code>rw</code> 被第一个读者锁住）；"读者优先"方案中写者甚至可能<strong>饥饿</strong>，若题目要求"写者优先"必须额外增加信号量。</li>
+</ul>
+<p class="lab">真题示例</p>
+<p class="q-stem"><span class="q-src">2014 年 408 第 45 题（综合应用题，7 分）</span></p>
+<p>某生产者-消费者问题中，有一个可以存放 <code>1000</code> 个数据的环形缓冲区，生产者进程 <code>P</code> 与消费者进程 <code>C</code> 共享该缓冲区。请用信号量的 <code>wait</code>、<code>signal</code> 操作描述 <code>P</code> 与 <code>C</code> 的同步与互斥关系（只需给出进程的算法描述，不必写出完整的程序）。</p>
+<blockquote>
+<p>解析：设 <code>empty</code> 表示空单元数（初值 <code>1000</code>）、<code>full</code> 表示已放数据个数（初值 <code>0</code>）、<code>mutex</code> 用于互斥访问缓冲区（初值 <code>1</code>）。生产者 <code>P</code> 的循环体为：<code>wait(empty)</code> → <code>wait(mutex)</code> → 把数据放入缓冲区 → <code>signal(mutex)</code> → <code>signal(full)</code>，随后循环继续生产。消费者 <code>C</code> 的循环体为：<code>wait(full)</code> → <code>wait(mutex)</code> → 从缓冲区取数据 → <code>signal(mutex)</code> → <code>signal(empty)</code>，随后循环继续消费。<strong>判分点有三处：一是三个信号量的初值必须写对（<code>empty = 1000</code>、<code>full = 0</code>、<code>mutex = 1</code>）；二是 <code>wait(empty)</code>/<code>wait(full)</code> 必须排在 <code>wait(mutex)</code> 之前，否则会产生死锁；三是 <code>signal</code> 的顺序中释放互斥锁在唤醒对方之前，保证被唤醒者能顺利进入临界区。</strong></p>
+</blockquote>
+<hr /></main></div>
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script>
+// 侧栏筛选
+var q = document.getElementById('q');
+if (q) q.addEventListener('input', function () {
+  var v = this.value.trim().toLowerCase();
+  document.querySelectorAll('nav details.grp').forEach(function (d) {
+    var any = false;
+    d.querySelectorAll('a.item').forEach(function (a) {
+      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
+      a.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    d.style.display = (any || !v) ? '' : 'none';
+    if (v && any) d.open = true;
+  });
+});
+// 进度条 + 回到顶部
+var bar = document.getElementById('bar'), top = document.querySelector('.totop');
+function onScroll() {
+  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
+  var max = h.scrollHeight - h.clientHeight;
+  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  if (top) top.classList.toggle('on', y > 500);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+// 复制
+document.querySelectorAll('.codebox').forEach(function (box) {
+  var btn = box.querySelector('button'), pre = box.querySelector('pre');
+  if (!btn || !pre) return;
+  btn.addEventListener('click', function () {
+    var t = pre.innerText;
+    var done = function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
+    else {
+      var ta = document.createElement('textarea'); ta.value = t;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
+    }
+  });
+});
+// 主题（记住选择 + 跟随系统）
+var tb = document.getElementById('theme'), saved = null;
+try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
+if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function syncThemeBtn() {
+  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+syncThemeBtn();
+if (tb) tb.addEventListener('click', function () {
+  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  syncThemeBtn();
+  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
+});
+// 窄屏抽屉
+var mb = document.getElementById('menu');
+if (mb) {
+  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
+  document.querySelector('nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
+  });
+}
+// 目录高亮当前章节
+(function () {
+  var links = [].slice.call(document.querySelectorAll('nav a.item'));
+  var targets = links.map(function (a) {
+    var h = a.getAttribute('href') || '';
+    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
+    return id ? document.getElementById(id) : null;
+  });
+  if (!targets.some(Boolean)) return;
+  function mark() {
+    var y = scrollY + 130, idx = -1;
+    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
+  }
+  addEventListener('scroll', mark, { passive: true }); mark();
+})();
+</script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  if (!window.mermaid) {
+    nodes.forEach(function (el) {
+      el.insertAdjacentHTML('beforebegin',
+        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
+        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.textContent; pre.appendChild(code);
+      el.innerHTML = ''; el.appendChild(pre);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
+    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
+    state: { useMaxWidth: true } });
+  nodes.forEach(function (el, i) {
+    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
+      el.innerHTML = r.svg;
+    }).catch(function (e) {
+      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
+    });
+  });
+})();
+</script>
+</body></html>

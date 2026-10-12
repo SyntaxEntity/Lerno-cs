@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>计算机组成原理 · 输入输出系统</title><style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
+  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
+  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
+  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
+  --radius:10px; --mw:780px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
+  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
+  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
+  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  text-rendering:optimizeLegibility;
+}
+/* ---------- 布局 ---------- */
+#wrap{display:flex;align-items:flex-start;min-height:100vh}
+nav{
+  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
+  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
+}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
+nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
+#q{
+  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
+}
+#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+nav .home{
+  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
+  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+}
+nav .home:hover{filter:brightness(.97)}
+details.grp{margin:2px 0}
+details.grp>summary{
+  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
+  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:var(--line2)}
+details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
+details.grp[open]>summary{color:var(--acc)}
+nav a.item{
+  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
+  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+nav a.item:hover{background:var(--line2);color:var(--fg)}
+nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
+/* ---------- 进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
+/* ---------- 标题 ---------- */
+h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
+h2{
+  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
+  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
+}
+h3{font-size:18px;margin:28px 0 12px}
+p{margin:0 0 14px}
+/* ---------- 知识点卡片 ---------- */
+.kp{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
+}
+.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
+/* ---------- 字段 ---------- */
+.fld{margin:24px 0 0}
+.lab{
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
+}
+.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
+.freq{
+  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
+  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
+}
+.freq b{color:var(--fg)}
+html[data-theme="dark"] .freq{color:#f2e8cc}
+/* 结论速记 → 公式卡 */
+ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.facts li{
+  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
+  padding:11px 15px;font-size:15px;margin:0;
+}
+ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
+/* 易错点 → 卡片 */
+ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.errs li{
+  position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
+}
+ul.errs li::before{
+  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
+  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
+}
+html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
+/* 解析 */
+blockquote{
+  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
+  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
+}
+blockquote p:last-child{margin-bottom:0}
+blockquote strong{color:var(--fg)}
+/* 真题题干 */
+.q-stem{
+  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
+}
+.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
+/* ---------- 代码 ---------- */
+code{
+  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
+  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  word-break:break-word;
+}
+.codebox{margin:14px 0}
+.codebox .bar{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
+}
+.codebox button{
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  border-radius:6px;padding:2px 9px;font-size:11.5px;
+}
+.codebox button:hover{border-color:var(--acc);color:var(--acc)}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow:auto;margin:0;
+}
+pre code{background:none;padding:0;font-size:13px;line-height:1.5}
+/* ASCII 示意图：深色面板，保证等宽对齐可读 */
+.codebox.ascii .bar{color:var(--fg2);font-weight:600}
+.codebox.ascii pre{
+  background:var(--dark);border-color:#000;color:var(--dark-fg);
+  font-size:12.5px;line-height:1.45;padding:18px;
+}
+.codebox.ascii pre code{color:var(--dark-fg)}
+/* Mermaid */
+.fig{margin:16px 0}
+.mermaid{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:16px;overflow:auto;text-align:center;min-height:44px;
+}
+.mermaid svg{max-width:100%;height:auto}
+.fig details{margin-top:8px}
+.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
+.fig summary:hover{color:var(--acc)}
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--line2)}
+/* ---------- 杂项 ---------- */
+.warn{
+  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
+  padding:11px 15px;font-size:14px;margin:14px 0;
+}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:40;
+}
+.totop.on{opacity:1;pointer-events:auto}
+.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
+#theme{
+  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
+}
+#menu{
+  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
+  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
+}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+/* ---------- 窄屏 ---------- */
+@media (max-width:1000px){
+  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
+      box-shadow:4px 0 22px rgba(0,0,0,.12)}
+  nav.open{transform:none}
+  main{padding:22px 18px 130px;max-width:none}
+  #menu{display:flex}
+  .kp{padding:20px 18px 24px}
+}
+/* ---------- 打印 ---------- */
+@media print{
+  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
+  body{background:#fff;font-size:11pt}
+  main{max-width:none;padding:0}
+  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
+  h2{break-after:avoid}
+  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
+  .mermaid{border-color:#ccc}
+  a{color:#000;text-decoration:none}
+}
+</style>
+<script src="../mermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<input id="q" placeholder="筛选知识点…" autocomplete="off">
+<a class="home" href="../index.html">⌂ 全科单页合集</a>
+<details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
+<a class="item" href="../数据结构/01-线性表.html">线性表</a>
+<a class="item" href="../数据结构/02-顺序表与链表.html">顺序表与链表</a>
+<a class="item" href="../数据结构/03-栈与队列.html">栈与队列</a>
+<a class="item" href="../数据结构/04-树与二叉树.html">树与二叉树</a>
+<a class="item" href="../数据结构/05-图.html">图</a>
+<a class="item" href="../数据结构/06-查找.html">查找</a>
+<a class="item" href="../数据结构/07-排序.html">排序</a>
+</details>
+<details class="grp" open><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
+<a class="item" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算</a>
+<a class="item" href="../计算机组成原理/02-存储系统.html">存储系统</a>
+<a class="item" href="../计算机组成原理/03-指令系统.html">指令系统</a>
+<a class="item" href="../计算机组成原理/04-中央处理器.html">中央处理器 CPU</a>
+<a class="item" href="../计算机组成原理/05-总线.html">总线</a>
+<a class="item cur" href="../计算机组成原理/06-输入输出系统.html">输入输出系统</a>
+</details>
+<details class="grp"><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
+<a class="item" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<a class="item" href="../操作系统/02-进程与线程.html">进程与线程</a>
+<a class="item" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
+<a class="item" href="../操作系统/04-同步与互斥.html">同步与互斥</a>
+<a class="item" href="../操作系统/05-内存管理.html">内存管理</a>
+<a class="item" href="../操作系统/06-文件管理.html">文件管理</a>
+<a class="item" href="../操作系统/07-输入输出管理.html">输入输出管理</a>
+</details>
+<details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
+<a class="item" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
+<a class="item" href="../计算机网络/02-物理层.html">物理层</a>
+<a class="item" href="../计算机网络/03-数据链路层.html">数据链路层</a>
+<a class="item" href="../计算机网络/04-网络层.html">网络层</a>
+<a class="item" href="../计算机网络/05-传输层.html">传输层</a>
+<a class="item" href="../计算机网络/06-应用层.html">应用层</a>
+</details></nav><main><h1>计算机组成原理 ｜ 输入输出系统</h1><h1 id="_1">计算机组成原理 · 输入输出系统</h1>
+<h2 id="_2" id="kp">输入输出系统 [高频]</h2>
+<p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2025；分数占比约 10%；主要题型：选择题 + 综合应用题（中断、DMA、磁盘时间计算）。</p>
+<p class="lab">核心讲解</p>
+<p><code>I/O</code> 接口（设备控制器）的作用是<strong>数据缓冲、格式转换、状态与命令寄存、地址译码</strong>，它把 CPU 的高速并行总线与设备的低速串行工作方式解耦。<code>I/O</code> 端口的编址有两种：<strong>统一编址</strong>（把端口当作主存单元，用普通访存指令访问，无需专门指令但占用主存地址空间）与<strong>独立编址</strong>（有独立的地址空间与专用 <code>IN/OUT</code> 指令，不占主存空间但指令类型增多）。<code>I/O</code> 控制方式的发展主线是<strong>CPU 干预程度逐步降低</strong>：<strong>程序查询</strong>方式下 CPU 不断读状态寄存器空转等待，CPU 与设备完全串行；</p>
+<p><strong>程序中断</strong>方式下 CPU 发出命令后继续执行原程序，设备就绪时用中断通知 CPU 在<strong>一条指令执行结束后</strong>响应，数据传送仍需 CPU 用指令搬入主存；<strong>DMA</strong> 方式由 DMA 控制器直接在主存与设备之间成块传送，数据<strong>不经过 CPU 的寄存器</strong>，每传送一个字（或一个数据块）占用一次总线（周期挪用/周期窃取），只有在传送前（初始化）与传送后（中断处理）才需要 CPU 参与；<strong>通道</strong>方式由通道处理器执行通道程序，进一步把 CPU 从 <code>I/O</code> 管理中解放出来。</p>
+<p><strong>中断系统</strong>要点：CPU 响应中断的条件是"有中断请求 + 中断允许触发器为 1 + 当前指令执行结束"；响应时由硬件自动执行<strong>中断隐指令</strong>完成三件事——<strong>关中断、保存断点（<code>PC</code>）、取中断向量</strong>；随后由中断服务程序保存现场并执行服务。</p>
+<p><strong>多重中断</strong>（中断嵌套）靠<strong>中断屏蔽字</strong>控制：屏蔽字中某位为 <code>1</code> 表示屏蔽（禁止）对应的中断源，因此优先级越高的中断源，其屏蔽字中"1"的位数越多。<strong>磁盘</strong>的性能指标是存取时间，<code>存取时间 = 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为旋转半圈的时间 <code>60 / (2 × 转速)</code>（转速单位 <code>rpm</code>）；数据传输率与位密度、转速（线速度）相关，<code>数据传输率 = 每条磁道的容量 / 旋转一圈的时间</code>。固态硬盘 <code>SSD</code> 基于闪存，无机械寻道与旋转延迟，随机访问快，但存在<strong>写放大、擦除次数受限（寿命）</strong>的问题。</p>
+<p class="lab">关键结论速记</p><ul class="facts">
+<li><code>四种 I/O 方式 CPU 干预程度：程序查询 &gt; 程序中断 &gt; DMA &gt; 通道</code> —— 判据是"CPU 是否需要在传送过程中持续参与"。</li>
+<li><code>DMA 数据不经过 CPU 寄存器，直接在主存与设备间传送</code> —— 这是 DMA 与程序中断方式的本质区别。</li>
+<li><code>中断隐指令由硬件执行：关中断、保存断点、取中断向量</code> —— 它是"指令"但不是程序里的指令。</li>
+<li><code>中断响应时机：一条指令执行结束后</code> —— 而不是任意时刻，也不是一个时钟周期后。</li>
+<li><code>屏蔽字为 1 表示屏蔽，优先级越高屏蔽的位数越多</code> —— 多重中断靠它实现嵌套。</li>
+<li><code>磁盘存取时间 = 寻道 + 旋转延迟 + 传输</code>，<code>平均旋转延迟 = 60 / (2 × 转速)</code> 秒 —— 旋转延迟取半圈。</li>
+</ul>
+<p class="lab">示意图</p>
+<p><strong>四种 I/O 控制方式的数据通路与 CPU 参与程度</strong>：从程序查询到通道，CPU 的角色从"全程搬运工"逐步退化为"发起与善后"。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>(1) programmed query (polling)
+  CPU ---&gt; status reg ---&gt; busy? loop until ready ---&gt; data reg ---&gt; CPU reg ---&gt; memory
+      CPU spins in a busy-wait loop, device and CPU run serially
+
+(2) interrupt driven
+  CPU --command--&gt; device ... device ready --INTR--&gt; CPU suspends program
+      ISR: data reg ---&gt; CPU reg ---&gt; memory
+      transfer still done by CPU instructions, but CPU works while waiting
+
+(3) DMA
+  CPU --init--&gt; DMAC (memory addr, device addr, count, direction)
+      device &lt;======data======&gt; memory        does NOT pass CPU registers
+      each word steals one bus cycle; DMAC raises an interrupt at the end
+
+(4) channel
+  CPU --start--&gt; channel, channel runs a channel program
+      channel &lt;===&gt; device &lt;===&gt; memory, CPU only starts and finishes
+
+  comparison
+  method        CPU intervention during transfer   data path
+  -----------   --------------------------------   ---------------------
+  polling       continuous busy wait                via CPU register
+  interrupt     per word (instruction driven)       via CPU register
+  DMA           none per word, only cycle steal     memory &lt;-&gt; device
+  channel       none, channel runs channel program  memory &lt;-&gt; device
+</code></pre></div>
+<p>磁盘存取时间的构成如下（一次读盘由三段组成，寻道与旋转延迟是主要开销）。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>disk access time decomposition
+
+  |&lt;-- seek time --&gt;|&lt;-- rotational latency --&gt;|&lt;-- transfer --&gt;|
+  +-----------------+--------------------------+----------------+
+   head moves to      wait for target sector    read/write the
+   the target track   to rotate under the head  target sector
+
+  average rotational latency = half a turn = 60 / (2 * rpm) seconds
+  transfer time              = bytes to read / data transfer rate
+  data transfer rate         = bytes per track / time per revolution
+</code></pre></div>
+<div class="fig"><div class="mermaid" data-src="flowchart TD
+    D0[&quot;用户进程发出 read 系统调用&quot;] --&gt; D1[&quot;文件系统把逻辑块号映射为磁盘块号&quot;]
+    D1 --&gt; D2[&quot;构造 I/O 请求 交给设备独立性层&quot;]
+    D2 --&gt; D3[&quot;设备驱动程序写设备寄存器 启动控制器&quot;]
+    D3 --&gt; D4[&quot;磁盘控制器执行寻道与旋转等待&quot;]
+    D4 --&gt; D5[&quot;数据经 DMA 直接写入主存缓冲区&quot;]
+    D5 --&gt; D6{&quot;传送是否出错&quot;}
+    D6 --&gt;|是| D7[&quot;重传 或向上返回错误&quot;]
+    D6 --&gt;|否| D8[&quot;控制器发出中断&quot;]
+    D8 --&gt; D9[&quot;中断处理程序唤醒等待的进程&quot;]
+    D9 --&gt; D10[&quot;返回用户态 数据可用&quot;]
+">flowchart TD
+    D0[&quot;用户进程发出 read 系统调用&quot;] --&gt; D1[&quot;文件系统把逻辑块号映射为磁盘块号&quot;]
+    D1 --&gt; D2[&quot;构造 I/O 请求 交给设备独立性层&quot;]
+    D2 --&gt; D3[&quot;设备驱动程序写设备寄存器 启动控制器&quot;]
+    D3 --&gt; D4[&quot;磁盘控制器执行寻道与旋转等待&quot;]
+    D4 --&gt; D5[&quot;数据经 DMA 直接写入主存缓冲区&quot;]
+    D5 --&gt; D6{&quot;传送是否出错&quot;}
+    D6 --&gt;|是| D7[&quot;重传 或向上返回错误&quot;]
+    D6 --&gt;|否| D8[&quot;控制器发出中断&quot;]
+    D8 --&gt; D9[&quot;中断处理程序唤醒等待的进程&quot;]
+    D9 --&gt; D10[&quot;返回用户态 数据可用&quot;]
+</div><details><summary>查看该图 mermaid 源码</summary><pre><code>flowchart TD
+    D0[&quot;用户进程发出 read 系统调用&quot;] --&gt; D1[&quot;文件系统把逻辑块号映射为磁盘块号&quot;]
+    D1 --&gt; D2[&quot;构造 I/O 请求 交给设备独立性层&quot;]
+    D2 --&gt; D3[&quot;设备驱动程序写设备寄存器 启动控制器&quot;]
+    D3 --&gt; D4[&quot;磁盘控制器执行寻道与旋转等待&quot;]
+    D4 --&gt; D5[&quot;数据经 DMA 直接写入主存缓冲区&quot;]
+    D5 --&gt; D6{&quot;传送是否出错&quot;}
+    D6 --&gt;|是| D7[&quot;重传 或向上返回错误&quot;]
+    D6 --&gt;|否| D8[&quot;控制器发出中断&quot;]
+    D8 --&gt; D9[&quot;中断处理程序唤醒等待的进程&quot;]
+    D9 --&gt; D10[&quot;返回用户态 数据可用&quot;]
+</code></pre></details></div>
+<p class="lab">易错点</p><ul class="errs">
+<li>认为 DMA 传送完全不需要 CPU 参与：DMA 只在<strong>数据传送过程</strong>中不需要 CPU 干预，传送前的初始化（设置主存地址、设备地址、传送长度、方向）与传送结束后的中断处理都必须由 CPU 完成。</li>
+<li>把中断响应时机写成"任意时刻"或"一个时钟周期后"：可屏蔽中断只在<strong>一条指令执行结束后</strong>响应（这样断点才是一条指令的边界）；若在指令中间响应，断点无法正确保存。</li>
+<li>混淆中断隐指令与中断服务程序：中断隐指令是<strong>硬件自动执行</strong>的（关中断、保存断点、取中断向量），而保存现场、执行设备服务、恢复现场是<strong>中断服务程序（软件）</strong>做的，两者不能混为一谈。</li>
+<li>磁盘旋转延迟算成一圈：平均旋转延迟是<strong>旋转半圈</strong>的时间，即 <code>60 / (2 × 转速)</code> 秒；若按一圈计算，存取时间会偏大一倍。</li>
+</ul>
+<p class="lab">真题示例</p>
+<p class="q-stem"><span class="q-src">2012 年真题改编（单项选择题，2 分）</span></p>
+<p>某磁盘的转速为 <code>7200 rpm</code>，平均寻道时间为 <code>8 ms</code>，数据传输率为 <code>20 MB/s</code>。若读取一个 <code>4 KB</code> 的磁盘块，则平均存取时间约为（ ）。</p>
+<p>A. <code>4.2 ms</code>　B. <code>8.2 ms</code>　C. <code>12.4 ms</code>　D. <code>16.5 ms</code></p>
+<blockquote>
+<p>解析：平均存取时间由三段相加。平均旋转延迟 <code>= 60 / (2 × 7200) s = 4.17 ms</code>（旋转<strong>半圈</strong>）；传输时间 <code>= 4 KB / 20 MB/s = 4096 B / (20 × 10^6 B/s) ≈ 0.205 ms</code>；再加上平均寻道时间 <code>8 ms</code>，得 <code>8 + 4.17 + 0.205 ≈ 12.37 ms</code>，最接近 <strong>C</strong>。干扰项 D（<code>16.5 ms</code>）正是把旋转延迟误算成<strong>一整圈</strong>（<code>8.33 ms</code>）的结果，B（<code>8.2 ms</code>）则是完全漏算旋转延迟的结果。<strong>判分点是旋转延迟必须取半圈，以及单位换算（<code>rpm</code> 转秒要除以 60、<code>KB</code> 与 <code>MB</code> 统一为字节）。</strong></p>
+</blockquote>
+<hr /></main></div>
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script>
+// 侧栏筛选
+var q = document.getElementById('q');
+if (q) q.addEventListener('input', function () {
+  var v = this.value.trim().toLowerCase();
+  document.querySelectorAll('nav details.grp').forEach(function (d) {
+    var any = false;
+    d.querySelectorAll('a.item').forEach(function (a) {
+      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
+      a.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    d.style.display = (any || !v) ? '' : 'none';
+    if (v && any) d.open = true;
+  });
+});
+// 进度条 + 回到顶部
+var bar = document.getElementById('bar'), top = document.querySelector('.totop');
+function onScroll() {
+  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
+  var max = h.scrollHeight - h.clientHeight;
+  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  if (top) top.classList.toggle('on', y > 500);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+// 复制
+document.querySelectorAll('.codebox').forEach(function (box) {
+  var btn = box.querySelector('button'), pre = box.querySelector('pre');
+  if (!btn || !pre) return;
+  btn.addEventListener('click', function () {
+    var t = pre.innerText;
+    var done = function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
+    else {
+      var ta = document.createElement('textarea'); ta.value = t;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
+    }
+  });
+});
+// 主题（记住选择 + 跟随系统）
+var tb = document.getElementById('theme'), saved = null;
+try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
+if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function syncThemeBtn() {
+  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+syncThemeBtn();
+if (tb) tb.addEventListener('click', function () {
+  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  syncThemeBtn();
+  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
+});
+// 窄屏抽屉
+var mb = document.getElementById('menu');
+if (mb) {
+  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
+  document.querySelector('nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
+  });
+}
+// 目录高亮当前章节
+(function () {
+  var links = [].slice.call(document.querySelectorAll('nav a.item'));
+  var targets = links.map(function (a) {
+    var h = a.getAttribute('href') || '';
+    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
+    return id ? document.getElementById(id) : null;
+  });
+  if (!targets.some(Boolean)) return;
+  function mark() {
+    var y = scrollY + 130, idx = -1;
+    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
+  }
+  addEventListener('scroll', mark, { passive: true }); mark();
+})();
+</script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  if (!window.mermaid) {
+    nodes.forEach(function (el) {
+      el.insertAdjacentHTML('beforebegin',
+        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
+        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.textContent; pre.appendChild(code);
+      el.innerHTML = ''; el.appendChild(pre);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
+    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
+    state: { useMaxWidth: true } });
+  nodes.forEach(function (el, i) {
+    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
+      el.innerHTML = r.svg;
+    }).catch(function (e) {
+      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
+    });
+  });
+})();
+</script>
+</body></html>

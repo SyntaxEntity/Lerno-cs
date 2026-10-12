@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>计算机组成原理 · 存储系统</title><style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
+  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
+  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
+  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
+  --radius:10px; --mw:780px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
+  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
+  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
+  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  text-rendering:optimizeLegibility;
+}
+/* ---------- 布局 ---------- */
+#wrap{display:flex;align-items:flex-start;min-height:100vh}
+nav{
+  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
+  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
+}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
+nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
+#q{
+  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
+}
+#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+nav .home{
+  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
+  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+}
+nav .home:hover{filter:brightness(.97)}
+details.grp{margin:2px 0}
+details.grp>summary{
+  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
+  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:var(--line2)}
+details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
+details.grp[open]>summary{color:var(--acc)}
+nav a.item{
+  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
+  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+nav a.item:hover{background:var(--line2);color:var(--fg)}
+nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
+/* ---------- 进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
+/* ---------- 标题 ---------- */
+h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
+h2{
+  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
+  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
+}
+h3{font-size:18px;margin:28px 0 12px}
+p{margin:0 0 14px}
+/* ---------- 知识点卡片 ---------- */
+.kp{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
+}
+.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
+/* ---------- 字段 ---------- */
+.fld{margin:24px 0 0}
+.lab{
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
+}
+.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
+.freq{
+  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
+  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
+}
+.freq b{color:var(--fg)}
+html[data-theme="dark"] .freq{color:#f2e8cc}
+/* 结论速记 → 公式卡 */
+ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.facts li{
+  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
+  padding:11px 15px;font-size:15px;margin:0;
+}
+ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
+/* 易错点 → 卡片 */
+ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.errs li{
+  position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
+}
+ul.errs li::before{
+  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
+  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
+}
+html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
+/* 解析 */
+blockquote{
+  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
+  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
+}
+blockquote p:last-child{margin-bottom:0}
+blockquote strong{color:var(--fg)}
+/* 真题题干 */
+.q-stem{
+  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
+}
+.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
+/* ---------- 代码 ---------- */
+code{
+  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
+  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  word-break:break-word;
+}
+.codebox{margin:14px 0}
+.codebox .bar{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
+}
+.codebox button{
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  border-radius:6px;padding:2px 9px;font-size:11.5px;
+}
+.codebox button:hover{border-color:var(--acc);color:var(--acc)}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow:auto;margin:0;
+}
+pre code{background:none;padding:0;font-size:13px;line-height:1.5}
+/* ASCII 示意图：深色面板，保证等宽对齐可读 */
+.codebox.ascii .bar{color:var(--fg2);font-weight:600}
+.codebox.ascii pre{
+  background:var(--dark);border-color:#000;color:var(--dark-fg);
+  font-size:12.5px;line-height:1.45;padding:18px;
+}
+.codebox.ascii pre code{color:var(--dark-fg)}
+/* Mermaid */
+.fig{margin:16px 0}
+.mermaid{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:16px;overflow:auto;text-align:center;min-height:44px;
+}
+.mermaid svg{max-width:100%;height:auto}
+.fig details{margin-top:8px}
+.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
+.fig summary:hover{color:var(--acc)}
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--line2)}
+/* ---------- 杂项 ---------- */
+.warn{
+  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
+  padding:11px 15px;font-size:14px;margin:14px 0;
+}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:40;
+}
+.totop.on{opacity:1;pointer-events:auto}
+.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
+#theme{
+  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
+}
+#menu{
+  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
+  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
+}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+/* ---------- 窄屏 ---------- */
+@media (max-width:1000px){
+  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
+      box-shadow:4px 0 22px rgba(0,0,0,.12)}
+  nav.open{transform:none}
+  main{padding:22px 18px 130px;max-width:none}
+  #menu{display:flex}
+  .kp{padding:20px 18px 24px}
+}
+/* ---------- 打印 ---------- */
+@media print{
+  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
+  body{background:#fff;font-size:11pt}
+  main{max-width:none;padding:0}
+  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
+  h2{break-after:avoid}
+  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
+  .mermaid{border-color:#ccc}
+  a{color:#000;text-decoration:none}
+}
+</style>
+<script src="../mermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<input id="q" placeholder="筛选知识点…" autocomplete="off">
+<a class="home" href="../index.html">⌂ 全科单页合集</a>
+<details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
+<a class="item" href="../数据结构/01-线性表.html">线性表</a>
+<a class="item" href="../数据结构/02-顺序表与链表.html">顺序表与链表</a>
+<a class="item" href="../数据结构/03-栈与队列.html">栈与队列</a>
+<a class="item" href="../数据结构/04-树与二叉树.html">树与二叉树</a>
+<a class="item" href="../数据结构/05-图.html">图</a>
+<a class="item" href="../数据结构/06-查找.html">查找</a>
+<a class="item" href="../数据结构/07-排序.html">排序</a>
+</details>
+<details class="grp" open><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
+<a class="item" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算</a>
+<a class="item cur" href="../计算机组成原理/02-存储系统.html">存储系统</a>
+<a class="item" href="../计算机组成原理/03-指令系统.html">指令系统</a>
+<a class="item" href="../计算机组成原理/04-中央处理器.html">中央处理器 CPU</a>
+<a class="item" href="../计算机组成原理/05-总线.html">总线</a>
+<a class="item" href="../计算机组成原理/06-输入输出系统.html">输入输出系统</a>
+</details>
+<details class="grp"><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
+<a class="item" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<a class="item" href="../操作系统/02-进程与线程.html">进程与线程</a>
+<a class="item" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
+<a class="item" href="../操作系统/04-同步与互斥.html">同步与互斥</a>
+<a class="item" href="../操作系统/05-内存管理.html">内存管理</a>
+<a class="item" href="../操作系统/06-文件管理.html">文件管理</a>
+<a class="item" href="../操作系统/07-输入输出管理.html">输入输出管理</a>
+</details>
+<details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
+<a class="item" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
+<a class="item" href="../计算机网络/02-物理层.html">物理层</a>
+<a class="item" href="../计算机网络/03-数据链路层.html">数据链路层</a>
+<a class="item" href="../计算机网络/04-网络层.html">网络层</a>
+<a class="item" href="../计算机网络/05-传输层.html">传输层</a>
+<a class="item" href="../计算机网络/06-应用层.html">应用层</a>
+</details></nav><main><h1>计算机组成原理 ｜ 存储系统</h1><h1 id="_1">计算机组成原理 · 存储系统</h1>
+<h2 id="_2" id="kp">存储系统 [高频]</h2>
+<p class="freq"><b>考频</b>　考察次数 32 次；涉及年份：2009—2025 年几乎年年出现，2010、2013、2015、2018、2020、2022、2024、2025 年为典型年份；分数占比约 22%；主要题型：选择题 + 综合应用题（43 题常考 Cache/主存扩展与地址划分）。</p>
+<p class="lab">核心讲解</p>
+<p><strong>存储层次</strong>的依据是程序访问的局部性：越靠近 CPU 的层次越快、越小、越贵，<code>Cache</code> 与主存之间以<strong>块（行）</strong>为单位交换数据，主存与辅存之间以<strong>页</strong>为单位。<strong>Cache 的地址划分</strong>是本科目最高频的计算：把物理地址从低位到高位切成"块内地址（<code>log2 块大小</code> 位）→ 组号（<code>log2 组数</code> 位）→ 标记"三段。直接映射时"组"就是行，行号 <code>= 主存块号 mod Cache 行数</code>；<code>N</code> 路组相联时组数 <code>= Cache 容量 / (块大小 × N)</code>；全相联只有标记与块内地址两段。<strong>平均访问时间</strong>在"先查 Cache，未命中再访主存"的串行模型下为 <code>T = 命中率 * Tc + 缺失率 * Tm</code>；</p>
+<p>若采用"并行/同时启动"或"流水"模型，公式中的 <code>Tm</code> 要改为"未命中时的额外开销"，必须按题意选择。<strong>Cache 行</strong>除数据外还需<strong>有效位</strong>，写回法还要<strong>脏位</strong>，替换算法用 LRU 时还要计数位或栈位，这些开销在做"Cache 总容量/总位数"题时必须计入。<strong>DRAM</strong> 需要定时刷新（一般取 <code>2 ms</code> 一个刷新周期），刷新按<strong>行</strong>进行、只需行地址，三种方式为集中刷新（有"死时间"）、分散刷新（无死区但存取周期变长）、异步刷新（折中，最常用）。</p>
+<p><strong>主存扩展</strong>分位扩展（数据线加宽，地址线共用）与字扩展（地址空间加大，需片选译码）。<strong>虚拟存储</strong>把逻辑地址翻译成物理地址：查 <code>TLB</code> → 查页表 → 若缺页则触发缺页异常；<code>TLB</code> 命中则不必访存取页表项，<code>Cache</code> 命中则不必访问主存，做时间计算时需按题意枚举四种命中组合。<strong>磁盘</strong>的存取时间 <code>= 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为<strong>旋转半圈</strong>的时间：<code>60 / 转速 / 2</code>。</p>
+<p class="lab">关键结论速记</p><ul class="facts">
+<li><code>组数 = Cache 容量 / (块大小 × 路数)</code>，<code>块内地址位数 = log2(块大小)</code>、<code>组号位数 = log2(组数)</code>、<code>标记位数 = 地址位数 - 组号 - 块内</code> —— Cache 地址划分三步走。</li>
+<li><code>Cache 行总位数 = 标记 + 1 有效位 + 脏位(写回时) + 替换计数位 + 数据位</code> —— 做"总容量"题必须加控制位。</li>
+<li><code>串行模型 T = 命中率 × Tc + 缺失率 × Tm</code> —— 若题中说明"并行访问"则需换成额外开销口径，不能硬套。</li>
+<li><code>DRAM 刷新按行、以 2 ms 为周期、只需行地址</code> —— 集中/分散/异步三种方式的差别在"是否有死时间"。</li>
+<li><code>磁盘存取时间 = 寻道 + 旋转延迟 + 传输</code>，<code>平均旋转延迟 = 60 / (2 × 转速)</code> 秒 —— 转速单位 rpm 换算成秒要除以 60。</li>
+<li><code>TLB 命中 → 无需访存查页表；Cache 命中 → 无需访主存</code> —— 计算有效访问时间时必须按题意枚举命中组合。</li>
+</ul>
+<p class="lab">示意图</p>
+<p><strong>Cache 地址划分</strong>：同一个 32 位物理地址，在直接映射与 <code>N</code> 路组相联下切成不同段数；组相联是"直接映射的组索引 + 组内全相联比较"的折中。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>Cache line structure (data block + tag + control bits)
+
+  +----------------+---+-------+----------+
+  |     data       | V | dirty |  tag     |
+  +----------------+---+-------+----------+
+    block size B     1     1    tag bits
+
+direct mapping: line number = block number mod number of lines
+
+ 31                      tag                 index     offset
+ +--------------------------+------------------+---------+
+ |          tag             |    line index    | offset  |
+ +--------------------------+------------------+---------+
+                            |&lt;-- log2(lines) --&gt;|&lt;log2 B &gt;|
+
+N-way set associative: number of sets = capacity / (B * N)
+
+ 31                      tag                 set       offset
+ +--------------------------+------------------+---------+
+ |          tag             |     set index    | offset  |
+ +--------------------------+------------------+---------+
+   compare tag with N ways in parallel (N comparators)
+
+worked example (32-bit address, B = 64 B, 8-way, capacity = 512 KB)
+   sets    = 512 KB / (64 B * 8) = 1024          -&gt; index = 10 bit
+   offset  = log2 64 = 6 bit
+   tag     = 32 - 10 - 6 = 16 bit
+
+ 31            16 15         6 5        0
+ +----------------+-----------+----------+
+ |   tag (16)     | set (10)  | off (6)  |
+ +----------------+-----------+----------+
+</code></pre></div>
+<p><strong>一次访存（load）的完整判定流程</strong>：<code>TLB</code>、<code>Cache</code>、主存、页表四者的关系决定了有效访问时间的计算口径。</p>
+<div class="fig"><div class="mermaid" data-src="flowchart TD
+    M0[&quot;CPU 发出逻辑地址&quot;] --&gt; M1[&quot;按虚页号查 TLB&quot;]
+    M1 --&gt; M2{&quot;TLB 命中&quot;}
+    M2 --&gt;|是| M3[&quot;得到物理页框号 拼成物理地址&quot;]
+    M2 --&gt;|否| M4[&quot;访主存查页表&quot;]
+    M4 --&gt; M5{&quot;页表项有效位&quot;}
+    M5 --&gt;|无效| M6[&quot;缺页异常 调入页面后重新执行&quot;]
+    M5 --&gt;|有效| M7[&quot;得到物理页框号 并回填 TLB&quot;]
+    M7 --&gt; M3
+    M3 --&gt; M8[&quot;按物理地址的组号与标记查 Cache&quot;]
+    M8 --&gt; M9{&quot;Cache 命中&quot;}
+    M9 --&gt;|是| M10[&quot;取数据返回 CPU&quot;]
+    M9 --&gt;|否| M11[&quot;访问主存取块 按替换算法与写策略更新&quot;]
+    M11 --&gt; M10
+">flowchart TD
+    M0[&quot;CPU 发出逻辑地址&quot;] --&gt; M1[&quot;按虚页号查 TLB&quot;]
+    M1 --&gt; M2{&quot;TLB 命中&quot;}
+    M2 --&gt;|是| M3[&quot;得到物理页框号 拼成物理地址&quot;]
+    M2 --&gt;|否| M4[&quot;访主存查页表&quot;]
+    M4 --&gt; M5{&quot;页表项有效位&quot;}
+    M5 --&gt;|无效| M6[&quot;缺页异常 调入页面后重新执行&quot;]
+    M5 --&gt;|有效| M7[&quot;得到物理页框号 并回填 TLB&quot;]
+    M7 --&gt; M3
+    M3 --&gt; M8[&quot;按物理地址的组号与标记查 Cache&quot;]
+    M8 --&gt; M9{&quot;Cache 命中&quot;}
+    M9 --&gt;|是| M10[&quot;取数据返回 CPU&quot;]
+    M9 --&gt;|否| M11[&quot;访问主存取块 按替换算法与写策略更新&quot;]
+    M11 --&gt; M10
+</div><details><summary>查看该图 mermaid 源码</summary><pre><code>flowchart TD
+    M0[&quot;CPU 发出逻辑地址&quot;] --&gt; M1[&quot;按虚页号查 TLB&quot;]
+    M1 --&gt; M2{&quot;TLB 命中&quot;}
+    M2 --&gt;|是| M3[&quot;得到物理页框号 拼成物理地址&quot;]
+    M2 --&gt;|否| M4[&quot;访主存查页表&quot;]
+    M4 --&gt; M5{&quot;页表项有效位&quot;}
+    M5 --&gt;|无效| M6[&quot;缺页异常 调入页面后重新执行&quot;]
+    M5 --&gt;|有效| M7[&quot;得到物理页框号 并回填 TLB&quot;]
+    M7 --&gt; M3
+    M3 --&gt; M8[&quot;按物理地址的组号与标记查 Cache&quot;]
+    M8 --&gt; M9{&quot;Cache 命中&quot;}
+    M9 --&gt;|是| M10[&quot;取数据返回 CPU&quot;]
+    M9 --&gt;|否| M11[&quot;访问主存取块 按替换算法与写策略更新&quot;]
+    M11 --&gt; M10
+</code></pre></details></div>
+<p class="lab">易错点</p><ul class="errs">
+<li>缓存容量计算漏掉控制位：Cache 行除数据块外还有有效位（写回法还有脏位、LRU 还有计数位），题目问"Cache 总位数/标记阵列容量"时必须加上这些位，只算数据位会偏小。</li>
+<li>把"组数"与"行数"混用：直接映射时组数等于行数，而 <code>N</code> 路组相联时 <code>行数 = 组数 × N</code>；若把组数直接当行数去算组号位数，地址划分会整体错位。</li>
+<li>用错平均访问时间模型：<code>T = h·Tc + (1-h)·Tm</code> 只适用于"先查 Cache 再访主存"的串行模型；若题目说"Cache 与主存同时启动"或给出"未命中额外开销"，必须改用对应公式。</li>
+<li>旋转延迟算成一圈：平均旋转延迟是<strong>半圈</strong>时间，即 <code>60 / (2 × 转速)</code> 秒（转速为 rpm）；算成一圈会使结果翻倍，磁盘存取时间题必错。</li>
+</ul>
+<p class="lab">真题示例</p>
+<p class="q-stem"><span class="q-src">2014 年 408 第 43 题（综合应用题，8 分）</span></p>
+<p>假设某计算机按字节编址，主存地址为 32 位，采用 8 路组相联映射的 Cache，Cache 数据区容量为 512 KB，每个主存块大小为 64 字节，Cache 采用写回法并含 LRU 替换所需的计数位。要求：给出物理地址中标记、组号与块内地址的位数；求 Cache 中每一行的总位数（含必要的控制位）。</p>
+<blockquote>
+<p>解析：先求组数——<code>组数 = Cache 数据区容量 / (块大小 × 路数) = 512 KB / (64 B × 8) = 1024 = 2^10</code>。于是<strong>块内地址 = <code>log2 64 = 6</code> 位、组号 = <code>log2 1024 = 10</code> 位、标记 = <code>32 - 10 - 6 = 16</code> 位</strong>。再求行总位数——数据位 <code>64 × 8 = 512</code> 位，标记 <code>16</code> 位，有效位 1 位，写回法需脏位 1 位，8 路 LRU 需要能区分 8 种次序的计数位（3 位，或按题意用 <code>log2 8 = 3</code>）：合计 <code>512 + 16 + 1 + 1 + 3 = 533</code> 位/行。<strong>判分点是"组数公式里要乘路数"与"控制位必须计入"，两处都是高频失分点。</strong></p>
+</blockquote>
+<hr /></main></div>
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script>
+// 侧栏筛选
+var q = document.getElementById('q');
+if (q) q.addEventListener('input', function () {
+  var v = this.value.trim().toLowerCase();
+  document.querySelectorAll('nav details.grp').forEach(function (d) {
+    var any = false;
+    d.querySelectorAll('a.item').forEach(function (a) {
+      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
+      a.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    d.style.display = (any || !v) ? '' : 'none';
+    if (v && any) d.open = true;
+  });
+});
+// 进度条 + 回到顶部
+var bar = document.getElementById('bar'), top = document.querySelector('.totop');
+function onScroll() {
+  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
+  var max = h.scrollHeight - h.clientHeight;
+  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  if (top) top.classList.toggle('on', y > 500);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+// 复制
+document.querySelectorAll('.codebox').forEach(function (box) {
+  var btn = box.querySelector('button'), pre = box.querySelector('pre');
+  if (!btn || !pre) return;
+  btn.addEventListener('click', function () {
+    var t = pre.innerText;
+    var done = function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
+    else {
+      var ta = document.createElement('textarea'); ta.value = t;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
+    }
+  });
+});
+// 主题（记住选择 + 跟随系统）
+var tb = document.getElementById('theme'), saved = null;
+try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
+if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function syncThemeBtn() {
+  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+syncThemeBtn();
+if (tb) tb.addEventListener('click', function () {
+  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  syncThemeBtn();
+  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
+});
+// 窄屏抽屉
+var mb = document.getElementById('menu');
+if (mb) {
+  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
+  document.querySelector('nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
+  });
+}
+// 目录高亮当前章节
+(function () {
+  var links = [].slice.call(document.querySelectorAll('nav a.item'));
+  var targets = links.map(function (a) {
+    var h = a.getAttribute('href') || '';
+    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
+    return id ? document.getElementById(id) : null;
+  });
+  if (!targets.some(Boolean)) return;
+  function mark() {
+    var y = scrollY + 130, idx = -1;
+    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
+  }
+  addEventListener('scroll', mark, { passive: true }); mark();
+})();
+</script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  if (!window.mermaid) {
+    nodes.forEach(function (el) {
+      el.insertAdjacentHTML('beforebegin',
+        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
+        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.textContent; pre.appendChild(code);
+      el.innerHTML = ''; el.appendChild(pre);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
+    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
+    state: { useMaxWidth: true } });
+  nodes.forEach(function (el, i) {
+    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
+      el.innerHTML = r.svg;
+    }).catch(function (e) {
+      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
+    });
+  });
+})();
+</script>
+</body></html>

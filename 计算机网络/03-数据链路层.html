@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>计算机网络 · 数据链路层</title><style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
+  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
+  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
+  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
+  --radius:10px; --mw:780px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
+  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
+  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
+  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
+}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
+       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  text-rendering:optimizeLegibility;
+}
+/* ---------- 布局 ---------- */
+#wrap{display:flex;align-items:flex-start;min-height:100vh}
+nav{
+  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
+  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
+}
+nav::-webkit-scrollbar{width:9px}
+nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
+nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
+#q{
+  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
+}
+#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+nav .home{
+  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
+  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+}
+nav .home:hover{filter:brightness(.97)}
+details.grp{margin:2px 0}
+details.grp>summary{
+  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
+  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary:hover{background:var(--line2)}
+details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
+details.grp[open]>summary{color:var(--acc)}
+nav a.item{
+  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
+  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+nav a.item:hover{background:var(--line2);color:var(--fg)}
+nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
+/* ---------- 进度条 ---------- */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
+/* ---------- 标题 ---------- */
+h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
+h2{
+  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
+  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
+}
+h3{font-size:18px;margin:28px 0 12px}
+p{margin:0 0 14px}
+/* ---------- 知识点卡片 ---------- */
+.kp{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
+}
+.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
+/* ---------- 字段 ---------- */
+.fld{margin:24px 0 0}
+.lab{
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
+}
+.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
+.freq{
+  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
+  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
+}
+.freq b{color:var(--fg)}
+html[data-theme="dark"] .freq{color:#f2e8cc}
+/* 结论速记 → 公式卡 */
+ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.facts li{
+  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
+  padding:11px 15px;font-size:15px;margin:0;
+}
+ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
+/* 易错点 → 卡片 */
+ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.errs li{
+  position:relative;background:var(--panel);border:1px solid var(--line);
+  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
+}
+ul.errs li::before{
+  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
+  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
+}
+html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
+/* 解析 */
+blockquote{
+  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
+  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
+}
+blockquote p:last-child{margin-bottom:0}
+blockquote strong{color:var(--fg)}
+/* 真题题干 */
+.q-stem{
+  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
+}
+.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
+/* ---------- 代码 ---------- */
+code{
+  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
+  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  word-break:break-word;
+}
+.codebox{margin:14px 0}
+.codebox .bar{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
+}
+.codebox button{
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  border-radius:6px;padding:2px 9px;font-size:11.5px;
+}
+.codebox button:hover{border-color:var(--acc);color:var(--acc)}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
+  padding:14px 16px;overflow:auto;margin:0;
+}
+pre code{background:none;padding:0;font-size:13px;line-height:1.5}
+/* ASCII 示意图：深色面板，保证等宽对齐可读 */
+.codebox.ascii .bar{color:var(--fg2);font-weight:600}
+.codebox.ascii pre{
+  background:var(--dark);border-color:#000;color:var(--dark-fg);
+  font-size:12.5px;line-height:1.45;padding:18px;
+}
+.codebox.ascii pre code{color:var(--dark-fg)}
+/* Mermaid */
+.fig{margin:16px 0}
+.mermaid{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:16px;overflow:auto;text-align:center;min-height:44px;
+}
+.mermaid svg{max-width:100%;height:auto}
+.fig details{margin-top:8px}
+.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
+.fig summary:hover{color:var(--acc)}
+/* ---------- 表格 ---------- */
+.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
+th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--line2)}
+/* ---------- 杂项 ---------- */
+.warn{
+  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
+  padding:11px 15px;font-size:14px;margin:14px 0;
+}
+.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
+  transition:opacity .2s;z-index:40;
+}
+.totop.on{opacity:1;pointer-events:auto}
+.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
+#theme{
+  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
+  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
+}
+#menu{
+  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
+  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
+}
+hr{border:none;border-top:1px solid var(--line);margin:32px 0}
+/* ---------- 窄屏 ---------- */
+@media (max-width:1000px){
+  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
+      box-shadow:4px 0 22px rgba(0,0,0,.12)}
+  nav.open{transform:none}
+  main{padding:22px 18px 130px;max-width:none}
+  #menu{display:flex}
+  .kp{padding:20px 18px 24px}
+}
+/* ---------- 打印 ---------- */
+@media print{
+  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
+  body{background:#fff;font-size:11pt}
+  main{max-width:none;padding:0}
+  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
+  h2{break-after:avoid}
+  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
+  .mermaid{border-color:#ccc}
+  a{color:#000;text-decoration:none}
+}
+</style>
+<script src="../mermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<input id="q" placeholder="筛选知识点…" autocomplete="off">
+<a class="home" href="../index.html">⌂ 全科单页合集</a>
+<details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
+<a class="item" href="../数据结构/01-线性表.html">线性表</a>
+<a class="item" href="../数据结构/02-顺序表与链表.html">顺序表与链表</a>
+<a class="item" href="../数据结构/03-栈与队列.html">栈与队列</a>
+<a class="item" href="../数据结构/04-树与二叉树.html">树与二叉树</a>
+<a class="item" href="../数据结构/05-图.html">图</a>
+<a class="item" href="../数据结构/06-查找.html">查找</a>
+<a class="item" href="../数据结构/07-排序.html">排序</a>
+</details>
+<details class="grp"><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
+<a class="item" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算</a>
+<a class="item" href="../计算机组成原理/02-存储系统.html">存储系统</a>
+<a class="item" href="../计算机组成原理/03-指令系统.html">指令系统</a>
+<a class="item" href="../计算机组成原理/04-中央处理器.html">中央处理器 CPU</a>
+<a class="item" href="../计算机组成原理/05-总线.html">总线</a>
+<a class="item" href="../计算机组成原理/06-输入输出系统.html">输入输出系统</a>
+</details>
+<details class="grp"><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
+<a class="item" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<a class="item" href="../操作系统/02-进程与线程.html">进程与线程</a>
+<a class="item" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
+<a class="item" href="../操作系统/04-同步与互斥.html">同步与互斥</a>
+<a class="item" href="../操作系统/05-内存管理.html">内存管理</a>
+<a class="item" href="../操作系统/06-文件管理.html">文件管理</a>
+<a class="item" href="../操作系统/07-输入输出管理.html">输入输出管理</a>
+</details>
+<details class="grp" open><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
+<a class="item" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
+<a class="item" href="../计算机网络/02-物理层.html">物理层</a>
+<a class="item cur" href="../计算机网络/03-数据链路层.html">数据链路层</a>
+<a class="item" href="../计算机网络/04-网络层.html">网络层</a>
+<a class="item" href="../计算机网络/05-传输层.html">传输层</a>
+<a class="item" href="../计算机网络/06-应用层.html">应用层</a>
+</details></nav><main><h1>计算机网络 ｜ 数据链路层</h1><h1 id="_1">计算机网络 · 数据链路层</h1>
+<h2 id="_2" id="kp">数据链路层 [高频]</h2>
+<p class="freq"><b>考频</b>　考察次数 22 次；涉及年份：2010—2025 年高频，2011、2013、2015、2017、2019、2020、2022、2024 年为典型年份；分数占比约 20%；主要题型：选择题 + 综合应用题（滑动窗口、CSMA/CD、以太网帧）。</p>
+<p class="lab">核心讲解</p>
+<p>数据链路层的三个基本功能是<strong>封装成帧（组帧）、差错控制、流量控制</strong>。<strong>组帧</strong>常用四种方法：字符计数法（用计数字段标明帧长，一旦计数出错就全盘失步）、<strong>字符填充法</strong>（用 <code>SOH</code>/<code>EOT</code> 定界，数据中出现的 <code>SOH</code>/<code>EOT</code> 前插入转义字符 <code>ESC</code>，接收方删除转义）、<strong>零比特填充法</strong>（<code>HDLC</code> 使用：在标志字段 <code>01111110</code> 之外的数据中，每出现 <strong>5 个连续 <code>1</code> 就填入一个 <code>0</code></strong>，接收方每见 5 个连续 <code>1</code> 就删除其后的 <code>0</code>）、<strong>违规编码法</strong>（如曼彻斯特编码中的非法电平组合），后两种是"透明传输"的标准做法。<strong>差错控制</strong>中，<strong>奇偶校验</strong>只能检出奇数个错误；</p>
+<p><strong>循环冗余校验 <code>CRC</code></strong> 用生成多项式做<strong>模 2 除法</strong>求余数作为 <code>FCS</code>，能检出所有单比特错、所有奇数个错以及长度不超过生成多项式阶数的突发错；<strong>海明码</strong>通过 <code>2^r &gt;= k + r + 1</code> 确定所需的<strong>校验位数 <code>r</code></strong>（<code>k</code> 为数据位数），校验位放在 <code>2^i</code> 位置（第 1、2、4、8… 位），可实现<strong>一位纠错</strong>（配合总校验位可做到"纠一位、检两位"）。<strong>流量控制与可靠传输</strong>三种协议必须分清：<strong>停止-等待</strong>发送窗口为 <code>1</code>、每发一帧等一个确认，信道利用率 <code>= T_d / (T_d + RTT + T_a)</code>（<code>T_d</code> 为发送时延、<code>T_a</code> 为确认发送时延）；</p>
+<p><strong>后退 <code>N</code> 帧 <code>GBN</code></strong> 用累计确认，接收窗口为 <code>1</code>，出错后重传从出错帧开始的全部帧，<strong>发送窗口上限为 <code>2^n - 1</code></strong>（<code>n</code> 为序号位数）；<strong>选择重传 <code>SR</code></strong> 逐帧确认、接收方缓存乱序帧，只重传出错帧，<strong>发送窗口与接收窗口上限均为 <code>2^(n-1)</code></strong>，即窗口之和不超过 <code>2^n</code>。<strong>介质访问控制</strong>分三类：<strong>信道划分</strong>（频分 <code>FDM</code>、时分 <code>TDM</code>、码分 <code>CDM</code>，各站点固定分配、无冲突）、<strong>随机访问</strong>（<code>ALOHA</code>、<code>CSMA</code>、<code>CSMA/CD</code>、<code>CSMA/CA</code>）、<strong>轮询访问</strong>（令牌传递）。</p>
+<p><strong><code>CSMA/CD</code></strong> 的工作是"<strong>先听后发、边听边发、冲突停发、随机重发</strong>"：站点发送前先监听信道，发送中继续监听，一旦检测到冲突就立即停止并发送<strong>人为干扰信号</strong>，然后按<strong>截断二进制指数退避</strong>算法等待重发（第 <code>i</code> 次冲突后从 <code>{0, 1, ..., 2^k - 1}</code> 中随机取 <code>r</code>，<code>k = min(i, 10)</code>，等待 <code>r</code> 倍争用期）。<strong>最小帧长</strong>的依据是"发送时延必须不小于往返传播时延（争用期 <code>2τ</code>）"，否则发送方在冲突信号返回前已发完帧而无法检测冲突：<code>最小帧长 = 2 × 传播时延 × 数据率 = 争用期 × 数据率</code>，以太网取 <code>2τ = 51.2 μs</code>、<code>10 Mb/s</code>，故最小帧长 <code>512 bit = 64 B</code>。</p>
+<p><strong>以太网帧</strong>的 <code>MAC</code> 地址为 <code>48</code> 位，帧格式为"目的地址（6 <code>B</code>）+ 源地址（6 <code>B</code>）+ 类型（2 <code>B</code>）+ 数据（46—1500 <code>B</code>）+ <code>FCS</code>（4 <code>B</code>）"，故最小帧 <code>64 B</code>、最大帧 <code>1518 B</code>。<strong>交换机</strong>工作在数据链路层，通过<strong>自学习</strong>建立"<code>MAC</code> 地址 → 端口"的转发表，能隔离冲突域但不能隔离广播域。</p>
+<p class="lab">关键结论速记</p><ul class="facts">
+<li><code>零比特填充：发送方每 5 个连续 1 后插 0，接收方每 5 个连续 1 后删 0</code> —— 保证数据对标志字段 <code>01111110</code> 透明。</li>
+<li><code>海明码校验位数：2^r &gt;= k + r + 1</code>（<code>k</code> 数据位、<code>r</code> 校验位） —— 校验位位于第 1、2、4、8… 位。</li>
+<li><code>CRC 用模 2 除法求余数作为 FCS</code> —— 生成多项式最高次为 <code>r</code> 则余数取 <code>r</code> 位，且模 2 运算不产生进位。</li>
+<li><code>GBN 发送窗口 &lt;= 2^n - 1，接收窗口 = 1</code>；<code>SR 收发窗口均 &lt;= 2^(n-1)</code> —— 序号位数 <code>n</code> 决定窗口上限。</li>
+<li><code>CSMA/CD：先听后发、边听边发、冲突停发、随机重发</code>；<code>最小帧长 = 争用期 × 数据率</code>。</li>
+<li><code>以太网最小帧 64 B、最大帧 1518 B、数据字段 46—1500 B</code> —— 小于 46 <code>B</code> 需填充。</li>
+<li><code>交换机隔离冲突域但不隔离广播域</code> —— 隔离广播域要靠路由器或 <code>VLAN</code>。</li>
+</ul>
+<p class="lab">示意图</p>
+<p><strong>最小帧长的推导与以太网争用期</strong>：发送方必须在冲突信号返回之前仍在发送，否则无法检测到冲突。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>why a minimum frame size is needed (CSMA/CD)
+
+  A                                    B
+  |------ propagation delay t ------&gt;  |     t = distance / v
+  |                                    |
+  |  A starts sending at time 0        |
+  |                                    |  B starts sending at t - e
+  |&lt;---- collision happens near B ----&gt;|
+  |                                    |
+  |  the collision signal needs t to come back to A
+  |&lt;------------- round trip = 2t ----&gt;|
+
+  requirement: A&#x27;s transmission time &gt;= 2t  (the contention period)
+      T_send = frame_length / data_rate &gt;= 2 * t
+      =&gt; minimum frame length = 2 * t * data_rate
+
+  classic Ethernet numbers
+      data rate = 10 Mb/s, 2t = 51.2 us
+      min frame = 51.2 us * 10 Mb/s = 512 bit = 64 byte
+      max frame = 1518 byte (with 1500 byte data field)
+
+ethernet frame format (DIX Ethernet V2)
+
+  +---------+---------+-------+------------------+-------+
+  | dest MA | src MAC |  type |  data (46-1500)  |  FCS  |
+  +---------+---------+-------+------------------+-------+
+     6 B       6 B      2 B         46 - 1500 B     4 B
+  min frame = 6+6+2+46+4 = 64 B      max = 6+6+2+1500+4 = 1518 B
+  a data field shorter than 46 B must be padded
+</code></pre></div>
+<p><strong><code>CSMA/CD</code> 的发送与冲突退避流程</strong>：检测到冲突后必须立即停止并发送干扰信号，再用截断二进制指数退避决定重发时刻。</p>
+<div class="fig"><div class="mermaid" data-src="flowchart TD
+    C0[&quot;站点有帧要发送&quot;] --&gt; C1[&quot;监听信道是否空闲&quot;]
+    C1 --&gt; C2{&quot;信道空闲&quot;}
+    C2 --&gt;|否 忙| C1
+    C2 --&gt;|是 且持续 9.6us 仍空闲| C3[&quot;开始发送帧&quot;]
+    C3 --&gt; C4{&quot;发送过程中是否检测到冲突&quot;}
+    C4 --&gt;|否| C5{&quot;帧是否发送完毕&quot;}
+    C5 --&gt;|否| C4
+    C5 --&gt;|是| C6[&quot;发送成功 本次结束&quot;]
+    C4 --&gt;|是| C7[&quot;立即停止发送 并发送人为干扰信号&quot;]
+    C7 --&gt; C8[&quot;冲突次数 i 加 1&quot;]
+    C8 --&gt; C9{&quot;i 是否超过 16&quot;}
+    C9 --&gt;|是| C10[&quot;丢弃该帧 向上报错&quot;]
+    C9 --&gt;|否| C11[&quot;取 k = min(i, 10) 从 0 到 2^k - 1 随机取 r&quot;]
+    C11 --&gt; C12[&quot;等待 r 倍争用期 2t 后重新监听&quot;]
+    C12 --&gt; C1
+">flowchart TD
+    C0[&quot;站点有帧要发送&quot;] --&gt; C1[&quot;监听信道是否空闲&quot;]
+    C1 --&gt; C2{&quot;信道空闲&quot;}
+    C2 --&gt;|否 忙| C1
+    C2 --&gt;|是 且持续 9.6us 仍空闲| C3[&quot;开始发送帧&quot;]
+    C3 --&gt; C4{&quot;发送过程中是否检测到冲突&quot;}
+    C4 --&gt;|否| C5{&quot;帧是否发送完毕&quot;}
+    C5 --&gt;|否| C4
+    C5 --&gt;|是| C6[&quot;发送成功 本次结束&quot;]
+    C4 --&gt;|是| C7[&quot;立即停止发送 并发送人为干扰信号&quot;]
+    C7 --&gt; C8[&quot;冲突次数 i 加 1&quot;]
+    C8 --&gt; C9{&quot;i 是否超过 16&quot;}
+    C9 --&gt;|是| C10[&quot;丢弃该帧 向上报错&quot;]
+    C9 --&gt;|否| C11[&quot;取 k = min(i, 10) 从 0 到 2^k - 1 随机取 r&quot;]
+    C11 --&gt; C12[&quot;等待 r 倍争用期 2t 后重新监听&quot;]
+    C12 --&gt; C1
+</div><details><summary>查看该图 mermaid 源码</summary><pre><code>flowchart TD
+    C0[&quot;站点有帧要发送&quot;] --&gt; C1[&quot;监听信道是否空闲&quot;]
+    C1 --&gt; C2{&quot;信道空闲&quot;}
+    C2 --&gt;|否 忙| C1
+    C2 --&gt;|是 且持续 9.6us 仍空闲| C3[&quot;开始发送帧&quot;]
+    C3 --&gt; C4{&quot;发送过程中是否检测到冲突&quot;}
+    C4 --&gt;|否| C5{&quot;帧是否发送完毕&quot;}
+    C5 --&gt;|否| C4
+    C5 --&gt;|是| C6[&quot;发送成功 本次结束&quot;]
+    C4 --&gt;|是| C7[&quot;立即停止发送 并发送人为干扰信号&quot;]
+    C7 --&gt; C8[&quot;冲突次数 i 加 1&quot;]
+    C8 --&gt; C9{&quot;i 是否超过 16&quot;}
+    C9 --&gt;|是| C10[&quot;丢弃该帧 向上报错&quot;]
+    C9 --&gt;|否| C11[&quot;取 k = min(i, 10) 从 0 到 2^k - 1 随机取 r&quot;]
+    C11 --&gt; C12[&quot;等待 r 倍争用期 2t 后重新监听&quot;]
+    C12 --&gt; C1
+</code></pre></details></div>
+<p class="lab">易错点</p><ul class="errs">
+<li><code>GBN</code> 与 <code>SR</code> 的窗口上限记反：<code>GBN</code> 的发送窗口上限是 <code>2^n - 1</code>（接收窗口恒为 <code>1</code>），<code>SR</code> 的发送与接收窗口上限都是 <code>2^(n-1)</code>；把两者对调或用 <code>2^n</code> 做上限都会导致序号歧义。</li>
+<li>最小帧长漏乘 <code>2</code>：<code>最小帧长 = 2τ × 数据率</code>，其中 <code>2τ</code> 是<strong>往返</strong>传播时延（争用期）；只乘单程传播时延会把最小帧长算小一半，进而误判"该帧能否被检测到冲突"。</li>
+<li>海明码校验位数公式记错：正确式子是 <code>2^r &gt;= k + r + 1</code>（<code>k</code> 为数据位数），注意不等号右边要<strong>加上 <code>r</code> 本身</strong>（表示"校验位也要被校验"）；漏掉 <code>r</code> 会得到偏小的校验位数。</li>
+<li>混淆交换机与路由器的隔离能力：交换机工作在数据链路层，能隔离<strong>冲突域</strong>但<strong>不隔离广播域</strong>（广播帧会被转发到所有端口）；隔离广播域必须用路由器或划分 <code>VLAN</code>。</li>
+</ul>
+<p class="lab">真题示例</p>
+<p class="q-stem"><span class="q-src">2016 年 408 第 36 题（单项选择题，2 分）</span></p>
+<p>若某以太网的传播时延为 <code>25.6 μs</code>，数据传输速率为 <code>10 Mb/s</code>，则其最小帧长应为（ ）。</p>
+<p>A. <code>64 B</code>　B. <code>128 B</code>　C. <code>256 B</code>　D. <code>512 B</code></p>
+<blockquote>
+<p>解析：直接套用"最小帧长 = 争用期 × 数据率"。争用期是<strong>往返</strong>传播时延 <code>2τ = 2 × 25.6 μs = 51.2 μs</code>，故最小帧长 <code>= 51.2 μs × 10 Mb/s = 512 bit = 64 B</code>，答案为 <strong>A</strong>。若忘记乘 2（只取 <code>25.6 μs</code>）会得到 <code>256 bit = 32 B</code> 而不在选项中，从而暴露出错误来源。<strong>判分点是争用期必须是往返传播时延，以及比特与字节的换算（<code>512 bit = 64 B</code>）。</strong></p>
+</blockquote>
+<hr /></main></div>
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script>
+// 侧栏筛选
+var q = document.getElementById('q');
+if (q) q.addEventListener('input', function () {
+  var v = this.value.trim().toLowerCase();
+  document.querySelectorAll('nav details.grp').forEach(function (d) {
+    var any = false;
+    d.querySelectorAll('a.item').forEach(function (a) {
+      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
+      a.style.display = hit ? '' : 'none';
+      if (hit) any = true;
+    });
+    d.style.display = (any || !v) ? '' : 'none';
+    if (v && any) d.open = true;
+  });
+});
+// 进度条 + 回到顶部
+var bar = document.getElementById('bar'), top = document.querySelector('.totop');
+function onScroll() {
+  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
+  var max = h.scrollHeight - h.clientHeight;
+  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+  if (top) top.classList.toggle('on', y > 500);
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+// 复制
+document.querySelectorAll('.codebox').forEach(function (box) {
+  var btn = box.querySelector('button'), pre = box.querySelector('pre');
+  if (!btn || !pre) return;
+  btn.addEventListener('click', function () {
+    var t = pre.innerText;
+    var done = function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1200);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
+    else {
+      var ta = document.createElement('textarea'); ta.value = t;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
+    }
+  });
+});
+// 主题（记住选择 + 跟随系统）
+var tb = document.getElementById('theme'), saved = null;
+try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
+if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
+if (saved) document.documentElement.setAttribute('data-theme', saved);
+function syncThemeBtn() {
+  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+}
+syncThemeBtn();
+if (tb) tb.addEventListener('click', function () {
+  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  syncThemeBtn();
+  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
+});
+// 窄屏抽屉
+var mb = document.getElementById('menu');
+if (mb) {
+  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
+  document.querySelector('nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
+  });
+}
+// 目录高亮当前章节
+(function () {
+  var links = [].slice.call(document.querySelectorAll('nav a.item'));
+  var targets = links.map(function (a) {
+    var h = a.getAttribute('href') || '';
+    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
+    return id ? document.getElementById(id) : null;
+  });
+  if (!targets.some(Boolean)) return;
+  function mark() {
+    var y = scrollY + 130, idx = -1;
+    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
+    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
+  }
+  addEventListener('scroll', mark, { passive: true }); mark();
+})();
+</script>
+<script>
+(function () {
+  var nodes = document.querySelectorAll('.mermaid');
+  if (!nodes.length) return;
+  if (!window.mermaid) {
+    nodes.forEach(function (el) {
+      el.insertAdjacentHTML('beforebegin',
+        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
+        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.textContent; pre.appendChild(code);
+      el.innerHTML = ''; el.appendChild(pre);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
+    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
+    state: { useMaxWidth: true } });
+  nodes.forEach(function (el, i) {
+    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
+      el.innerHTML = r.svg;
+    }).catch(function (e) {
+      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
+      var pre = document.createElement('pre'), code = document.createElement('code');
+      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
+    });
+  });
+})();
+</script>
+</body></html>
