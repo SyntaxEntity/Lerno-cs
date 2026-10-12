@@ -518,9 +518,18 @@ def build():
                          "../mermaid.min.js", subtitle=s["name"]))
 
     # 全科单页合集
-    parts = ['<a id="top"></a>', "<h1>408 全科速成复习资料</h1>",
+    parts = ['<a id="top"></a>',
+             '<h1 style="font-size:32px;margin-bottom:10px">408 计算机学科专业基础综合'
+             '<span class="tag" style="margin-left:12px;font-size:12px">速成复习资料</span></h1>',
+             '<p style="color:var(--fg2);font-size:15px;margin-bottom:8px">'
+             '数据结构 · 计算机组成原理 · 操作系统 · 计算机网络</p>',
+             '<div class="tw" style="margin:18px 0 26px"><table><thead><tr>'
+             '<th>4 个科目</th><th>26 个知识点</th><th>60 张 ASCII 图</th>'
+             '<th>52 张 Mermaid 图</th><th>完全离线可用</th>'
+             '</tr></thead></table></div>',
              '<p class="warn">本页把四科全部内容合并为单页：左侧目录可折叠与筛选，'
-             '右下角可切换深浅色，支持 Ctrl+F 全文检索。</p>']
+             '右下角可切换深浅色，支持 Ctrl+F 全文检索；每个知识点均按'
+             '「考频统计 → 核心讲解 → 关键结论速记 → 示意图 → 易错点 → 真题示例」组织。</p>']
     for k in T.ORDER:
         s = T.SUBJECTS[k]
         parts.append('<h1 style="margin:2.4em 0 0;font-size:26px">%s'
