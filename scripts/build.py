@@ -143,8 +143,8 @@ def subject_index(subject_key, topics):
     sub = T.SUBJECTS[subject_key]
     rows = ["| # | 知识点 | 考察次数 | 分值占比 | 高频 |", "| --- | --- | --- | --- | --- |"]
     for i, (name, times, years, ratio, qtype, hot, slug) in enumerate(topics, 1):
-        # 同目录相对路径：总览与章节 md 都在 408/<科目>/ 下，点开即达；
-        # HTML 版由 build_html.py 用页内短链接处理，互不依赖
+        # 归档里链接指向同目录的 .md（归档内自洽、在 GitHub/编辑器里可点开）；
+        # 网页版由 build_html.py 在渲染时把 .md 改指同名跳转页 .md.html
         rows.append("| %d | [%s](%s.md) | %s | %s | %s |"
                     % (i, name, slug,
                        (T.PENDING if times == T.PENDING else "%d 次" % times),

@@ -15,6 +15,7 @@
   F10 易错点 条目数 2—4 条
 用法： python3 scripts/validate.py [--stats]
 """
+import glob
 import os
 import re
 import sys
@@ -490,11 +491,58 @@ def check_links():
                 target = m.group(1)
                 if target.startswith(("http", "#", "mailto:")):
                     continue
-                # 允许两种口径：与所在 md 同目录，或相对 408/ 根
+                # 允许三种落点：与所在 md 同目录、相对归档根、或站点里的跳转页
                 cands = [os.path.join(os.path.dirname(f), target),
-                         os.path.join(DOCS, target)]
+                         os.path.join(DOCS, target),
+                         os.path.join(SITE, target + ".html")]
+                if target.endswith(".md"):
+                    cands.append(os.path.join(SITE, target[:-3] + ".md.html"))
                 if not any(os.path.exists(c) for c in cands):
                     err(rel, 0, "F15", "相对链接解析失败（同目录 / 408/ 根均无此文件）：%s" % target)
+
+
+def check_site_links():
+    """F17: 站点与归档里的每一个相对链接都必须真实可达。
+
+    为什么需要：同一段 Markdown 会在两个位置渲染（科目目录内 / 根目录合集页），
+    链接深度必须按渲染位置修正；`.md` 与 `.md.html` 的落点也不同。
+    这类错误只在点击时暴露，必须机器兜住。
+    """
+    from urllib.parse import unquote
+
+    def visible(h):
+        h = re.sub(r"<pre>.*?</pre>", "", h, flags=re.S)
+        return re.sub(r'data-src="[^"]*"', "", h)
+
+    def ok(base, target):
+        t = unquote(target.split("#")[0].split("?")[0])
+        if not t or t.startswith(("http", "mailto:", "javascript:", "data:", "#")):
+            return True
+        return os.path.exists(os.path.normpath(os.path.join(base, t)))
+
+    for f in glob.glob(os.path.join(SITE, "**", "*.html"), recursive=True):
+        d = os.path.dirname(os.path.abspath(f))
+        with open(f, encoding="utf-8") as fh:
+            body = visible(fh.read())
+        for attr, val in re.findall(r'(href|src)="([^"]+)"', body):
+            if not ok(d, val):
+                err(os.path.relpath(f, ROOT), 0, "F17",
+                    "链接不可达（%s）：%s" % (attr, val[:60]))
+    for f in glob.glob(os.path.join(SITE, "**", "*.md.html"), recursive=True):
+        d = os.path.dirname(os.path.abspath(f))
+        with open(f, encoding="utf-8") as fh:
+            m = re.search(r'url=([^"\'>]+)', fh.read())
+        if m and not ok(d, m.group(1)):
+            err(os.path.relpath(f, ROOT), 0, "F17", "跳转页目标不存在：%s" % m.group(1))
+    for f in glob.glob(os.path.join(DOCS, "**", "*.md"), recursive=True):
+        d = os.path.dirname(os.path.abspath(f))
+        with open(f, encoding="utf-8") as fh:
+            for m in re.finditer(r"\]\(([^)\s]+)\)", fh.read()):
+                if "assets/" in m.group(1):
+                    continue          # 示例路径（写作规范里的占位）
+                if not ok(d, m.group(1)) and not ok(SITE, m.group(1)):
+                    err(os.path.relpath(f, ROOT), 0, "F17",
+                        "Markdown 链接不可达：%s" % m.group(1))
 
 
 def check_html():
@@ -608,6 +656,7 @@ def main():
 
     check_readme_citations()
     check_links()
+    check_site_links()
     check_html()
     return report("408 复习资料校验报告")
 

@@ -441,7 +441,12 @@ def md_to_html(text):
     body = markdown.markdown(text, extensions=["tables", "fenced_code", "toc", "sane_lists"])
     for i, b in enumerate(blocks):
         body = body.replace("<p>\x00B%d\x00</p>" % i, b).replace("\x00B%d\x00" % i, b)
-    return _style_fields(_clean_html(body))
+    body = _clean_html(body)
+    # 站点不发布 .md 本身，只发布 .html 与同名跳转页 xx.md.html：
+    # 把指向 .md 的链接改指跳转页，避免网页里点出 404
+    body = re.sub(r'href="([^"]+?)\.md(?![.\w])',
+                  lambda m: 'href="%s.md.html"' % m.group(1), body)
+    return _style_fields(body)
 
 
 # ---------------------------------------------------------------------------
@@ -466,8 +471,9 @@ def page(title, sidebar, body, mermaid_src, subtitle=""):
                      JS, MERMAID_INIT)
 
 
-def sidebar_for(subject_key=None, current=None, single_page=False):
-    prefix = "" if subject_key is None else "../"
+def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter"):
+    """page: "chapter" 章节页（在 <科目>/ 内）| "overview" 科目总览 | "root" 仓库根页面。"""
+    prefix = "../" if page in ("chapter", "overview") else ""
     out = ['<div class="brand">408 速成复习资料'
            '<small>四科 · 26 个知识点 · 离线可读</small></div>',
            '<input id="q" placeholder="筛选知识点…" autocomplete="off">']
@@ -485,11 +491,37 @@ def sidebar_for(subject_key=None, current=None, single_page=False):
             if single_page:
                 href, attr = "#%s-%s" % (k, t[6]), ' data-anchor="%s-%s"' % (k, t[6])
             else:
-                href, attr = "%s%s/%s.html" % (prefix, s["dir"], t[6]), ""
+                # 规则：本科目页面（章节页与总览页都在该科目目录内）→ 同目录直链；
+                #       其他科目 → 上一层再进该科目目录；根目录页面 → 直接进科目目录
+                if page in ("chapter", "overview") and k == subject_key:
+                    href = "%s.html" % t[6]
+                elif page in ("chapter", "overview"):
+                    href = "../%s/%s.html" % (s["dir"], t[6])
+                else:
+                    href = "%s/%s.html" % (s["dir"], t[6])
+                attr = ""
             cls = "item cur" if (current == t[6] and subject_key == k) else "item"
             out.append('<a class="%s" href="%s"%s>%s</a>' % (cls, href, attr, t[0]))
         out.append("</details>")
     return "\n".join(out)
+
+
+
+def relink(body, prefix_re, prefix_out):
+    """把正文里的相对链接按「输出位置」重写深度。
+
+    同一段 Markdown 会在两个位置渲染：科目目录内（同目录相对）与根目录的
+    合集页（需带科目子目录）。链接必须按渲染位置修正，否则总览里的章节索引
+    在合集页里会 404。
+    """
+    def fix(m):
+        href = m.group(2)
+        if re.match(r"^(https?:|mailto:|#|/|data:)", href):
+            return m.group(0)
+        if not re.search(prefix_re, href):
+            return m.group(0)
+        return '%s="%s%s"' % (m.group(1), prefix_out, href)
+    return re.sub(r'(href|src)="([^"]+)"', fix, body)
 
 
 def build():
@@ -510,11 +542,13 @@ def build():
             # 单章页面：给知识点标题加锚点，便于目录高亮
             body = re.sub(r"<h2([^>]*)>", r'<h2\1 id="kp">', body, count=1)
             with open(os.path.join(out, t[6] + ".html"), "w", encoding="utf-8") as f:
-                f.write(page("%s · %s" % (s["name"], t[0]), sidebar_for(k, t[6]), body,
+                f.write(page("%s · %s" % (s["name"], t[0]),
+                             sidebar_for(k, t[6], page="chapter"), body,
                              "../mermaid.min.js",
                              subtitle="%s ｜ %s" % (s["name"], t[0])))
         with open(os.path.join(out, "index.html"), "w", encoding="utf-8") as f:
-            f.write(page("%s · 科目总览" % s["name"], sidebar_for(k, None), overviews[k],
+            f.write(page("%s · 科目总览" % s["name"],
+                         sidebar_for(k, None, page="overview"), overviews[k],
                          "../mermaid.min.js", subtitle=s["name"]))
 
     # 全科单页合集
@@ -535,20 +569,23 @@ def build():
         parts.append('<h1 style="margin:2.4em 0 0;font-size:26px">%s'
                      '<span class="tag" style="margin-left:10px">%d 分</span></h1>'
                      % (s["name"], s["score"]))
-        parts.append(overviews[k])
+        # 合集页在仓库根渲染，总览里的章节索引需补上科目子目录
+        parts.append(relink(overviews[k], r"\.md\.html", s["dir"] + "/"))
         for t in T.TOPICS[k]:
             parts.append('<section class="kp" id="%s-%s">' % (k, t[6]))
             parts.append(chapters[(k, t[6])])
             parts.append("</section>")
     with open(os.path.join(SITE, "index.html"), "w", encoding="utf-8") as f:
-        f.write(page("408 全科速成复习资料", sidebar_for(None, None, single_page=True),
+        f.write(page("408 全科速成复习资料",
+                     sidebar_for(None, None, single_page=True, page="root"),
                      "\n".join(parts), "mermaid.min.js"))
     rp = os.path.join(DOCS, "00-总览.md")
     if os.path.exists(rp):
         with open(rp, encoding="utf-8") as f:
             body = md_to_html(f.read())
         with open(os.path.join(SITE, "README.html"), "w", encoding="utf-8") as f:
-            f.write(page("408 总览", sidebar_for(None, None), body, "mermaid.min.js"))
+            f.write(page("408 总览", sidebar_for(None, None, page="root"), body,
+                         "mermaid.min.js"))
     return len(chapters)
 
 
