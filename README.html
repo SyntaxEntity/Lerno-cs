@@ -796,7 +796,11 @@ python3 scripts/validate.py           # 校验成品：模板完整性、考频�
 <li><code>F5</code> <strong>ASCII 图内不得出现全角字符或制表符</strong>（否则等宽对齐会被破坏）；</li>
 <li><code>F6</code> 真题年份必须落在 <code>2009—2025</code>；</li>
 <li><code>F8</code> 每个知识点必须同时具备 ASCII 图与 Mermaid 图；</li>
-<li><code>F9</code>/<code>F10</code>/<code>F11</code> 核心讲解句数、易错点条数、关键结论速记条数在规范区间内。</li>
+<li><code>F9</code>/<code>F10</code>/<code>F11</code> 核心讲解句数、易错点条数、关键结论速记条数在规范区间内；</li>
+<li><code>F12</code> README 声明的"已核对原题"清单与正文标注<strong>双向逐条一致</strong>；</li>
+<li><code>F13</code>/<code>F14</code> 块级元素之间必须有空行，并用真实渲染器确认模板字段各自独立成段；</li>
+<li><code>F15</code>/<code>F17</code> 文档内相对链接可从仓库根解析，站点与归档的每个相对链接真实可达（含 <code>.md</code> 跳转页目标存在性）；</li>
+<li><code>F16</code> HTML 产物与组件完整性（防止渲染器静默退化）。</li>
 </ul>
 <p>除静态规则外，还可用官方 <code>mermaid</code> 解析器做<strong>真实语法校验</strong>：脚本会把全部 <code>52</code> 张 Mermaid 图逐张交给 <code>mermaid.parse()</code>，全部解析通过才算合格（这一层能发现静态规则看不出、但渲染时必然报错的写法）。</p>
 <div class="codebox"><div class="bar"><span>bash</span><button type="button">复制</button></div><pre><code>npm install --prefix .tools mermaid jsdom   # 一次性准备，.tools/ 已在 .gitignore 中忽略
