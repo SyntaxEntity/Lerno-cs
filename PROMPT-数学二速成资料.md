@@ -94,7 +94,7 @@
 
 ## 三、工程要求（这一节最重要，请逐条执行）
 
-我把 408 资料的做法沉淀在 `408-new/PLAYBOOK-速成资料工程化.md`，**请先完整读一遍**。
+我把 408 资料的做法沉淀在 `website/408-kaoyan/PLAYBOOK-速成资料工程化.md`，**请先完整读一遍**。
 核心结论复述如下：
 
 ### 3.1 单一数据源（强制）
@@ -262,11 +262,11 @@ Mermaid 硬性约束：
 
 ## 九、可直接复用的参考实现
 
-仓库里 `408-new/` 是同类任务的完整实现，**请先读这三个文件再动手**：
+仓库里 `website/408-kaoyan/` 是同类任务的完整实现，**请先读这三个文件再动手**：
 
-1. `408-new/PLAYBOOK-速成资料工程化.md` —— 方法论与全部踩坑记录（最重要）
-2. `408-new/scripts/validate.py` —— 16 类校验项的实现，可直接借鉴 F1/F2/F13/F14/F15/F16
-3. `408-new/scripts/build.py` + `scripts/normalize_md.py` —— 组装与空行规范化
+1. `website/408-kaoyan/PLAYBOOK-速成资料工程化.md` —— 方法论与全部踩坑记录（最重要）
+2. `website/408-kaoyan/scripts/validate.py` —— 16 类校验项的实现，可直接借鉴 F1/F2/F13/F14/F15/F16
+3. `website/408-kaoyan/scripts/build.py` + `scripts/normalize_md.py` —— 组装与空行规范化
 
 可直接复制改造的：`normalize_md.py`（无需改动）、`validate.py` 的
 `lint_markdown()`、`check_links()`、`check_html()` 三个函数。

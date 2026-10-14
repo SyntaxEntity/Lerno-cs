@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 """408 复习资料校验器。
 
-校验项：
-  F1 每个 ## 小节必须含 5 个模板字段，且顺序为 考频统计→核心讲解→示意图→易错点→真题示例
+校验项（F1—F17）：
+  F1 每个 ## 小节必须含 6 个模板字段，且顺序为
+     考频统计→核心讲解→关键结论速记→示意图→易错点→真题示例
   F2 考频统计行必须与 scripts/topics.py 的权威数据逐字一致
   F3 代码围栏必须成对闭合，且示意图必须带语言标签（text/mermaid）
   F4 禁止占位符（TODO / 待补充讲解 / XXX / 略 等）
@@ -13,6 +14,13 @@
   F8 每个知识点必须有 ≥1 个 ASCII 图，且 ≥1 个 Mermaid 图（复杂流程）
   F9 核心讲解 句数（中文句号/分号切分）不少于 3 句
   F10 易错点 条目数 2—4 条
+  F11 关键结论速记 条目数落在规范区间
+  F12 README 声明的"已核对原题"清单必须与正文标注逐条一致
+  F13 Markdown 结构 lint：块级元素之间必须有空行
+  F14 用真实 Markdown 渲染器确认模板字段各自独立成段
+  F15 文档内所有相对链接必须能从仓库根解析
+  F16 HTML 产物完整性与组件完整性（防渲染器静默退化）
+  F17 站点与归档里的每一个相对链接都必须真实可达（含跳转页目标）
 用法： python3 scripts/validate.py [--stats]
 """
 import glob
@@ -130,7 +138,7 @@ def validate_file(path, subject_key, is_overview=False):
 
     stats["sections"] += len(sections)
 
-    # 校验每个小节的字段。科目总览是元文件；其余文件的每个 ## 小节都必须齐备五段式
+    # 校验每个小节的字段。科目总览是元文件；其余文件的每个 ## 小节都必须齐备 6 个模板字段
     for idx, (start, title) in enumerate(sections):
         if is_overview:
             continue
