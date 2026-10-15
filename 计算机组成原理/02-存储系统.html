@@ -59,14 +59,14 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>存储系统</h1><h1 id="_1">计算机组成原理 · 存储系统</h1>
+<main><div class="inner"><h1>存储系统</h1><h1 id="_1">计算机组成原理 · 存储系统</h1>
 <h2 id="_2" id="kp">存储系统 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 32 次；涉及年份：2009—2025 年几乎年年出现，2010、2013、2015、2018、2020、2022、2024、2025 年为典型年份；分数占比约 22%；主要题型：选择题 + 综合应用题（43 题常考 Cache/主存扩展与地址划分）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 32 次；涉及年份：2009—2025 年几乎年年出现，2010、2013、2015、2018、2020、2022、2024、2025 年为典型年份；分数占比约 22%；主要题型：选择题 + 综合应用题（43 题常考 Cache/主存扩展与地址划分）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>存储层次</strong>的依据是程序访问的局部性：越靠近 CPU 的层次越快、越小、越贵，<code>Cache</code> 与主存之间以<strong>块（行）</strong>为单位交换数据，主存与辅存之间以<strong>页</strong>为单位。<strong>Cache 的地址划分</strong>是本科目最高频的计算：把物理地址从低位到高位切成"块内地址（<code>log2 块大小</code> 位）→ 组号（<code>log2 组数</code> 位）→ 标记"三段。直接映射时"组"就是行，行号 <code>= 主存块号 mod Cache 行数</code>；<code>N</code> 路组相联时组数 <code>= Cache 容量 / (块大小 × N)</code>；全相联只有标记与块内地址两段。<strong>平均访问时间</strong>在"先查 Cache，未命中再访主存"的串行模型下为 <code>T = 命中率 * Tc + 缺失率 * Tm</code>；</p>
 <p>若采用"并行/同时启动"或"流水"模型，公式中的 <code>Tm</code> 要改为"未命中时的额外开销"，必须按题意选择。<strong>Cache 行</strong>除数据外还需<strong>有效位</strong>，写回法还要<strong>脏位</strong>，替换算法用 LRU 时还要计数位或栈位，这些开销在做"Cache 总容量/总位数"题时必须计入。<strong>DRAM</strong> 需要定时刷新（一般取 <code>2 ms</code> 一个刷新周期），刷新按<strong>行</strong>进行、只需行地址，三种方式为集中刷新（有"死时间"）、分散刷新（无死区但存取周期变长）、异步刷新（折中，最常用）。</p>
 <p><strong>主存扩展</strong>分位扩展（数据线加宽，地址线共用）与字扩展（地址空间加大，需片选译码）。<strong>虚拟存储</strong>把逻辑地址翻译成物理地址：查 <code>TLB</code> → 查页表 → 若缺页则触发缺页异常；<code>TLB</code> 命中则不必访存取页表项，<code>Cache</code> 命中则不必访问主存，做时间计算时需按题意枚举四种命中组合。<strong>磁盘</strong>的存取时间 <code>= 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为<strong>旋转半圈</strong>的时间：<code>60 / 转速 / 2</code>。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>组数 = Cache 容量 / (块大小 × 路数)</code>，<code>块内地址位数 = log2(块大小)</code>、<code>组号位数 = log2(组数)</code>、<code>标记位数 = 地址位数 - 组号 - 块内</code> —— Cache 地址划分三步走。</li>
 <li><code>Cache 行总位数 = 标记 + 1 有效位 + 脏位(写回时) + 替换计数位 + 数据位</code> —— 做"总容量"题必须加控制位。</li>
 <li><code>串行模型 T = 命中率 × Tc + 缺失率 × Tm</code> —— 若题中说明"并行访问"则需换成额外开销口径，不能硬套。</li>
@@ -74,7 +74,7 @@
 <li><code>磁盘存取时间 = 寻道 + 旋转延迟 + 传输</code>，<code>平均旋转延迟 = 60 / (2 × 转速)</code> 秒 —— 转速单位 rpm 换算成秒要除以 60。</li>
 <li><code>TLB 命中 → 无需访存查页表；Cache 命中 → 无需访主存</code> —— 计算有效访问时间时必须按题意枚举命中组合。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>Cache 地址划分</strong>：同一个 32 位物理地址，在直接映射与 <code>N</code> 路组相联下切成不同段数；组相联是"直接映射的组索引 + 组内全相联比较"的折中。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>Cache line structure (data block + tag + control bits)
 
@@ -153,27 +153,29 @@ worked example (32-bit address, B = 64 B, 8-way, capacity = 512 KB)
     M9 --&gt;|否| M11[&quot;访问主存取块 按替换算法与写策略更新&quot;]
     M11 --&gt; M10
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>缓存容量计算漏掉控制位：Cache 行除数据块外还有有效位（写回法还有脏位、LRU 还有计数位），题目问"Cache 总位数/标记阵列容量"时必须加上这些位，只算数据位会偏小。</li>
 <li>把"组数"与"行数"混用：直接映射时组数等于行数，而 <code>N</code> 路组相联时 <code>行数 = 组数 × N</code>；若把组数直接当行数去算组号位数，地址划分会整体错位。</li>
 <li>用错平均访问时间模型：<code>T = h·Tc + (1-h)·Tm</code> 只适用于"先查 Cache 再访主存"的串行模型；若题目说"Cache 与主存同时启动"或给出"未命中额外开销"，必须改用对应公式。</li>
 <li>旋转延迟算成一圈：平均旋转延迟是<strong>半圈</strong>时间，即 <code>60 / (2 × 转速)</code> 秒（转速为 rpm）；算成一圈会使结果翻倍，磁盘存取时间题必错。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2014 年 408 第 43 题（综合应用题，8 分）</span></p>
 <p>假设某计算机按字节编址，主存地址为 32 位，采用 8 路组相联映射的 Cache，Cache 数据区容量为 512 KB，每个主存块大小为 64 字节，Cache 采用写回法并含 LRU 替换所需的计数位。要求：给出物理地址中标记、组号与块内地址的位数；求 Cache 中每一行的总位数（含必要的控制位）。</p>
 <blockquote>
 <p>解析：先求组数——<code>组数 = Cache 数据区容量 / (块大小 × 路数) = 512 KB / (64 B × 8) = 1024 = 2^10</code>。于是<strong>块内地址 = <code>log2 64 = 6</code> 位、组号 = <code>log2 1024 = 10</code> 位、标记 = <code>32 - 10 - 6 = 16</code> 位</strong>。再求行总位数——数据位 <code>64 × 8 = 512</code> 位，标记 <code>16</code> 位，有效位 1 位，写回法需脏位 1 位，8 路 LRU 需要能区分 8 种次序的计数位（3 位，或按题意用 <code>log2 8 = 3</code>）：合计 <code>512 + 16 + 1 + 1 + 3 = 533</code> 位/行。<strong>判分点是"组数公式里要乘路数"与"控制位必须计入"，两处都是高频失分点。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="01-数据表示与运算.html"><span class="cn-dir">← 上一章</span><span class="cn-title">数据表示与运算</span></a><a class="cn-next" href="03-指令系统.html"><span class="cn-dir">下一章 →</span><span class="cn-title">指令系统</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="01-数据表示与运算.html"><span class="cn-dir">← 上一章</span><span class="cn-title">数据表示与运算</span></a><a class="cn-next" href="03-指令系统.html"><span class="cn-dir">下一章 →</span><span class="cn-title">指令系统</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

@@ -59,14 +59,14 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>总线</h1><h1 id="_1">计算机组成原理 · 总线</h1>
+<main><div class="inner"><h1>总线</h1><h1 id="_1">计算机组成原理 · 总线</h1>
 <h2 id="_2" id="kp">总线 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 14 次；涉及年份：2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 6%；主要题型：选择题为主（总线带宽、总线周期、仲裁）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 14 次；涉及年份：2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 6%；主要题型：选择题为主（总线带宽、总线周期、仲裁）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>总线是连接多个部件的<strong>共享传输介质</strong>，按功能分为<strong>数据总线</strong>（双向，位数决定一次能传多少位）、<strong>地址总线</strong>（单向，由 CPU 指向主存/IO，位数决定寻址空间）、<strong>控制总线</strong>（双向/单向混合，传时序与命令）。按层次分为片内总线、系统总线（含数据/地址/控制三类）、通信总线。</p>
 <p><strong>性能指标</strong>中最常考的是带宽：<code>总线带宽 = 总线工作频率 × (总线宽度 / 8)</code> 字节/秒，若一个总线周期能传送多个数据字，则还要乘上每周期传送的次数；<code>总线传输周期 = 一个地址 + 一个数据字的传送时间</code>，含地址期与数据期，若题中给出"每个总线周期含 <code>k</code> 个时钟"，则带宽 <code>= 总线宽度 / (k × 时钟周期)</code>。<strong>总线仲裁</strong>解决多个主设备争用总线的问题，三种方式的特点必须分清：<strong>链式查询</strong>只需 3 根线（请求、允许、忙），结构简单、扩充容易，但<strong>优先级固定且离控制器越近越高</strong>，且某一环节故障会导致其后所有设备无法获得总线；</p>
 <p><strong>计数器定时查询</strong>用一组设备地址线代替允许线，优先级可通过计数初值改变、较为灵活，但增加 <code>log2 n</code> 根线；<strong>独立请求</strong>每个设备都有独立的请求线与允许线，响应最快、优先级最灵活，但线数最多（<code>2n</code> 根），控制逻辑最复杂。<strong>总线定时</strong>决定数据传送的时序：<strong>同步定时</strong>由统一时钟控制，速度快、协议简单，但各设备必须在同一时钟节拍内完成，适合速度相近的设备；<strong>异步定时</strong>用"请求—应答"握手，分为不互锁（请求方不等回答即撤销）、半互锁（请求方等回答，回答方不等请求撤销）、全互锁（双方都等对方撤销），可靠性高但速度慢；<strong>半同步</strong>在同步基础上加一条 <code>WAIT</code> 线以兼容慢速设备。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>总线带宽 = 工作频率 × 总线宽度 / 8</code>（字节/秒） —— 宽度按<strong>字节</strong>折算，<code>位/秒</code> 则不必除以 8，单位不能混。</li>
 <li><code>带宽也可写为 总线宽度 / 总线传输周期</code> —— 当题目给出"每个总线周期含 k 个时钟"时用此式更稳。</li>
 <li><code>链式查询 3 根线、优先级固定；独立请求 2n 根线、优先级最灵活</code> —— 线数与灵活性的权衡是选择题核心。</li>
@@ -74,7 +74,7 @@
 <li><code>地址总线位数决定寻址空间：n 位可寻址 2^n 个单元</code> —— 与数据总线宽度决定的"一次传送位数"不要混淆。</li>
 <li><code>总线复用：同一组线在不同时间段传地址与数据</code> —— 复用可减少引脚数，代价是速度下降。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>三总线结构与一次总线传输的时序</strong>：地址线单向送出地址，数据线双向传送数据，控制线给出读/写与握手信号。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>three-bus structure
 
@@ -148,28 +148,30 @@ arbitration comparison
     I6 --&gt;|否| I8[&quot;执行设备服务 处理后恢复现场与屏蔽字&quot;]
     I8 --&gt; I9[&quot;开中断 中断返回 恢复断点继续原程序&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>总线带宽计算漏乘或单位错：<code>总线宽度</code>以位给出时要先除以 8 换算成字节，带宽结果单位是 <code>B/s</code>；若题目问 <code>b/s</code> 则不要除。另外当一个总线周期含 <code>k</code> 个时钟时，必须除以整个周期而不是单个时钟。</li>
 <li>认为链式查询的优先级可以自由设置：链式查询的优先级由设备在链上的<strong>物理位置</strong>决定，离总线控制器越近优先级越高，无法通过软件随意改变；要改变优先级需用计数器定时查询方式。</li>
 <li>把地址总线位数与数据总线位数的作用弄反：<strong>地址总线位数决定可寻址的主存单元个数</strong>（<code>n</code> 位对应 <code>2^n</code> 个单元），<strong>数据总线位数决定一次能并行传送的位数</strong>，两者互不相干。</li>
 <li>混淆异步定时的三种互锁方式：不互锁是请求方不等应答就撤销请求（最快但最不可靠），半互锁是请求方等应答、应答方不等请求撤销，全互锁是双方互相等待（最可靠但最慢）；把半互锁与全互锁的等待关系写反是常见失分点。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2015 年真题改编（单项选择题，2 分）</span></p>
 <p>某同步总线的时钟频率为 <code>100 MHz</code>，总线宽度为 <code>32</code> 位，地址/数据线复用，每传送一个地址或一个数据都占一个时钟周期。该总线支持突发传送方式，一次突发连续传送 <code>8</code> 个数据字（只需送出首地址一次）。则这次突发传送的数据传输率约为（ ）。</p>
 <p>A. <code>356 MB/s</code>　B. <code>400 MB/s</code>　C. <code>800 MB/s</code>　D. <code>3200 MB/s</code></p>
 <blockquote>
 <p>解析：地址/数据线复用意味着一个总线周期至少要占"地址期 + 数据期"。突发传送只送一次首地址，随后连续送 <code>8</code> 个数据字，故一次突发共需 <code>1 + 8 = 9</code> 个时钟周期，传送数据量为 <code>8 × 32 位 = 32</code> 字节。时钟周期 <code>= 1 / 100 MHz = 10 ns</code>，9 个时钟耗时 <code>90 ns</code>，故数据传输率 <code>= 32 B / 90 ns ≈ 0.356 × 10^9 B/s ≈ 356 MB/s</code>，答案为 <strong>A</strong>。若忘记计入地址期（只算 8 个时钟）就会得到 <code>400 MB/s</code> 的干扰项 B——<strong>"地址/数据线复用 + 突发传送"必须计入一次地址期开销，这是本题的判分点。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="04-中央处理器.html"><span class="cn-dir">← 上一章</span><span class="cn-title">中央处理器 CPU</span></a><a class="cn-next" href="06-输入输出系统.html"><span class="cn-dir">下一章 →</span><span class="cn-title">输入输出系统</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="04-中央处理器.html"><span class="cn-dir">← 上一章</span><span class="cn-title">中央处理器 CPU</span></a><a class="cn-next" href="06-输入输出系统.html"><span class="cn-dir">下一章 →</span><span class="cn-title">输入输出系统</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

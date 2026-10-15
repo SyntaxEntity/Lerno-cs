@@ -59,14 +59,14 @@
 <a class="sb-chap" href="05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>计算机网络体系结构</h1><h1 id="_1">计算机网络 · 计算机网络体系结构</h1>
+<main><div class="inner"><h1>计算机网络体系结构</h1><h1 id="_1">计算机网络 · 计算机网络体系结构</h1>
 <h2 id="_2" id="kp">计算机网络体系结构 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 14 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 8%；主要题型：选择题为主（分层模型、协议/服务、设备与层次对应）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 14 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 8%；主要题型：选择题为主（分层模型、协议/服务、设备与层次对应）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>计算机网络按覆盖范围分为广域网、城域网、局域网与个人区域网；按交换方式分为电路交换、报文交换与<strong>分组交换</strong>（<code>408</code> 的默认语境）。性能指标中必须分清两种时延：<strong>发送时延（传输时延）<code>= 数据长度 / 发送速率</code></strong> 取决于数据量与链路速率，<strong>传播时延 <code>= 距离 / 电磁波传播速率</code></strong> 只取决于物理距离与介质（约 <code>2 × 10^8 m/s</code> 在铜缆/光纤中）。因此"提高带宽"能减少发送时延，但<strong>不能减少传播时延</strong>；<strong>时延带宽积 <code>= 传播时延 × 带宽</code></strong> 表示"链路上能容纳的比特数"，又称"以比特为单位的链路长度"；<strong>往返时间 <code>RTT</code></strong> 是往返一次的时间。</p>
 <p>总时延 <code>= 发送时延 + 传播时延 + 处理时延 + 排队时延</code>，其中处理与排队时延在题目给出时才能计入。<code>OSI</code> 参考模型自下而上为<strong>物理层、数据链路层、网络层、传输层、会话层、表示层、应用层</strong>，<code>TCP/IP</code> 模型为<strong>网络接口层、网际层、传输层、应用层</strong>，二者对应关系是"<code>TCP/IP</code> 的应用层 = <code>OSI</code> 的会话层 + 表示层 + 应用层"，"<code>TCP/IP</code> 的网络接口层 = <code>OSI</code> 的物理层 + 数据链路层"。<strong>协议</strong>是通信双方必须遵守的规则集合，三要素是<strong>语法、语义、同步</strong>；</p>
 <p><strong>服务</strong>是下层向上层提供的功能，是"垂直"的，而协议是"水平"的（同层对等实体之间）。<strong>各层的数据单元</strong>名称不同：物理层为比特、数据链路层为帧、网络层为分组（数据报）、传输层为报文段（<code>TCP</code>）或用户数据报（<code>UDP</code>）；<strong>各层的典型设备</strong>为：中继器与集线器在物理层、网桥与交换机在数据链路层、路由器在网络层、网关在应用层。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>发送时延 = 数据长度 / 速率</code>，<code>传播时延 = 距离 / 传播速率</code> —— 提高带宽只减少发送时延，不影响传播时延。</li>
 <li><code>时延带宽积 = 传播时延 × 带宽</code> —— 物理意义是"链路中能容纳的比特数"，又称链路长度（比特）。</li>
 <li><code>OSI 七层 = 物理、数据链路、网络、传输、会话、表示、应用</code>；<code>TCP/IP 四层 = 网络接口、网际、传输、应用</code>。</li>
@@ -74,7 +74,7 @@
 <li><code>协议三要素：语法、语义、同步</code>；协议是水平的、服务是垂直的。</li>
 <li><code>设备与层次：集线器/中继器在物理层，交换机/网桥在数据链路层，路由器在网络层</code> —— 判断题的高频依据。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong><code>OSI</code> 七层与 <code>TCP/IP</code> 四层的对应关系及数据单元封装</strong>：每下一层都在上层数据前加上本层首部（必要时加尾部），形成该层的数据单元。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>OSI 7 layers                     TCP/IP 4 layers        PDU name
 +---------------------+          +----------------+     ------------
@@ -158,13 +158,13 @@ devices and the layer they operate at
     S8 --&gt; S9
     S9 --&gt; S10[&quot;逐层解封 校验 FCS 与首部 最终交给应用进程&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>把发送时延与传播时延混为一谈：<code>发送时延 = 数据长度 / 速率</code>（与数据量和带宽有关），<code>传播时延 = 距离 / 传播速率</code>（只与距离和介质有关）；因此"增大带宽可以减小传播时延"是错误说法。</li>
 <li><code>OSI</code> 与 <code>TCP/IP</code> 的层间对应关系写错：<code>TCP/IP</code> 的<strong>网络接口层</strong>对应 <code>OSI</code> 的物理层与数据链路层，<strong>应用层</strong>对应 <code>OSI</code> 的会话层、表示层与应用层；把"表示层"划到传输层或把"会话层"划到网络层都是错的。</li>
 <li>认为集线器能隔离冲突域：集线器工作在物理层、只是多端口的信号放大转发，<strong>所有端口属于同一个冲突域与同一个广播域</strong>；能隔离冲突域的是交换机/网桥，能隔离广播域的是路由器。</li>
 <li>把协议与服务混同：<strong>协议是水平方向</strong>（同层对等实体之间的规则），<strong>服务是垂直方向</strong>（下层通过服务访问点向上层提供的能力）；上层只能看见服务而看不见下层的协议实现。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2014 年真题改编（单项选择题，2 分）</span></p>
 <p>下列关于 <code>OSI</code> 参考模型与 <code>TCP/IP</code> 模型各层功能的叙述中，正确的是（ ）。</p>
 <p>A. 数据链路层负责为分组选择路由并实现拥塞控制
@@ -174,15 +174,17 @@ D. 会话层负责数据格式转换与加密，属于 <code>TCP/IP</code> 模�
 <blockquote>
 <p>解析：逐项对应层次职责。<strong>A 错</strong>——"为分组选择路由"是<strong>网络层</strong>的功能，"拥塞控制"也主要由传输层与网络层承担，不是数据链路层的职责。<strong>B 对</strong>——<strong>传输层</strong>面向进程到进程（端到端）通信，<code>TCP</code> 在此层实现可靠传输、流量控制与拥塞控制，这是传输层的标准描述。<strong>C 错</strong>——"相邻结点之间"的差错控制与流量控制属于<strong>数据链路层</strong>，网络层做的是主机到主机的分组转发（不保证可靠）。<strong>D 错</strong>——数据格式转换与加密属于<strong>表示层</strong>，而在 <code>TCP/IP</code> 模型中它被并入<strong>应用层</strong>，不是传输层。答案选 <strong>B</strong>。<strong>判分依据是"端到端 = 传输层、点到点 = 数据链路层"以及表示层在 <code>TCP/IP</code> 中并入应用层这两条对应关系。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-next" href="02-物理层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">物理层</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-next" href="02-物理层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">物理层</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

@@ -59,13 +59,13 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>文件管理</h1><h1 id="_1">操作系统 · 文件管理</h1>
+<main><div class="inner"><h1>文件管理</h1><h1 id="_1">操作系统 · 文件管理</h1>
 <h2 id="_2" id="kp">文件管理 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2024；分数占比约 16%；主要题型：选择题 + 综合应用题（文件物理结构、目录、磁盘空间）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2024；分数占比约 16%；主要题型：选择题 + 综合应用题（文件物理结构、目录、磁盘空间）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>文件管理把磁盘上的物理块抽象为按名访问的逻辑文件：文件逻辑结构分无结构流式（顺序文件）与有结构记录式（顺序、索引、索引顺序、散列），物理结构分连续、链接（隐式/显式 FAT）、索引（单级/多级/混合），其中 UNIX 混合索引的最大文件长度 = <code>D*a + I*a + I^2*a + I^3*a</code>，<code>D</code>、<code>I</code> 为直接与一级间接地址项个数，<code>a</code> 为盘块大小，逐项相加不得漏掉直接项。目录本质是文件名到 FCB 的映射表，采用索引结点（inode）后把文件名与除名字外的属性分离，目录项只留<code>文件名 + inode 号</code>，使检索时一个盘块能容纳更多目录项、显著减少 I/O 次数。文件共享靠硬链接（多个目录项指向同一 inode，<code>count</code> 计数，删除只减计数，为 0 才真正回收）与软链接（新建一个存放路径名的文件，删除原文件后软链接失效成为悬空链接）。</p>
 <p>磁盘空间管理常用位示图、空闲链表、成组链接法；位示图的字号 <code>i</code>、位号 <code>j</code> 与块号换算按从 1 开始编号时为 <code>块号 = (i-1)*n + j</code>（<code>n</code> 为每字位数），从 0 开始编号时 <code>块号 = i*n + j</code>，两者必须与题设口径统一。进程访问文件先查进程打开文件表（含文件描述符、读写偏移、访问权限），表项指向系统打开文件表的全局表项（含 inode 指针、引用计数），再由 inode 逐级查目录与磁盘，最终由页/块缓存完成 <code>read</code>。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>最大文件长度 = D*a + I*a + I^2*a + I^3*a</code> —— 直接、一级、二级、三级间接地址项逐项求和，<code>a</code> 为盘块大小，物理块号还需占用地址项宽度（如 4B）。</li>
 <li><code>一级间接可指块数 = a / 地址项字节数</code> —— 索引块本身占一个盘块，能放的指针个数由此决定，再逐级平方或立方。</li>
 <li><code>inode 把文件名与属性分离</code> —— 目录项只存<code>文件名 + inode 号</code>，检索路径名时目录占块少、命中率高，一个文件可被多个目录项共享。</li>
@@ -73,7 +73,7 @@
 <li><code>位示图 n 位/字</code> —— 从 1 开始编号 <code>块号 = (i-1)*n + j</code>；从 0 开始编号 <code>块号 = i*n + j</code>，<code>j</code> 为字内位号。</li>
 <li><code>打开文件表两级</code> —— 进程表项（fd、读写位置、权限）唯一指向系统打开文件表项（inode 指针、引用计数），<code>read</code> 只改进程表项的偏移。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>hybrid-index inode layout  (a = block size, w = address width, k = a / w)
 
  inode
@@ -144,27 +144,29 @@
     A11 --&gt; A12[数据拷入用户缓冲区 偏移增加]
     A12 --&gt; A13[返回实际读到的字节数]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>算最大文件长度时漏掉直接地址项或漏乘盘块大小：正确做法是<code>直接项数*a + 一级间接项数*a + k*a + k^2*a + k^3*a</code>，<code>k</code> 由盘块大小除以地址项字节数得到，每一项都要乘 <code>a</code>。</li>
 <li>把软链接说成共享索引结点：软链接是新建的独立文件，自身有 inode，内容只是原文件路径名；只有硬链接才共享同一 inode 并靠引用计数决定回收时机。</li>
 <li>位示图块号与字号位号换算搞错起始编号：题设从 1 开始时<code>块号 = (i-1)*n + j</code>，从 0 开始时<code>块号 = i*n + j</code>，且同一题内字号、位号、块号必须同口径。</li>
 <li>混淆两级打开文件表：进程打开文件表存 fd、读写偏移与权限，系统打开文件表存 inode 指针与引用计数；<code>read</code> 改变的是进程表项的偏移，<code>fork</code> 后父子可共享该偏移。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2010 年 408 第 46 题（综合应用题，8 分）</span></p>
 <p>某文件系统采用混合索引分配方式，inode 中有 10 个直接地址项、1 个一级间接地址项、1 个二级间接地址项、1 个三级间接地址项，每个地址项占 4B，磁盘块大小 4KB，则单个文件的最大长度是多少字节，约合多少 GB？</p>
 <blockquote>
 <p>解析：每块可放指针数 <code>k = 4096 / 4 = 1024</code>。直接项可寻址 <code>10 * 4KB</code>；一级间接 <code>1024 * 4KB</code>；二级间接 <code>1024^2 * 4KB</code>；三级间接 <code>1024^3 * 4KB</code>。总和 = <code>(10 + 1024 + 1024^2 + 1024^3) * 4KB = (10 + 1024 + 1048576 + 1073741824) * 4096B ≈ 4.0001 * 10^12 B</code>，即约 <code>4TB</code>（若按 <code>1GB = 2^30 B</code> 计，约 <code>3725GB</code>；按 <code>10^9 B</code> 计约 <code>4000GB</code>）。结论：最大文件长度约 <code>4 * 10^12</code> 字节，数量级远大于按块号宽度直接相乘的粗算值，关键是三级间接项的高次幂且每项都乘盘块大小。</p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="05-内存管理.html"><span class="cn-dir">← 上一章</span><span class="cn-title">内存管理</span></a><a class="cn-next" href="07-输入输出管理.html"><span class="cn-dir">下一章 →</span><span class="cn-title">输入输出管理</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="05-内存管理.html"><span class="cn-dir">← 上一章</span><span class="cn-title">内存管理</span></a><a class="cn-next" href="07-输入输出管理.html"><span class="cn-dir">下一章 →</span><span class="cn-title">输入输出管理</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

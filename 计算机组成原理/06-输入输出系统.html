@@ -59,15 +59,15 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>输入输出系统</h1><h1 id="_1">计算机组成原理 · 输入输出系统</h1>
+<main><div class="inner"><h1>输入输出系统</h1><h1 id="_1">计算机组成原理 · 输入输出系统</h1>
 <h2 id="_2" id="kp">输入输出系统 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2025；分数占比约 10%；主要题型：选择题 + 综合应用题（中断、DMA、磁盘时间计算）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2025；分数占比约 10%；主要题型：选择题 + 综合应用题（中断、DMA、磁盘时间计算）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><code>I/O</code> 接口（设备控制器）的作用是<strong>数据缓冲、格式转换、状态与命令寄存、地址译码</strong>，它把 CPU 的高速并行总线与设备的低速串行工作方式解耦。<code>I/O</code> 端口的编址有两种：<strong>统一编址</strong>（把端口当作主存单元，用普通访存指令访问，无需专门指令但占用主存地址空间）与<strong>独立编址</strong>（有独立的地址空间与专用 <code>IN/OUT</code> 指令，不占主存空间但指令类型增多）。<code>I/O</code> 控制方式的发展主线是<strong>CPU 干预程度逐步降低</strong>：<strong>程序查询</strong>方式下 CPU 不断读状态寄存器空转等待，CPU 与设备完全串行；</p>
 <p><strong>程序中断</strong>方式下 CPU 发出命令后继续执行原程序，设备就绪时用中断通知 CPU 在<strong>一条指令执行结束后</strong>响应，数据传送仍需 CPU 用指令搬入主存；<strong>DMA</strong> 方式由 DMA 控制器直接在主存与设备之间成块传送，数据<strong>不经过 CPU 的寄存器</strong>，每传送一个字（或一个数据块）占用一次总线（周期挪用/周期窃取），只有在传送前（初始化）与传送后（中断处理）才需要 CPU 参与；<strong>通道</strong>方式由通道处理器执行通道程序，进一步把 CPU 从 <code>I/O</code> 管理中解放出来。</p>
 <p><strong>中断系统</strong>要点：CPU 响应中断的条件是"有中断请求 + 中断允许触发器为 1 + 当前指令执行结束"；响应时由硬件自动执行<strong>中断隐指令</strong>完成三件事——<strong>关中断、保存断点（<code>PC</code>）、取中断向量</strong>；随后由中断服务程序保存现场并执行服务。</p>
 <p><strong>多重中断</strong>（中断嵌套）靠<strong>中断屏蔽字</strong>控制：屏蔽字中某位为 <code>1</code> 表示屏蔽（禁止）对应的中断源，因此优先级越高的中断源，其屏蔽字中"1"的位数越多。<strong>磁盘</strong>的性能指标是存取时间，<code>存取时间 = 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为旋转半圈的时间 <code>60 / (2 × 转速)</code>（转速单位 <code>rpm</code>）；数据传输率与位密度、转速（线速度）相关，<code>数据传输率 = 每条磁道的容量 / 旋转一圈的时间</code>。固态硬盘 <code>SSD</code> 基于闪存，无机械寻道与旋转延迟，随机访问快，但存在<strong>写放大</strong>、<strong>擦除次数受限</strong>（寿命）的问题。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>四种 I/O 方式 CPU 干预程度：程序查询 &gt; 程序中断 &gt; DMA &gt; 通道</code> —— 判据是"CPU 是否需要在传送过程中持续参与"。</li>
 <li><code>DMA 数据不经过 CPU 寄存器，直接在主存与设备间传送</code> —— 这是 DMA 与程序中断方式的本质区别。</li>
 <li><code>中断隐指令由硬件执行：关中断、保存断点、取中断向量</code> —— 它是"指令"但不是程序里的指令。</li>
@@ -75,7 +75,7 @@
 <li><code>屏蔽字为 1 表示屏蔽，优先级越高屏蔽的位数越多</code> —— 多重中断靠它实现嵌套。</li>
 <li><code>磁盘存取时间 = 寻道 + 旋转延迟 + 传输</code>，<code>平均旋转延迟 = 60 / (2 × 转速)</code> 秒 —— 旋转延迟取半圈。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>四种 I/O 控制方式的数据通路与 CPU 参与程度</strong>：从程序查询到通道，CPU 的角色从"全程搬运工"逐步退化为"发起与善后"。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>(1) programmed query (polling)
   CPU ---&gt; status reg ---&gt; busy? loop until ready ---&gt; data reg ---&gt; CPU reg ---&gt; memory
@@ -149,28 +149,30 @@
     D8 --&gt; D9[&quot;中断处理程序唤醒等待的进程&quot;]
     D9 --&gt; D10[&quot;返回用户态 数据可用&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>认为 DMA 传送完全不需要 CPU 参与：DMA 只在<strong>数据传送过程</strong>中不需要 CPU 干预，传送前的初始化（设置主存地址、设备地址、传送长度、方向）与传送结束后的中断处理都必须由 CPU 完成。</li>
 <li>把中断响应时机写成"任意时刻"或"一个时钟周期后"：可屏蔽中断只在<strong>一条指令执行结束后</strong>响应（这样断点才是一条指令的边界）；若在指令中间响应，断点无法正确保存。</li>
 <li>混淆中断隐指令与中断服务程序：中断隐指令是<strong>硬件自动执行</strong>的（关中断、保存断点、取中断向量），而保存现场、执行设备服务、恢复现场是<strong>中断服务程序</strong>（软件）做的，两者不能混为一谈。</li>
 <li>磁盘旋转延迟算成一圈：平均旋转延迟是<strong>旋转半圈</strong>的时间，即 <code>60 / (2 × 转速)</code> 秒；若按一圈计算，存取时间会偏大一倍。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2012 年真题改编（单项选择题，2 分）</span></p>
 <p>某磁盘的转速为 <code>7200 rpm</code>，平均寻道时间为 <code>8 ms</code>，数据传输率为 <code>20 MB/s</code>。若读取一个 <code>4 KB</code> 的磁盘块，则平均存取时间约为（ ）。</p>
 <p>A. <code>4.2 ms</code>　B. <code>8.2 ms</code>　C. <code>12.4 ms</code>　D. <code>16.5 ms</code></p>
 <blockquote>
 <p>解析：平均存取时间由三段相加。平均旋转延迟 <code>= 60 / (2 × 7200) s = 4.17 ms</code>（旋转<strong>半圈</strong>）；传输时间 <code>= 4 KB / 20 MB/s = 4096 B / (20 × 10^6 B/s) ≈ 0.205 ms</code>；再加上平均寻道时间 <code>8 ms</code>，得 <code>8 + 4.17 + 0.205 ≈ 12.37 ms</code>，最接近 <strong>C</strong>。干扰项 D（<code>16.5 ms</code>）正是把旋转延迟误算成<strong>一整圈</strong>（<code>8.33 ms</code>）的结果，B（<code>8.2 ms</code>）则是完全漏算旋转延迟的结果。<strong>判分点是旋转延迟必须取半圈，以及单位换算（<code>rpm</code> 转秒要除以 60、<code>KB</code> 与 <code>MB</code> 统一为字节）。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="05-总线.html"><span class="cn-dir">← 上一章</span><span class="cn-title">总线</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="05-总线.html"><span class="cn-dir">← 上一章</span><span class="cn-title">总线</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

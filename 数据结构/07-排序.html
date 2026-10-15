@@ -59,15 +59,15 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>排序</h1><h1 id="_1">数据结构 · 排序</h1>
+<main><div class="inner"><h1>排序</h1><h1 id="_1">数据结构 · 排序</h1>
 <h2 id="_2" id="kp">排序 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2009、2010、2012、2014、2016、2018、2020、2022、2024、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（外部排序、堆、快排过程）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2009、2010、2012、2014、2016、2018、2020、2022、2024、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（外部排序、堆、快排过程）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>排序算法按思想分为五类：<strong>插入类</strong>（直接插入、折半插入、希尔）、<strong>交换类</strong>（冒泡、快速）、<strong>选择类</strong>（简单选择、堆）、<strong>归并类</strong>、<strong>基数类</strong>。直接插入排序把第 <code>i</code> 个元素插入前面已排好的子序列，最好情况（已有序）比较 <code>n-1</code> 次、移动 0 次即 <code>O(n)</code>，最坏与平均为 <code>O(n^2)</code>，稳定，且<strong>比较次数与初始序列有关</strong>。</p>
 <p>希尔排序按增量分组做插入排序，增量逐次折半到 1，平均约 <code>O(n^1.3)</code>，<strong>不稳定</strong>，且时间与增量序列的选取有关。冒泡排序每趟把最大元素"冒"到末尾，最好 <code>O(n)</code>（设置交换标志）、最坏 <code>O(n^2)</code>，稳定。<strong>快速排序</strong>每趟以枢轴划分，平均 <code>O(n log n)</code>、最坏 <code>O(n^2)</code>（当序列<strong>基本有序</strong>或枢轴总取到最值时），平均与最好空间 <code>O(log n)</code>（递归栈）、最坏 <code>O(n)</code>，<strong>不稳定</strong>；</p>
 <p>快排是所有内部排序中平均性能最优的，但退化时不如堆排序。<strong>堆排序</strong>先把数组建成大根堆（建堆时间 <code>O(n)</code>），再反复"取堆顶与末尾交换 + 向下调整"，每次调整 <code>O(log n)</code>，总时间 <code>O(n log n)</code>（最好、最坏、平均都一样），空间 <code>O(1)</code>，<strong>不稳定</strong>；堆是"完全二叉树的顺序存储"，<code>i</code> 的左右孩子是 <code>2i</code> 与 <code>2i+1</code>。<strong>归并排序</strong>自底向上或自顶向下合并有序段，时间恒为 <code>O(n log n)</code>、需要 <code>O(n)</code> 辅助空间、<strong>稳定</strong>。<strong>基数排序</strong>按位从低位到高位分配与收集，时间 <code>O(d(n+r))</code>、空间 <code>O(r)</code>、<strong>稳定</strong>。</p>
 <p><strong>外部排序</strong>受内存限制，核心是减少归并趟数 <code>S = ceil(log_k m)</code>（<code>m</code> 为初始归并段数、<code>k</code> 为归并路数）：用<strong>置换-选择排序</strong>生成更长的初始归并段以减少 <code>m</code>，用<strong>败者树</strong>把 <code>k</code> 路归并中每次选最小的比较次数从 <code>k-1</code> 降到 <code>ceil(log2 k)</code>，用<strong>最佳归并树</strong>（哈夫曼思想）为长度不等的归并段安排归并次序以最小化读写次数，并可通过增加虚段构造严格的 <code>k</code> 叉哈夫曼树。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>不稳定的排序：快排、希尔、简单选择、堆</code> —— 口诀"快些选堆"；插入、冒泡、归并、基数排序稳定。</li>
 <li><code>与初始序列有关的：插入、冒泡、快排、希尔</code> —— 堆排序、归并排序、基数排序的时间与初始序列无关。</li>
 <li><code>快排最坏 O(n^2) 出现在基本有序时，空间最坏 O(n)</code> —— 枢轴选最值导致划分极不平衡。</li>
@@ -75,7 +75,7 @@
 <li><code>归并 O(n log n) 稳定但需 O(n) 空间</code> —— 是"稳定 + 最坏也是 O(n log n)"的首选；基数排序 <code>O(d(n+r))</code> 稳定，但要求关键字可分解为有限位。</li>
 <li><code>外部排序：S = ceil(log_k m)</code>、败者树使单次选最小的比较次数降为 ceil(log2 k)<code>—— 减少</code>S<code>的两条路是增大</code>k<code>或减少</code>m`。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>大根堆的数组表示与"筛选（向下调整）"过程</strong>：堆在数组中按下标 <code>1..n</code> 存储，<code>i</code> 的孩子为 <code>2i</code>、<code>2i+1</code>；输出堆顶后把末尾元素放到根，再与较大的孩子交换，逐层下沉。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>array (1-based):  [ 87, 45, 78, 32, 17, 65, 53 ]
 index:              1   2   3   4   5   6   7
@@ -130,27 +130,29 @@ heapsort = build heap O(n) + n-1 times (swap + sift down) each O(log n)
     Q6 --&gt; Q2
     Q7 --&gt; Q8[&quot;对左右两个子区间递归划分&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>把堆排序说成稳定：堆排序在"堆顶与末尾交换"时会跨越多个元素，等值元素的相对次序被破坏，属于<strong>不稳定</strong>排序；稳定且 <code>O(n log n)</code> 的只有归并排序（基数排序对位数有限制）。</li>
 <li>认为快排最坏情况与初始序列无关：快排最坏 <code>O(n^2)</code> 恰好发生在<strong>初始序列基本有序</strong>（或逆序）时，此时每次划分都极不平衡；而堆排序、归并排序的时间与初始序列无关。</li>
 <li>混淆"建堆"与"排序"的复杂度：自底向上建堆只要 <code>O(n)</code>（从 <code>floor(n/2)</code> 号开始向前调整），但对每个元素做一次 <code>O(log n)</code> 的调整为 <code>O(n log n)</code>；若把建堆写成 <code>O(n log n)</code> 就会误判总复杂度。</li>
 <li>外部排序归并趟数忘记向上取整：<code>S = ceil(log_k m)</code>，且为减少 <code>S</code> 可以<strong>增大 k 或减少 m</strong>；用败者树可让 <code>k</code> 路归并每次选最小的比较次数为 <code>ceil(log2 k)</code> 而不是 <code>k-1</code>。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2016 年真题改编（综合应用题，15 分）</span></p>
 <p>已知由 <code>n</code>（<code>n &gt;= 2</code>）个正整数构成的集合 <code>A = {a_k | 0 &lt;= k &lt; n}</code>，将其所有元素依次划分成两个子集 <code>A1</code> 和 <code>A2</code>，且 <code>A1</code> 中元素个数为 <code>n1</code>。设计一个尽可能高效的划分算法，满足 <code>|n1 - n2|</code> 最小且 <code>|sum(A1) - sum(A2)|</code> 最大，要求：给出算法的基本设计思想；根据设计思想，采用 C 或 C++ 描述算法，关键之处给出注释；说明你所设计算法的时间复杂度和空间复杂度。</p>
 <blockquote>
 <p>解析：<strong>先排序、再对半分</strong>是最直接的满足两个条件的做法：排序后取前 <code>floor(n/2)</code> 个元素作为 <code>A1</code>、其余作为 <code>A2</code>，则两子集元素个数之差最小（<code>n</code> 为偶数时为 0，为奇数时为 1），且由于序列有序，"最小的一半之和"与"最大的一半之和"之差达到最大。用快速排序实现时平均时间复杂度 <code>O(n log n)</code>、空间复杂度 <code>O(log n)</code>。<strong>更高分的做法是基于快排划分的"部分选择"</strong>：只要求出中位数位置并保证其左侧元素都不大于右侧即可，只需一次递归的单侧划分，期望时间 <code>O(n)</code>（最坏 <code>O(n^2)</code>）、空间 <code>O(1)</code>；这体现了"不需要完全有序、只需第 <code>floor(n/2)</code> 位置就位"的优化思想，是本题的满分思路。</p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="06-查找.html"><span class="cn-dir">← 上一章</span><span class="cn-title">查找</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="06-查找.html"><span class="cn-dir">← 上一章</span><span class="cn-title">查找</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

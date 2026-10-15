@@ -59,14 +59,14 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>数据表示与运算</h1><h1 id="_1">计算机组成原理 · 数据表示与运算</h1>
+<main><div class="inner"><h1>数据表示与运算</h1><h1 id="_1">计算机组成原理 · 数据表示与运算</h1>
 <h2 id="_2" id="kp">数据表示与运算 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2021、2023 年为典型年份；分数占比约 12%；主要题型：选择题 + 43/44 题计算。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2021、2023 年为典型年份；分数占比约 12%；主要题型：选择题 + 43/44 题计算。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>定点数的编码有四种：<strong>原码</strong>（最高位符号位，其余为绝对值）、<strong>反码</strong>（负数在原码基础上数值位取反）、<strong>补码</strong>（负数在反码基础上末位加 1）、<strong>移码</strong>（在补码基础上符号位取反，用于表示阶码）。<code>n</code> 位补码表示范围是 <code>-2^(n-1)</code> 到 <code>2^(n-1)-1</code>，比原码、反码多表示一个负数 <code>-2^(n-1)</code>，且 <code>0</code> 的表示唯一；<code>n</code> 位移码范围是 <code>-2^(n-1)</code> 到 <code>2^(n-1)-1</code>，其<strong>无符号数值大小顺序与真值顺序一致</strong>，所以移码适合做浮点数的阶码比较。</p>
 <p><strong>补码运算的溢出判断</strong>有两种等价方法：一是双符号位（变形补码）结果的两个符号位为 <code>01</code> 表示正溢出、<code>10</code> 表示负溢出；二是单符号位下判断"最高位进位 <code>C_n</code> 与次高位进位 <code>C_(n-1)</code> 是否异或为 1"。<strong>IEEE 754 单精度</strong>共 32 位，字段为 <code>1 位符号 + 8 位阶码 + 23 位尾数</code>，阶码用<strong>偏移量 127 的移码</strong>（<code>E = e + 127</code>），规格化数的尾数隐含最高位的 <code>1</code>（即 <code>1.M</code>），故真实有效位是 24 位。</p>
 <p>特殊值约定：阶码全 0 且尾数全 0 表示 <code>±0</code>；阶码全 0 而尾数非 0 表示非规格化数（此时隐含位为 0，用于表示接近 0 的数）；阶码全 1 且尾数全 0 表示 <code>±inf</code>；阶码全 1 而尾数非 0 表示 <code>NaN</code>。<strong>浮点数加减</strong>的五个步骤是：对阶（小阶向大阶看齐，尾数右移，移出的位保留为保护位）、尾数加减、规格化（左规或右规，右规一次阶码加 1）、舍入（常用就近舍入即"0 舍 1 入"）、判溢出（阶码溢出才是真溢出，尾数溢出可用右规纠正）。C 语言中 <code>int</code> 到 <code>float</code> 的转换会因 float 只有 24 位有效位而丢失低位，<code>float</code> 转 <code>int</code> 是<strong>向零截断</strong>，这些都必须在位级上理解。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>n 位补码范围 [-2^(n-1), 2^(n-1)-1]</code>、<code>原码/反码范围 [-(2^(n-1)-1), 2^(n-1)-1]</code> —— 补码比原码多一个负数，<code>0</code> 唯一。</li>
 <li><code>补码取负 = 全部位取反加 1</code>；<code>-128 的 8 位补码是 1000 0000</code> —— 该值没有对应的原码与反码。</li>
 <li><code>移码 = 补码的符号位取反</code>、<code>IEEE 754 阶码偏移量为 127（单精度）/ 1023（双精度）</code> —— 偏移量与"移码"的常数不要混淆。</li>
@@ -74,7 +74,7 @@
 <li><code>溢出判断：C_n 异或 C_(n-1)</code>，或双符号位 <code>01</code>/<code>10</code> —— 只有同号相加才可能溢出。</li>
 <li><code>浮点加减顺序：对阶 → 尾数运算 → 规格化 → 舍入 → 判溢出</code> —— 对阶一定"小阶向大阶看齐"。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>定点与浮点的位级字段划分</strong>：定点数只有符号位与数值位，浮点数把数值拆成"阶码 + 尾数"两段以便同时表达范围与精度。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>8-bit fixed point encodings (examples: +13 = 0000 1101)
 
@@ -180,28 +180,30 @@ worked example:  -12.5 = -1100.1B = -1.1001B * 2^3
     F13 --&gt;|是| F14[&quot;上溢报错 或 下溢按 0 处理&quot;]
     F13 --&gt;|否| F15[&quot;输出结果&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>混淆移码偏移量与 IEEE 754 偏移量：<code>n</code> 位纯移码是"补码符号位取反"（偏移 <code>2^(n-1)</code>），而 IEEE 754 单精度的阶码偏移量是 <strong>127</strong>（双精度 1023），两者不能互相代入。</li>
 <li>认为补码与原码表示范围相同：<code>n</code> 位补码比原码、反码多一个负数 <code>-2^(n-1)</code>，且 <code>-2^(n-1)</code> 不存在对应的原码与反码形式；此外补码的 <code>0</code> 表示唯一，原码与反码有 <code>+0</code>、<code>-0</code> 两种表示。</li>
 <li>把尾数溢出当成浮点溢出：尾数相加出现 <code>1x.xxx</code> 只是<strong>尾数溢出</strong>，可通过右规（尾数右移一位、阶码加 1）纠正；真正的溢出是<strong>阶码</strong>超出可表示范围，上溢才报错、下溢按机器零处理。</li>
 <li>对阶时方向搞反：必须<strong>小阶向大阶看齐</strong>（阶码小的数尾数右移），若反过来会让阶码变大而尾数左移，导致高位丢失、结果错误。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2011 年 408 第 13 题（单项选择题，2 分）</span></p>
 <p><code>float</code> 型数据通常用 IEEE 754 单精度浮点格式表示。若编译器将 <code>float</code> 型变量 <code>x</code> 赋值为 <code>-12.5</code>，则该变量的机器数是（ ）。</p>
 <p>A. <code>0xC1480000</code>　B. <code>0xC1480001</code>　C. <code>0xC1480002</code>　D. <code>0xC1480003</code></p>
 <blockquote>
 <p>解析：分三步。第一步，把 <code>-12.5</code> 化为二进制并规格化：<code>12.5 = 1100.1B = 1.1001B * 2^3</code>。第二步，填字段：符号位 <code>S = 1</code>（负数）；阶码 <code>E = 真值阶 3 + 偏移 127 = 130 = 10000010B</code>；尾数 <code>M = 1001</code> 后面补 0 到 23 位，即 <code>10010000000000000000000</code>。第三步，拼接并写成十六进制：<code>1 10000010 10010000000000000000000</code> 按 4 位分组为 <code>1100 0001 0100 1000 0000 0000 0000 0000</code>，即 <code>0xC1480000</code>。答案为 <strong>A</strong>。<strong>关键是把 <code>-12.5</code> 正确写成 <code>1.1001B * 2^3</code>，并把偏移量 127 加到真值阶上。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-next" href="02-存储系统.html"><span class="cn-dir">下一章 →</span><span class="cn-title">存储系统</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-next" href="02-存储系统.html"><span class="cn-dir">下一章 →</span><span class="cn-title">存储系统</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

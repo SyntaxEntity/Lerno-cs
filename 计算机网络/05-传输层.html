@@ -59,15 +59,15 @@
 </div>
 <a class="sb-chap" href="06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>传输层</h1><h1 id="_1">计算机网络 · 传输层</h1>
+<main><div class="inner"><h1>传输层</h1><h1 id="_1">计算机网络 · 传输层</h1>
 <h2 id="_2" id="kp">传输层 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2022、2023、2025；分数占比约 20%；主要题型：选择题 + 综合应用题（TCP 连接管理、拥塞控制、可靠传输）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2022、2023、2025；分数占比约 20%；主要题型：选择题 + 综合应用题（TCP 连接管理、拥塞控制、可靠传输）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>传输层提供<strong>进程到进程（端到端）</strong>的通信，用<strong>端口号</strong>（<code>16</code> 位）标识进程：<code>0—1023</code> 为熟知端口、<code>1024—49151</code> 为登记端口、<code>49152—65535</code> 为客户端临时端口。<strong><code>UDP</code></strong> 是无连接、不可靠、面向报文的服务，首部仅 <code>8 B</code>（源端口、目的端口、长度、校验和），无拥塞控制、无流量控制，适合实时音视频与 <code>DNS</code> 等场景；<strong><code>TCP</code></strong> 是面向连接、可靠、面向字节流的服务，首部固定 <code>20 B</code>，关键字段有<strong>序号 <code>seq</code></strong>（本报文段数据第一个字节的编号）、<strong>确认号 <code>ack</code></strong>（期望收到的下一个字节编号，即已正确收到 <code>ack - 1</code> 及之前的全部字节）、<strong>数据偏移</strong>（以 <code>4 B</code> 为单位）、窗口（接收窗口 <code>rwnd</code>）、以及 <code>SYN</code>/<code>ACK</code>/<code>FIN</code>/<code>RST</code>/<code>PSH</code>/<code>URG</code> 六个标志位。</p>
 <p><strong>连接管理</strong>：<strong>三次握手</strong>为 <code>SYN(seq = x)</code> → <code>SYN + ACK(seq = y, ack = x + 1)</code> → <code>ACK(seq = x + 1, ack = y + 1)</code>，其根本目的是<strong>双方都确认对方的收发能力正常并同步初始序号</strong>；<code>SYN</code> 报文<strong>不携带数据但要消耗一个序号</strong>。<strong>四次挥手</strong>为 <code>FIN</code> → <code>ACK</code> → <code>FIN</code> → <code>ACK</code>，之所以不能合并为三次，是因为 <code>TCP</code> 是全双工的，一方关闭发送方向后另一方可能还有数据要发送，因此<strong>被动关闭方的 <code>FIN</code> 必须单独发送</strong>。</p>
 <p>主动关闭方在发送最后一个 <code>ACK</code> 后进入 <strong><code>TIME_WAIT</code> 状态并等待 <code>2 MSL</code></strong>，其作用是：确保最后一个 <code>ACK</code> 能到达对方（若丢失可重传对方的 <code>FIN</code>），以及让本连接的旧报文段在网络中消失。<strong>可靠传输</strong>靠<strong>序号 + 确认 + 重传 + 滑动窗口</strong>实现：<code>TCP</code> 使用<strong>累计确认</strong>，超时重传时间 <code>RTO</code> 由加权平均往返时间 <code>RTTs</code> 与偏差 <code>RTTd</code> 动态计算（<code>RTO = RTTs + 4 × RTTd</code>），并采用 <code>Karn</code> 算法（重传时不更新 <code>RTTs</code>）。<strong>流量控制</strong>由接收方通过<strong>接收窗口 <code>rwnd</code></strong> 通告可用缓冲空间实现，发送方实际发送窗口 <code>= min(rwnd, cwnd)</code>；</p>
 <p>当 <code>rwnd</code> 为 <code>0</code> 时发送方启动<strong>持续计时器</strong>，超时后发送零窗口探测报文。<strong>拥塞控制</strong>包含四个算法：<strong>慢开始</strong>（<code>cwnd</code> 从 <code>1</code> 个 <code>MSS</code> 开始，每经过一个 <code>RTT</code> 翻倍，呈指数增长，直到达到慢开始门限 <code>ssthresh</code>）、<strong>拥塞避免</strong>（<code>cwnd</code> 每经过一个 <code>RTT</code> 只加 <code>1</code> 个 <code>MSS</code>，呈线性增长）、<strong>快重传</strong>（收到 <code>3</code> 个重复确认就立即重传丢失的报文段而不等超时）、<strong>快恢复</strong>（配合快重传，把 <code>ssthresh</code> 与 <code>cwnd</code> 都调整为当前 <code>cwnd</code> 的一半，然后进入拥塞避免）。<strong>超时</strong>时 <code>ssthresh = cwnd / 2</code>、<code>cwnd = 1</code> 并重新慢开始；<strong>快重传</strong>时 <code>ssthresh = cwnd / 2</code>、<code>cwnd = ssthresh</code> 并直接进入拥塞避免。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>TCP 首部固定 20 B、UDP 首部 8 B</code>；<code>SYN 与 FIN 各消耗一个序号，纯 ACK 不消耗序号</code>。</li>
 <li><code>确认号 = 期望收到的下一个字节序号</code>，即"<code>ack - 1</code> 及之前的字节已全部收到"（累计确认）。</li>
 <li><code>三次握手的目的：确认双方收发能力 + 同步初始序号</code>；<code>四次挥手不可合并的原因：TCP 全双工，被动方可能仍有数据要发</code>。</li>
@@ -76,7 +76,7 @@
 <li><code>超时：ssthresh = cwnd/2，cwnd = 1（重新慢开始）</code>；<code>快重传+快恢复：ssthresh = cwnd/2，cwnd = ssthresh（直接拥塞避免）</code>。</li>
 <li><code>快重传的触发条件是收到 3 个重复确认</code> —— 2 个不算，必须 3 个。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong><code>TCP</code> 三次握手与四次挥手的状态与序号交换</strong>：注意 <code>SYN</code> 与 <code>FIN</code> 各占一个序号，因此确认号分别为 <code>x + 1</code>、<code>y + 1</code>。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>three-way handshake
 
@@ -161,27 +161,29 @@ four-way handshake (connection release)
     S8 --&gt;|rwnd 小于 cwnd| S9[&quot;受流量控制限制 按 rwnd 发送&quot;]
     S8 --&gt;|rwnd 大于 cwnd| S10[&quot;受拥塞控制限制 按 cwnd 发送&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>认为四次挥手可以合并为三次：<code>TCP</code> 是全双工，客户端发出 <code>FIN</code> 只表示"我没有数据要发了"，此时服务器可能仍有数据待发送，因此服务器的 <code>ACK</code> 与 <code>FIN</code> 必须分开发送；只有在服务器恰好也无数据可发时才可能合并。</li>
 <li>忽略 <code>SYN</code> 与 <code>FIN</code> 消耗序号：<code>SYN</code> 与 <code>FIN</code> 各占一个序号，因此三次握手中第三个报文段的 <code>seq = x + 1</code>、<code>ack = y + 1</code>；把它们的序号忽略会导致后续所有序号计算整体偏移。</li>
 <li>混淆超时与快重传后的 <code>cwnd</code> 取值：<strong>超时</strong>时 <code>cwnd = 1</code> 并回到慢开始，<strong>快重传</strong>时 <code>cwnd = ssthresh = cwnd / 2</code> 并直接进入拥塞避免；把两者都写成"减半"或都写成"置 1"是典型错误。</li>
 <li>把发送窗口只按 <code>cwnd</code> 或只按 <code>rwnd</code> 计算：实际发送窗口是 <code>min(rwnd, cwnd)</code>，二者共同限制；只取其中一个会得到偏大的窗口与偏高的吞吐量。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2017 年真题改编（综合应用题，9 分）</span></p>
 <p>甲、乙双方通过 <code>TCP</code> 传送数据，<code>MSS = 1000 B</code>。甲首先向乙发送一个 <code>SYN</code> 报文段（序号为 <code>1000</code>），乙回应 <code>SYN + ACK</code>（序号为 <code>2000</code>），甲再发送确认。此后甲连续向乙发送数据，当甲收到乙发来的连续 <code>3</code> 个重复确认（确认号均为 <code>5000</code>）时，甲的拥塞窗口 <code>cwnd</code> 为 <code>8000 B</code>、慢开始门限 <code>ssthresh</code> 为 <code>16000 B</code>。要求：写出三次握手中第三个报文段的序号与确认号；说明甲收到 3 个重复确认后应执行什么操作，并给出操作后的 <code>ssthresh</code> 与 <code>cwnd</code>。</p>
 <blockquote>
 <p>解析：第一步算握手序号——<code>SYN</code> 消耗一个序号，故甲发出的第三个报文段（纯 <code>ACK</code>）的<strong>序号为 <code>1000 + 1 = 1001</code>、确认号为 <code>2000 + 1 = 2001</code></strong>（确认号表示期望收到乙的下一个字节）。第二步判断丢包类型——收到<strong>连续 3 个重复确认</strong>触发的是<strong>快重传</strong>而不是超时重传，甲应立即<strong>重传确认号为 <code>5000</code> 的那个报文段</strong>（即丢失的报文段），而不必等超时计时器到期。第三步按快恢复调整——<code>ssthresh = cwnd / 2 = 8000 / 2 = 4000 B</code>，随后 <code>cwnd = ssthresh = 4000 B</code>，并<strong>直接进入拥塞避免阶段</strong>（而不是回到慢开始）。<strong>判分点是"3 个重复确认 = 快重传"、"快恢复后 cwnd 等于 ssthresh 而非 1"，以及握手报文中 SYN 占用序号导致的 <code>+1</code>。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="04-网络层.html"><span class="cn-dir">← 上一章</span><span class="cn-title">网络层</span></a><a class="cn-next" href="06-应用层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">应用层</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="04-网络层.html"><span class="cn-dir">← 上一章</span><span class="cn-title">网络层</span></a><a class="cn-next" href="06-应用层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">应用层</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

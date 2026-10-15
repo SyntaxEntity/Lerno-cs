@@ -59,14 +59,14 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>操作系统概述与运行机制</h1><h1 id="_1">操作系统 · 操作系统概述与运行机制</h1>
+<main><div class="inner"><h1>操作系统概述与运行机制</h1><h1 id="_1">操作系统 · 操作系统概述与运行机制</h1>
 <h2 id="_2" id="kp">操作系统概述与运行机制 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 16 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 10%；主要题型：选择题为主（内核态/用户态、系统调用、中断与异常）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 16 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 10%；主要题型：选择题为主（内核态/用户态、系统调用、中断与异常）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>操作系统是管理计算机硬件的系统软件，其四个基本特征是<strong>并发、共享、虚拟、异步</strong>，其中<strong>并发与共享互为存在条件</strong>（没有并发就无需共享，没有共享则并发程序无法推进）；虚拟建立在离散分配与多次性之上，异步是"程序走走停停、以不可预知的速度推进"。CPU 的执行状态分为<strong>内核态（管态）</strong>与<strong>用户态（目态）</strong>：只有内核态才能执行<strong>特权指令</strong>（如开关中断、设置时钟、清主存、修改 <code>PSW</code>、<code>I/O</code> 指令）并访问全部寄存器与存储空间；用户态只能执行非特权指令。<strong><code>PSW</code> 中的状态位</strong>标识当前处于哪一态，而<strong>由用户态进入内核态的唯一途径是中断或异常</strong>（系统调用本质上是通过<strong>陷入指令 <code>trap</code></strong> 触发的一次特殊异常）。</p>
 <p>注意 <code>trap</code> 指令本身<strong>不是特权指令</strong>——它需要在用户态执行才能完成"进入内核态"的动作。<strong>中断</strong>（外中断）来自 CPU 外部的事件（时钟中断、<code>I/O</code> 完成中断、控制台中断），<strong>异常</strong>（内中断）由当前执行的指令引起，分为故障 <code>fault</code>（如缺页、除零，可能被修复后重新执行该指令）、自陷 <code>trap</code>（如系统调用、断点，处理后返回到下一条指令）、终止 <code>abort</code>（如硬件故障，不返回）。<strong>系统调用</strong>的过程是：用户程序传递参数 → 执行陷入指令（<code>trap</code>/<code>syscall</code>，硬件将 <code>PSW</code> 改为内核态并转入内核入口）→ 内核按系统调用号查表执行服务例程 → 返回用户态。</p>
 <p>操作系统内核通常包含<strong>时钟管理、中断处理、原语、进程管理、存储管理、设备管理</strong>等功能，<strong>原语</strong>是"执行期间不可中断"的原子操作，靠<strong>关中断</strong>实现。体系结构上，<strong>宏内核</strong>把所有功能放在内核态、效率高但可靠性差；<strong>微内核</strong>只把最基本的功能（进程调度、中断处理、消息传递）留在内核，其余移出为用户态服务进程，可靠性高但频繁的消息传递带来开销。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>四个特征：并发、共享、虚拟、异步</code> —— 并发与共享互为存在条件，是最常考的相互关系。</li>
 <li><code>特权指令只能在核心态执行；trap 指令是唯一能在用户态执行并进入核心态的指令</code> —— 把 <code>trap</code> 说成特权指令即为错误。</li>
 <li><code>中断（外中断）来自 CPU 外部，异常（内中断）由当前指令引起</code> —— 时钟、<code>I/O</code> 完成属中断；缺页、除零、系统调用属异常。</li>
@@ -74,7 +74,7 @@
 <li><code>系统调用 = 传参 + 陷入指令 + 内核服务例程 + 返回用户态</code> —— 库函数不一定发生系统调用，系统调用一定进内核。</li>
 <li><code>原语的原子性靠关中断保证</code> —— 关中断/开中断是特权指令，故原语只能在核心态运行。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>用户态与内核态的地址空间与切换路径</strong>：用户程序只能通过中断/异常这道"门"进入内核，内核通过修改 <code>PSW</code> 回到用户态。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>process address space and the user/kernel boundary
 
@@ -145,28 +145,30 @@ mode switch paths
     C9 --&gt; C10[&quot;执行返回指令 恢复 PSW 回到用户态&quot;]
     C10 --&gt; C11[&quot;库函数返回 用户程序继续执行&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>把 <code>trap</code>（陷入）指令当成特权指令：<code>trap</code> 必须<strong>在用户态执行</strong>才能完成"请求进入内核"的功能，因此它是非特权指令；真正只能在核心态执行的是开关中断、<code>I/O</code>、修改 <code>PSW</code> 等特权指令。</li>
 <li>混淆中断与异常的分类归属：时钟中断、<code>I/O</code> 完成中断来自 CPU 外部，属<strong>中断</strong>；而缺页、除零、系统调用、断点由当前指令引起，属<strong>异常</strong>；把缺页说成"中断"是最常见的概念错误。</li>
 <li>认为系统调用与库函数等价：库函数可能只是用户态的一段代码（如 <code>printf</code> 的格式化部分），只有其中真正需要内核服务的环节才触发系统调用，二者不是一一对应。</li>
 <li>把"用户态到内核态"的途径扩大化：除中断与异常外，用户程序<strong>没有任何其他合法途径</strong>进入内核态；也不能通过跳转指令直接跳进内核代码（硬件会因特权级检查而拒绝）。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2011 年 408 第 23 题（单项选择题，2 分）</span></p>
 <p>下列选项中，在用户态执行的是（ ）。</p>
 <p>A. 命令解释程序　B. 缺页处理程序　C. 进程调度程序　D. 时钟中断处理程序</p>
 <blockquote>
 <p>解析：逐项判定所处的运行状态。<strong>缺页处理程序</strong>属于内存管理的内核功能，需访问页表与磁盘，必须在核心态（B 错）。<strong>进程调度程序</strong>要操作就绪队列与 <code>PCB</code>、修改 <code>PSW</code>，属内核功能，必须在核心态（C 错）。<strong>时钟中断处理程序</strong>是中断服务程序，由硬件中断触发、运行在核心态（D 错）。<strong>命令解释程序</strong>（<code>shell</code>）只是接收用户命令并创建子进程去执行，其自身运行在用户态，因此用户态可以执行（A 对）。答案选 <strong>A</strong>。<strong>判分依据是"该程序是否需要访问内核数据结构或执行特权指令"，不需要即可在用户态运行。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-next" href="02-进程与线程.html"><span class="cn-dir">下一章 →</span><span class="cn-title">进程与线程</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-next" href="02-进程与线程.html"><span class="cn-dir">下一章 →</span><span class="cn-title">进程与线程</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

@@ -51,7 +51,7 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>操作系统</h1><h1 id="408">操作系统 · 408 速成复习资料</h1>
+<main><div class="inner"><h1>操作系统</h1><h1 id="408">操作系统 · 408 速成复习资料</h1>
 <p><strong>科目分值</strong>：35 分 / 150 分　|　<strong>章节数</strong>：7　|　<strong>统计区间</strong>：2009—2025 年 408 统考真题（17 套）</p>
 <h2 id="_1">本科目章节索引</h2>
 <div class="tw"><table>
@@ -158,12 +158,12 @@
 用于确定复习优先级，不作为命题预测。数据口径与来源见 <code>README.md</code>。</p>
 </blockquote>
 <h2 id="_2">操作系统概述与运行机制 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 16 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 10%；主要题型：选择题为主（内核态/用户态、系统调用、中断与异常）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 16 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 10%；主要题型：选择题为主（内核态/用户态、系统调用、中断与异常）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>操作系统是管理计算机硬件的系统软件，其四个基本特征是<strong>并发、共享、虚拟、异步</strong>，其中<strong>并发与共享互为存在条件</strong>（没有并发就无需共享，没有共享则并发程序无法推进）；虚拟建立在离散分配与多次性之上，异步是"程序走走停停、以不可预知的速度推进"。CPU 的执行状态分为<strong>内核态（管态）</strong>与<strong>用户态（目态）</strong>：只有内核态才能执行<strong>特权指令</strong>（如开关中断、设置时钟、清主存、修改 <code>PSW</code>、<code>I/O</code> 指令）并访问全部寄存器与存储空间；用户态只能执行非特权指令。<strong><code>PSW</code> 中的状态位</strong>标识当前处于哪一态，而<strong>由用户态进入内核态的唯一途径是中断或异常</strong>（系统调用本质上是通过<strong>陷入指令 <code>trap</code></strong> 触发的一次特殊异常）。</p>
 <p>注意 <code>trap</code> 指令本身<strong>不是特权指令</strong>——它需要在用户态执行才能完成"进入内核态"的动作。<strong>中断</strong>（外中断）来自 CPU 外部的事件（时钟中断、<code>I/O</code> 完成中断、控制台中断），<strong>异常</strong>（内中断）由当前执行的指令引起，分为故障 <code>fault</code>（如缺页、除零，可能被修复后重新执行该指令）、自陷 <code>trap</code>（如系统调用、断点，处理后返回到下一条指令）、终止 <code>abort</code>（如硬件故障，不返回）。<strong>系统调用</strong>的过程是：用户程序传递参数 → 执行陷入指令（<code>trap</code>/<code>syscall</code>，硬件将 <code>PSW</code> 改为内核态并转入内核入口）→ 内核按系统调用号查表执行服务例程 → 返回用户态。</p>
 <p>操作系统内核通常包含<strong>时钟管理、中断处理、原语、进程管理、存储管理、设备管理</strong>等功能，<strong>原语</strong>是"执行期间不可中断"的原子操作，靠<strong>关中断</strong>实现。体系结构上，<strong>宏内核</strong>把所有功能放在内核态、效率高但可靠性差；<strong>微内核</strong>只把最基本的功能（进程调度、中断处理、消息传递）留在内核，其余移出为用户态服务进程，可靠性高但频繁的消息传递带来开销。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>四个特征：并发、共享、虚拟、异步</code> —— 并发与共享互为存在条件，是最常考的相互关系。</li>
 <li><code>特权指令只能在核心态执行；trap 指令是唯一能在用户态执行并进入核心态的指令</code> —— 把 <code>trap</code> 说成特权指令即为错误。</li>
 <li><code>中断（外中断）来自 CPU 外部，异常（内中断）由当前指令引起</code> —— 时钟、<code>I/O</code> 完成属中断；缺页、除零、系统调用属异常。</li>
@@ -171,7 +171,7 @@
 <li><code>系统调用 = 传参 + 陷入指令 + 内核服务例程 + 返回用户态</code> —— 库函数不一定发生系统调用，系统调用一定进内核。</li>
 <li><code>原语的原子性靠关中断保证</code> —— 关中断/开中断是特权指令，故原语只能在核心态运行。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>用户态与内核态的地址空间与切换路径</strong>：用户程序只能通过中断/异常这道"门"进入内核，内核通过修改 <code>PSW</code> 回到用户态。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>process address space and the user/kernel boundary
 
@@ -242,13 +242,13 @@ mode switch paths
     C9 --&gt; C10[&quot;执行返回指令 恢复 PSW 回到用户态&quot;]
     C10 --&gt; C11[&quot;库函数返回 用户程序继续执行&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>把 <code>trap</code>（陷入）指令当成特权指令：<code>trap</code> 必须<strong>在用户态执行</strong>才能完成"请求进入内核"的功能，因此它是非特权指令；真正只能在核心态执行的是开关中断、<code>I/O</code>、修改 <code>PSW</code> 等特权指令。</li>
 <li>混淆中断与异常的分类归属：时钟中断、<code>I/O</code> 完成中断来自 CPU 外部，属<strong>中断</strong>；而缺页、除零、系统调用、断点由当前指令引起，属<strong>异常</strong>；把缺页说成"中断"是最常见的概念错误。</li>
 <li>认为系统调用与库函数等价：库函数可能只是用户态的一段代码（如 <code>printf</code> 的格式化部分），只有其中真正需要内核服务的环节才触发系统调用，二者不是一一对应。</li>
 <li>把"用户态到内核态"的途径扩大化：除中断与异常外，用户程序<strong>没有任何其他合法途径</strong>进入内核态；也不能通过跳转指令直接跳进内核代码（硬件会因特权级检查而拒绝）。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2011 年 408 第 23 题（单项选择题，2 分）</span></p>
 <p>下列选项中，在用户态执行的是（ ）。</p>
 <p>A. 命令解释程序　B. 缺页处理程序　C. 进程调度程序　D. 时钟中断处理程序</p>
@@ -257,12 +257,12 @@ mode switch paths
 </blockquote>
 <hr />
 <h2 id="_3">进程与线程 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2020、2022、2024 年为典型年份；分数占比约 18%；主要题型：选择题 + 综合应用题（进程状态、PCB、线程共享、调度）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2020、2022、2024 年为典型年份；分数占比约 18%；主要题型：选择题 + 综合应用题（进程状态、PCB、线程共享、调度）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>进程</strong>是程序在一个数据集合上的一次运行过程，是系统进行<strong>资源分配</strong>的基本单位；<strong>线程</strong>是进程内的一个执行流，是<strong>处理机调度</strong>的基本单位。进程由<strong>程序段、数据段、<code>PCB</code></strong> 三部分组成，其中 <strong><code>PCB</code> 是进程存在的唯一标志</strong>，内容包括进程标识符、处理机现场信息（各寄存器与 <code>PC</code> 的值）、进程控制信息（状态、优先级、队列指针、资源清单）。</p>
 <p><strong>进程映像</strong>在内存中的布局自低到高为：代码段、数据段（含已初始化的 <code>data</code> 与未初始化的 <code>bss</code>）、堆（向上增长，<code>malloc</code> 分配）、栈（向下增长，存放函数调用帧与局部变量）。进程有<strong>五种基本状态</strong>：创建态、就绪态、运行态、阻塞态、终止态。状态转换的<strong>唯一主动转换</strong>是"运行 → 阻塞"（进程自己请求 <code>I/O</code> 或申请资源），其余都是被动的：<strong>就绪 → 运行</strong>由调度程序选中引起，<strong>运行 → 就绪</strong>由时间片用完或更高优先级抢占引起，<strong>阻塞 → 就绪</strong>由 <code>I/O</code> 完成或资源可用引起。</p>
 <p><strong>阻塞态不能直接转为运行态</strong>，必须先回到就绪态。<strong>进程控制</strong>由原语完成：创建（分配 <code>PCB</code> 与资源、置为就绪）、终止（回收资源、撤销 <code>PCB</code>）、阻塞与唤醒、挂起与激活。<strong>进程通信</strong>有共享存储、消息传递、管道通信三种方式（信号 <code>signal</code> 也可视为一种通知机制）。<strong>线程</strong>与进程的本质差别是：<strong>同一进程内的各线程共享该进程的资源</strong>（代码段、数据段、堆、打开的文件、地址空间），只<strong>私有栈、寄存器现场与线程控制块 <code>TCB</code></strong>；因此线程切换不需要切换地址空间，开销远小于进程切换。<strong>用户级线程</strong>由用户库函数管理，内核不感知，故<strong>一个线程阻塞会导致整个进程阻塞</strong>、且<strong>无法利用多核并行</strong>；<strong>内核级线程</strong>由内核管理，可被独立调度到不同处理机，但切换需陷入内核、开销较大。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>PCB 是进程存在的唯一标志</code>；进程 = 程序段 + 数据段 + <code>PCB</code>。</li>
 <li><code>进程是资源分配单位，线程是调度单位</code> —— 线程只私有栈与寄存器现场，其余与同进程内其他线程共享。</li>
 <li><code>运行 -&gt; 阻塞 是唯一主动转换，阻塞 -&gt; 就绪 是被动转换，阻塞不能直接到运行</code> —— 五状态转换的核心结论。</li>
@@ -270,7 +270,7 @@ mode switch paths
 <li><code>用户级线程阻塞则整个进程阻塞、不能并行于多核；内核级线程可独立调度</code> —— 两类线程的本质差异。</li>
 <li><code>线程切换不切换地址空间，进程切换要换页表并刷新 TLB</code> —— 这是线程切换开销更小的根本原因。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>进程映像的内存布局</strong>：堆与栈相向增长，中间是尚未分配的空闲区；多个线程共享代码段、数据段与堆，但各自有独立的栈。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>process image layout in virtual address space
 
@@ -327,13 +327,13 @@ mode switch paths
     运行态 --&gt; 终止态: 正常结束 或 异常终止
     终止态 --&gt; [*]: 回收资源 撤销 PCB
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>认为阻塞态可以直接转为运行态：进程被唤醒后只能进入<strong>就绪态</strong>排队等 <code>CPU</code>，必须再经调度才能运行；画状态图时多画一条"阻塞 → 运行"是最典型的失分点。</li>
 <li>把进程与线程的资源拥有关系搞反：线程<strong>不拥有</strong>资源（除栈与寄存器等私有部分），资源属于进程；因此"线程是资源分配单位"的说法是错误的。</li>
 <li>混淆挂起状态与阻塞状态：<strong>挂起</strong>是把进程映像换出到外存（不占内存，属"静止"状态），<strong>阻塞</strong>是等待事件（仍在内存）；挂起态与阻塞态是两个不同维度，可组合为"就绪挂起""阻塞挂起"。</li>
 <li>认为用户级线程能被内核独立调度：用户级线程对内核不可见，内核只认识进程，因此<strong>一个用户级线程执行阻塞系统调用会导致整个进程阻塞</strong>，也无法在多核上真正并行。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2020 年真题改编（单项选择题，2 分）</span></p>
 <p>下列关于进程与线程的叙述中，正确的是（ ）。</p>
 <p>A. 进程是处理机调度的基本单位，线程是资源分配的基本单位
@@ -345,12 +345,12 @@ D. 用户级线程的阻塞不会导致其所属进程被阻塞</p>
 </blockquote>
 <hr />
 <h2 id="_4">处理机调度与死锁 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 16%；主要题型：选择题 + 综合应用题（调度算法计算、银行家算法）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 16%；主要题型：选择题 + 综合应用题（调度算法计算、银行家算法）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>处理机调度</strong>分三级：<strong>高级调度</strong>（作业调度）决定哪些作业从外存进入内存并建立进程，<strong>中级调度</strong>（内存调度）决定挂起的进程何时重新调入内存（对应"就绪挂起 → 就绪"），<strong>低级调度</strong>（进程调度）从就绪队列中选一个进程分配 <code>CPU</code>，是频率最高、必须高效的一级；若系统有<strong>中级调度</strong>就说明采用了<strong>虚拟内存</strong>。评价指标中，<strong>周转时间 = 完成时间 - 到达时间</strong>，<strong>带权周转时间 = 周转时间 / 服务时间</strong>（<code>&gt;= 1</code>，越接近 1 越好），<strong>等待时间</strong>是进程在就绪队列中排队的时间之和（不含执行与 <code>I/O</code> 时间），<strong>响应时间</strong>是从提交请求到首次响应的时间。</p>
 <p><strong><code>FCFS</code></strong>（先来先服务）按到达顺序调度，非抢占、对长作业有利而对短作业不利，且对 <code>I/O</code> 繁忙型作业不利。<strong><code>SJF</code>/<code>SPF</code></strong>（短作业优先）平均周转时间与平均带权周转时间最短，但必须预知运行时间，且对长作业可能造成<strong>饥饿</strong>。<strong><code>HRRN</code></strong>（高响应比优先）用 <code>响应比 = (等待时间 + 服务时间) / 服务时间</code>，兼顾等待时间与服务时间，是非抢占式的折中方案。<strong>时间片轮转 <code>RR</code></strong> 只用于进程调度、按 <code>FCFS</code> 排队并轮流执行一个时间片：时间片过大会退化为 <code>FCFS</code>，过小则切换开销过大；</p>
 <p>它对<strong>响应时间</strong>有利但不保证周转时间。<strong>优先级调度</strong>分抢占式与非抢占式，就绪队列可用<strong>静态/动态优先级</strong>。<strong>多级反馈队列</strong>设置多个优先级递减、时间片递增的队列，新进程进最高级队列，用完时间片未完成则降级，只有高优先级队列为空才调度低优先级队列，因而能较好的满足各类进程需要，是通用性最强的算法。<strong>死锁</strong>是多个进程因竞争资源而互相等待、无外力干预都无法推进的局面，产生死锁的<strong>四个必要条件</strong>是<strong>互斥、不可剥夺、请求并保持、循环等待</strong>，四者同时成立才可能死锁。<strong>死锁预防</strong>通过破坏某个必要条件实现；<strong>死锁避免</strong>在分配前用<strong>银行家算法</strong>判断系统是否处于<strong>安全状态</strong>（存在一个安全序列使所有进程都能完成）；<strong>死锁检测与解除</strong>允许死锁发生，用资源分配图化简（可完全化简则无死锁）检测，再用资源剥夺、撤销进程或进程回退来解除。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>周转时间 = 完成 - 到达</code>，<code>带权周转时间 = 周转 / 服务时间</code> —— 带权周转时间必须除以服务时间，忘除是最常见错误。</li>
 <li><code>SJF 平均周转时间最短，但需预知运行时间且长作业可能饥饿</code> —— 这是"理论最优但工程上受限"的经典结论。</li>
 <li><code>RR 的时间片过大退化为 FCFS，过小则上下文切换开销剧增</code> —— 时间片选择是 RR 的核心权衡。</li>
@@ -358,7 +358,7 @@ D. 用户级线程的阻塞不会导致其所属进程被阻塞</p>
 <li><code>死锁四个必要条件：互斥、不可剥夺、请求并保持、循环等待</code> —— 缺一不可，破坏任一即可预防。</li>
 <li><code>银行家算法：Need = Max - Allocation，找 Need &lt;= Available 的进程并回收其资源</code> —— 找得到完整序列则处于安全状态。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>三种调度算法的甘特图对比</strong>：同一组作业（到达时间与服务时间相同）在不同算法下的完成顺序与平均周转时间不同。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>jobs:  A(arrive 0, service 7)  B(arrive 2, service 4)
        C(arrive 4, service 1)  D(arrive 5, service 4)
@@ -447,13 +447,13 @@ RR (time slice q = 4)
     B13 --&gt;|是| B7
     B13 --&gt;|否| B7
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>带权周转时间忘记除以服务时间：<code>带权周转时间 = 周转时间 / 服务时间</code>，量纲是"倍数"且必然 <code>&gt;= 1</code>；只算周转时间就答题会整题失分。</li>
 <li>认为 <code>SJF</code> 一定优于其他算法：<code>SJF</code> 的"平均周转时间最短"是在<strong>所有作业同时到达</strong>的前提下证明的；若到达时间不同，抢占式 <code>SRTN</code> 才更优，且 <code>SJF</code> 会造成长作业<strong>饥饿</strong>。</li>
 <li>把死锁避免与死锁预防混为一谈：<strong>预防</strong>是破坏四个必要条件之一（静态、保守），<strong>避免</strong>是用银行家算法在每次分配前动态判断安全性（允许必要条件存在但保证不进死锁），<strong>检测与解除</strong>则是允许死锁发生后再处理。</li>
 <li>银行家算法中 <code>Need</code> 计算错误或判断条件写反：<code>Need = Max - Allocation</code> 必须先算对；寻找安全序列时判据是 <code>Need &lt;= Available</code>（当前可用量），把 <code>Available</code> 误用成 <code>Max</code> 或 <code>Allocation</code> 都会得到错误结论。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2016 年 408 第 45 题（综合应用题，7 分）</span></p>
 <p>某系统中有 5 个进程 <code>P0 ~ P4</code>，3 类资源 <code>A、B、C</code>，当前时刻的资源分配情况为 <code>Available = (3, 3, 2)</code>，各进程的 <code>Max</code> 与 <code>Allocation</code> 如下表（<code>Need = Max - Allocation</code>）：<code>P0: Max(7,5,3) Alloc(0,1,0)</code>、<code>P1: Max(3,2,2) Alloc(2,0,0)</code>、<code>P2: Max(9,0,2) Alloc(3,0,2)</code>、<code>P3: Max(2,2,2) Alloc(2,1,1)</code>、<code>P4: Max(4,3,3) Alloc(0,0,2)</code>。要求：计算各进程的 <code>Need</code>；判断当前系统是否处于安全状态，若是则给出一个安全序列。</p>
 <blockquote>
@@ -461,13 +461,13 @@ RR (time slice q = 4)
 </blockquote>
 <hr />
 <h2 id="_5">同步与互斥 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2013、2015、2017、2018、2020、2022、2023、2025；分数占比约 20%；主要题型：综合应用题为主（45 题几乎固定考 PV 操作）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2013、2015、2017、2018、2020、2022、2023、2025；分数占比约 20%；主要题型：综合应用题为主（45 题几乎固定考 PV 操作）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>临界区</strong>是进程中访问临界资源的那段代码，实现互斥必须满足四条准则：<strong>空闲让进、忙则等待、有限等待、让权等待</strong>（前两条必须满足，后两条尽量避免"饥饿"与"忙等"）。软件方案中 <strong><code>Peterson</code> 算法</strong>用 <code>flag[]</code> 与 <code>turn</code> 两个变量实现两个进程的互斥，满足空闲让进、忙则等待与有限等待，但<strong>不满足让权等待</strong>（等待时仍占用 <code>CPU</code> 空转）；硬件方案中<strong>中断屏蔽</strong>最简单但只适用于单处理机且风险高，<strong><code>TestAndSet</code>（<code>TS</code>）与 <code>Swap</code> 指令</strong>是原子的，但同样属于忙等。<strong>信号量机制</strong>是 408 的核心考点：<strong>整型信号量</strong>的 <code>wait(S)</code> 是 <code>while (S &lt;= 0); S--;</code>，属于<strong>忙等</strong>；</p>
 <p><strong>记录型信号量</strong>用 <code>value</code> 与等待队列 <code>L</code> 描述，<code>wait(S)</code> 为 <code>S.value--; if (S.value &lt; 0) block(S.L);</code>，<code>signal(S)</code> 为 <code>S.value++; if (S.value &lt;= 0) wakeup(S.L);</code>。注意 <code>value</code> 的<strong>物理意义</strong>：<code>value &gt; 0</code> 表示当前可用资源数，<code>value &lt; 0</code> 表示<strong>在该信号量队列上阻塞的进程数</strong>；因此 <code>wait</code> 是"先减后判"、<code>signal</code> 是"先加后判"，判据是 <code>&lt; 0</code> 与 <code>&lt;= 0</code>。用信号量实现互斥时初值为 <code>1</code>，实现同步时初值为"可用资源数"（如缓冲区空位数），而"前驱关系"则用初值为 <code>0</code> 的信号量让后继进程先 <code>wait</code> 前驱进程的 <code>signal</code>。</p>
 <p><strong>生产者-消费者</strong>问题需要<strong>两个同步信号量 <code>empty</code>（初值 <code>n</code>）与 <code>full</code>（初值 <code>0</code>）加一个互斥信号量 <code>mutex</code>（初值 <code>1</code>）</strong>，且<strong>必须先对同步信号量 <code>wait</code> 再对 <code>mutex</code> 进行 <code>wait</code></strong>，否则当缓冲区满/空时进程会抱着互斥锁睡眠，导致另一进程无法推进而死锁。<strong>读者-写者</strong>问题中"读者优先"方案用一个 <code>count</code> 统计读者数并配 <code>mutex</code> 保护 <code>count</code>，第一个读者进入时对 <code>rw</code> 加锁、最后一个读者离开时释放 <code>rw</code>，从而允许读者并发。</p>
 <p><strong>哲学家进餐</strong>问题的死锁根源是"每个人都先拿左筷再等右筷"形成循环等待，解决办法包括：至多允许 4 人同时取筷（用初值 <code>4</code> 的信号量）、奇数号先拿左偶数号先拿右（破坏循环等待）、或用 <code>AND</code> 型信号量一次性申请两只筷子。<strong>管程</strong>把共享变量与操作封装在一起，同一时刻只允许一个进程在管程内活动，用<strong>条件变量</strong>的 <code>wait</code>/<code>signal</code> 实现等待与唤醒，把同步的复杂性交给编译器处理。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>记录型信号量：wait 先减后判 value &lt; 0 则阻塞，signal 先加后判 value &lt;= 0 则唤醒</code> —— 判据符号写反是最常见错误。</li>
 <li><code>信号量 value 的物理意义：正值 = 可用资源数，负值绝对值 = 阻塞进程数</code> —— 由此可反推被阻塞的进程个数。</li>
 <li><code>互斥信号量初值 1，同步信号量初值 = 资源数，前驱关系信号量初值 0</code> —— 三种用途的初值必须分清。</li>
@@ -475,7 +475,7 @@ RR (time slice q = 4)
 <li><code>读者优先：第一个读者锁 rw，最后一个读者解锁 rw，中间读者只改 count</code> —— 只要有读者在读，写者就一直等待。</li>
 <li><code>哲学家进餐的三种解法都指向破坏循环等待或限制并发数</code> —— 单独"先左后右"必然可能死锁。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>生产者-消费者模型的缓冲区与信号量协作</strong>：<code>empty</code> 与 <code>full</code> 是一对"互补计数"，任何时刻 <code>empty + full = n</code>，<code>mutex</code> 只保护对缓冲区的实际读写。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>circular buffer with 3 semaphores (n = 4 slots)
 
@@ -553,13 +553,13 @@ producer                          consumer
     V4 --&gt; V5[&quot;调用 wakeup 原语 该进程转入就绪态&quot;]
     V5 --&gt; V6[&quot;被唤醒进程等待重新调度获得 CPU&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li><code>wait</code>/<code>signal</code> 的判据符号写反：记录型信号量中 <code>wait</code> 里判 <code>value &lt; 0</code>（减 1 之后），<code>signal</code> 里判 <code>value &lt;= 0</code>（加 1 之后）；写成 <code>&lt;= 0</code> 与 <code>&lt; 0</code> 会导致阻塞/唤醒时机整体错位。</li>
 <li>生产者-消费者中先 <code>wait(mutex)</code> 再 <code>wait(empty)</code>：这样当缓冲区满时生产者会<strong>持有互斥锁</strong>进入睡眠，消费者无法进入临界区取走数据，双方互相等待形成<strong>死锁</strong>；必须"先同步后互斥"。</li>
 <li>混淆同步信号量与互斥信号量的初值：互斥信号量初值恒为 <code>1</code>（表示"临界区可用"），同步信号量初值等于可用资源数（生产者-消费者的 <code>empty</code> 为 <code>n</code>、<code>full</code> 为 <code>0</code>）；把 <code>full</code> 也设成 <code>n</code> 会让消费者一开始就去读空缓冲区。</li>
 <li>认为读者-写者问题中读者与写者可以同时进入：只要存在读者在读，写者就必须等待（<code>rw</code> 被第一个读者锁住）；"读者优先"方案中写者甚至可能<strong>饥饿</strong>，若题目要求"写者优先"必须额外增加信号量。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2014 年 408 第 45 题（综合应用题，7 分）</span></p>
 <p>某生产者-消费者问题中，有一个可以存放 <code>1000</code> 个数据的环形缓冲区，生产者进程 <code>P</code> 与消费者进程 <code>C</code> 共享该缓冲区。请用信号量的 <code>wait</code>、<code>signal</code> 操作描述 <code>P</code> 与 <code>C</code> 的同步与互斥关系（只需给出进程的算法描述，不必写出完整的程序）。</p>
 <blockquote>
@@ -567,14 +567,14 @@ producer                          consumer
 </blockquote>
 <hr />
 <h2 id="_6">内存管理 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 28 次；涉及年份：2009—2025 年几乎年年出现，2011、2014、2016、2018、2019、2021、2022、2024 年为典型年份；分数占比约 26%；主要题型：选择题 + 综合应用题（46 题常考分页/分段/地址翻译/页面置换）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 28 次；涉及年份：2009—2025 年几乎年年出现，2011、2014、2016、2018、2019、2021、2022、2024 年为典型年份；分数占比约 26%；主要题型：选择题 + 综合应用题（46 题常考分页/分段/地址翻译/页面置换）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>内存管理</strong>要解决四个问题：内存空间的分配与回收、地址转换、扩充、保护。程序的装入有三种方式：<strong>绝对装入</strong>（编译时确定物理地址，只适合单道）、<strong>静态重定位</strong>（装入时一次性修改所有地址，运行期间不能再移动）、<strong>动态重定位</strong>（运行时由<strong>重定位寄存器</strong>加逻辑地址得到物理地址，允许程序在内存中移动）。</p>
 <p><strong>连续分配</strong>中的<strong>动态分区分配</strong>有四种算法：<strong>首次适应</strong>（按地址递增查找第一个满足的空闲分区，性能通常最好、但低地址区被反复分割）、<strong>最佳适应</strong>（按容量递增，选最小满足的分区，会留下大量难以利用的外部碎片）、<strong>最坏适应</strong>（选最大分区，容易把大分区耗尽）、<strong>邻近适应</strong>（从上次结束处继续查找，使高地址大分区也被分割）。<strong>分页存储管理</strong>把逻辑地址空间分成大小相等的<strong>页</strong>、内存分成同样大小的<strong>页框（物理块）</strong>，逻辑地址结构为 <code>页号 P + 页内偏移 W</code>；</p>
 <p>页表存放"页号 → 页框号"的映射，<strong>页表项大小与页框大小、页表项数目共同决定页表长度</strong>，做题时要注意页表项是否按字节取整。<strong>两级页表</strong>把页号再拆成"一级页号 + 二级页号"，使页表本身也可以离散存放、不必连续占用大块内存；其地址结构位数拆分的依据是"每页能放多少个页表项"。<strong>分段存储管理</strong>按程序的逻辑单位（主程序段、子程序段、数据段）划分，逻辑地址为 <code>段号 S + 段内偏移 W</code>，段表项含段长与基址；</p>
 <p><strong>段是逻辑单位、对用户可见，页是物理单位、对用户透明</strong>，因此分页是一维的（只需一个地址），分段是二维的（必须给出段名与段内地址）。<strong>段页式</strong>先分段再分页，地址为 <code>段号 + 页号 + 页内偏移</code>，需要访问三次主存（段表、页表、数据），可用快表减少。<strong>虚拟内存</strong>的三个前提是<strong>多次性、对换性、离散分配</strong>；<strong>请求分页</strong>在访问的页不在内存时产生<strong>缺页中断（属异常/内中断）</strong>，由操作系统调页。</p>
 <p><strong>页面置换算法</strong>：<strong>最佳置换 <code>OPT</code></strong>（置换未来最久不用的页，不可实现，作为性能上界）、<strong>先进先出 <code>FIFO</code></strong>（实现简单，但可能出现 <strong><code>Belady</code> 异常</strong>——分配的页框越多缺页次数反而增加）、<strong>最近最久未使用 <code>LRU</code></strong>（性能接近 <code>OPT</code>，但需硬件支持、开销大）、<strong>时钟 <code>CLOCK</code>（简单时钟）</strong>（用访问位循环扫描，访问位为 1 则清 0 继续，为 0 则置换）、<strong>改进型 <code>CLOCK</code></strong>（同时考虑访问位 <code>A</code> 与修改位 <code>M</code>，优先淘汰 <code>A = 0 且 M = 0</code>，其次 <code>A = 0 且 M = 1</code>，从而减少写回磁盘的开销）。<strong>有效访问时间</strong>必须按题意枚举命中组合，若 <code>TLB</code> 未命中要额外访问一次主存读页表项，若缺页还要加上缺页处理时间。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>逻辑地址 = 页号 P + 页内偏移 W</code>；<code>页号位数 = log2(页数)</code>、<code>页内偏移位数 = log2(页大小)</code>。</li>
 <li><code>两级页表的位数拆分依据"每页可放 2^(页内偏移位数) / 页表项大小 个页表项"</code> —— 页表项大小要向上取整到字节。</li>
 <li><code>分页一维、对用户透明；分段二维、对用户可见</code>；分段便于共享与保护，分页便于内存分配。</li>
@@ -582,7 +582,7 @@ producer                          consumer
 <li><code>FIFO 可能出现 Belady 异常；LRU 与 OPT 不会（属堆栈类算法）</code> —— 这是判断缺页次数随页框数变化的依据。</li>
 <li><code>改进型 CLOCK 的优先淘汰次序：A=0,M=0 &gt; A=0,M=1 &gt; A=1,M=0 &gt; A=1,M=1</code> —— <code>M=0</code> 优先是为了避免写回。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>三种离散分配方式的地址结构与内存布局对比</strong>：分页的页框大小固定、页可离散存放；分段的段长可变、按逻辑划分；段页式是二者结合。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>(1) paging: logical address = page number P | offset W
 
@@ -678,13 +678,13 @@ producer                          consumer
     A11 --&gt;|否| A13[&quot;访问主存取数据并调入 Cache&quot;]
     A13 --&gt; A12
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>页表项大小与页表占用页数计算错误：页表项大小要<strong>向上取整到字节</strong>（如 <code>20</code> 位需占 <code>3</code> 字节而不是 <code>2.5</code> 字节），页表本身占用页数 <code>= 页表总字节数 / 页大小</code> 需向上取整；忽略这两处取整会得到偏小的答案。</li>
 <li>有效访问时间漏算 <code>TLB</code> 未命中时的访存：<code>TLB</code> 命中时只需一次访存取数据，未命中时要<strong>先访问主存读页表项、再访问主存取数据</strong>共两次；若还缺页则需再加缺页处理时间，必须按题意逐项列出。</li>
 <li>认为 <code>FIFO</code> 一定不会出现 <code>Belady</code> 异常：<code>FIFO</code> 是<strong>唯一</strong>会出现 <code>Belady</code> 异常的常用算法（页框增多而缺页次数反而增加）；<code>LRU</code> 与 <code>OPT</code> 属堆栈类算法，不会出现该异常。</li>
 <li>改进型 <code>CLOCK</code> 的淘汰次序写反：优先淘汰 <code>A = 0 且 M = 0</code>（既没被访问也没被修改，淘汰代价最小），最后才考虑 <code>A = 1 且 M = 1</code>；把"优先淘汰被修改过的页"当成规则会与减少磁盘写回的设计目标相悖。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2016 年 408 第 46 题（综合应用题，8 分）</span></p>
 <p>某 32 位系统采用二级页表的分页存储管理，按字节编址，页大小为 <code>4 KB</code>，页表项大小为 <code>4 B</code>。要求：给出一级页号、二级页号与页内偏移各占多少位；若某进程的代码段大小为 <code>8 MB</code> 且从逻辑地址 <code>0</code> 开始连续存放，求该代码段需要多少个二级页表。</p>
 <blockquote>
@@ -692,11 +692,11 @@ producer                          consumer
 </blockquote>
 <hr />
 <h2 id="_7">文件管理 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2024；分数占比约 16%；主要题型：选择题 + 综合应用题（文件物理结构、目录、磁盘空间）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2024；分数占比约 16%；主要题型：选择题 + 综合应用题（文件物理结构、目录、磁盘空间）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>文件管理把磁盘上的物理块抽象为按名访问的逻辑文件：文件逻辑结构分无结构流式（顺序文件）与有结构记录式（顺序、索引、索引顺序、散列），物理结构分连续、链接（隐式/显式 FAT）、索引（单级/多级/混合），其中 UNIX 混合索引的最大文件长度 = <code>D*a + I*a + I^2*a + I^3*a</code>，<code>D</code>、<code>I</code> 为直接与一级间接地址项个数，<code>a</code> 为盘块大小，逐项相加不得漏掉直接项。目录本质是文件名到 FCB 的映射表，采用索引结点（inode）后把文件名与除名字外的属性分离，目录项只留<code>文件名 + inode 号</code>，使检索时一个盘块能容纳更多目录项、显著减少 I/O 次数。文件共享靠硬链接（多个目录项指向同一 inode，<code>count</code> 计数，删除只减计数，为 0 才真正回收）与软链接（新建一个存放路径名的文件，删除原文件后软链接失效成为悬空链接）。</p>
 <p>磁盘空间管理常用位示图、空闲链表、成组链接法；位示图的字号 <code>i</code>、位号 <code>j</code> 与块号换算按从 1 开始编号时为 <code>块号 = (i-1)*n + j</code>（<code>n</code> 为每字位数），从 0 开始编号时 <code>块号 = i*n + j</code>，两者必须与题设口径统一。进程访问文件先查进程打开文件表（含文件描述符、读写偏移、访问权限），表项指向系统打开文件表的全局表项（含 inode 指针、引用计数），再由 inode 逐级查目录与磁盘，最终由页/块缓存完成 <code>read</code>。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>最大文件长度 = D*a + I*a + I^2*a + I^3*a</code> —— 直接、一级、二级、三级间接地址项逐项求和，<code>a</code> 为盘块大小，物理块号还需占用地址项宽度（如 4B）。</li>
 <li><code>一级间接可指块数 = a / 地址项字节数</code> —— 索引块本身占一个盘块，能放的指针个数由此决定，再逐级平方或立方。</li>
 <li><code>inode 把文件名与属性分离</code> —— 目录项只存<code>文件名 + inode 号</code>，检索路径名时目录占块少、命中率高，一个文件可被多个目录项共享。</li>
@@ -704,7 +704,7 @@ producer                          consumer
 <li><code>位示图 n 位/字</code> —— 从 1 开始编号 <code>块号 = (i-1)*n + j</code>；从 0 开始编号 <code>块号 = i*n + j</code>，<code>j</code> 为字内位号。</li>
 <li><code>打开文件表两级</code> —— 进程表项（fd、读写位置、权限）唯一指向系统打开文件表项（inode 指针、引用计数），<code>read</code> 只改进程表项的偏移。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>hybrid-index inode layout  (a = block size, w = address width, k = a / w)
 
  inode
@@ -775,13 +775,13 @@ producer                          consumer
     A11 --&gt; A12[数据拷入用户缓冲区 偏移增加]
     A12 --&gt; A13[返回实际读到的字节数]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>算最大文件长度时漏掉直接地址项或漏乘盘块大小：正确做法是<code>直接项数*a + 一级间接项数*a + k*a + k^2*a + k^3*a</code>，<code>k</code> 由盘块大小除以地址项字节数得到，每一项都要乘 <code>a</code>。</li>
 <li>把软链接说成共享索引结点：软链接是新建的独立文件，自身有 inode，内容只是原文件路径名；只有硬链接才共享同一 inode 并靠引用计数决定回收时机。</li>
 <li>位示图块号与字号位号换算搞错起始编号：题设从 1 开始时<code>块号 = (i-1)*n + j</code>，从 0 开始时<code>块号 = i*n + j</code>，且同一题内字号、位号、块号必须同口径。</li>
 <li>混淆两级打开文件表：进程打开文件表存 fd、读写偏移与权限，系统打开文件表存 inode 指针与引用计数；<code>read</code> 改变的是进程表项的偏移，<code>fork</code> 后父子可共享该偏移。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2010 年 408 第 46 题（综合应用题，8 分）</span></p>
 <p>某文件系统采用混合索引分配方式，inode 中有 10 个直接地址项、1 个一级间接地址项、1 个二级间接地址项、1 个三级间接地址项，每个地址项占 4B，磁盘块大小 4KB，则单个文件的最大长度是多少字节，约合多少 GB？</p>
 <blockquote>
@@ -789,13 +789,13 @@ producer                          consumer
 </blockquote>
 <hr />
 <h2 id="_8">输入输出管理 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 14 次；涉及年份：2011、2013、2015、2017、2019、2021、2023、2025；分数占比约 8%；主要题型：选择题为主（IO 控制方式、缓冲、假脱机、磁盘调度）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 14 次；涉及年份：2011、2013、2015、2017、2019、2021、2023、2025；分数占比约 8%；主要题型：选择题为主（IO 控制方式、缓冲、假脱机、磁盘调度）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><code>I/O</code> 软件按层次自下而上分为四层：<strong>中断处理程序</strong>（处理设备中断、唤醒等待进程）、<strong>设备驱动程序</strong>（把上层抽象命令翻译为对设备寄存器的具体操作，与硬件密切相关）、<strong>设备独立性软件</strong>（又称设备无关软件，负责逻辑设备名到物理设备名的映射、缓冲、设备分配与保护、差错处理，向用户提供统一的系统调用接口）、<strong>用户层 <code>I/O</code> 软件</strong>（如库函数 <code>printf</code>、<code>scanf</code>）。这四层中，<strong>设备独立性软件是"与设备无关"的部分，设备驱动程序是"与设备相关"的部分</strong>，这是分层的判据。</p>
 <p><strong>缓冲技术</strong>的作用是缓和 <code>CPU</code> 与 <code>I/O</code> 设备的速度差异、减少中断次数、解决数据粒度不匹配问题。<strong>单缓冲</strong>下处理一块数据的时间为 <code>T = max(C, T_io) + M</code>（<code>C</code> 为 <code>CPU</code> 处理时间、<code>T_io</code> 为输入时间、<code>M</code> 为数据传送时间），<strong>双缓冲</strong>下为 <code>T = max(C + M, T_io)</code>，因此双缓冲比单缓冲显著提高并行度；</p>
 <p>当 <code>T_io &gt; C + M</code> 时双缓冲能把设备与 <code>CPU</code> 的并行发挥到最大。<strong>设备分配</strong>中引入<strong>逻辑设备名</strong>是为了实现设备无关性：用户程序使用逻辑设备名，系统查<strong>逻辑设备表 <code>LUT</code></strong> 得到物理设备；设备分配的数据结构包括<strong>设备控制表 <code>DCT</code>、控制器控制表 <code>COCT</code>、通道控制表 <code>CHCT</code> 与系统设备表 <code>SDT</code></strong>。<strong><code>SPOOLing</code>（假脱机）技术</strong>用<strong>输入井与输出井</strong>（磁盘上的缓冲区）、<strong>输入进程与输出进程</strong>以及<strong>井管理程序</strong>，把独占设备（如打印机）改造成可被多个进程"共享"的设备：进程的打印请求被写成输出井中的文件并排队，由输出进程按序真正输出，因此进程不必等待打印机空闲。</p>
 <p><strong>磁盘调度算法</strong>决定多个磁盘请求的服务顺序，以<strong>总寻道时间最短</strong>为目标：<strong><code>FCFS</code></strong> 公平但平均寻道时间长；<strong><code>SSTF</code>（最短寻道时间优先）</strong>每次选离当前磁头最近的请求，性能较好但可能导致远端请求<strong>饥饿</strong>；<strong><code>SCAN</code>（电梯算法）</strong>沿一个方向服务到底再反向，避免饥饿且性能较好；<strong><code>C-SCAN</code>（循环扫描）</strong>只在一个方向服务，返程直接快速回到起始端而不服务请求，使各磁道等待时间更均匀；<strong><code>LOOK</code> 与 <code>C-LOOK</code></strong> 是 <code>SCAN</code>、<code>C-SCAN</code> 的改进——到达该方向上<strong>最远的请求</strong>就折返，不必移动到磁盘末端。<strong>磁盘管理</strong>还包括低级格式化（划分扇区）、分区、逻辑格式化（建立文件系统）、引导块与坏块处理。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>I/O 软件四层（底到顶）：中断处理程序 -&gt; 设备驱动程序 -&gt; 设备独立性软件 -&gt; 用户层软件</code> —— 与设备相关的是驱动层。</li>
 <li><code>单缓冲 T = max(C, T_io) + M，双缓冲 T = max(C + M, T_io)</code> —— 双缓冲的关键是 <code>C + M</code> 与 <code>T_io</code> 取较大者。</li>
 <li><code>SPOOLing 用共享设备（磁盘）模拟独占设备</code> —— 输入井/输出井在磁盘上，靠排队与守护进程实现"虚拟设备"。</li>
@@ -803,7 +803,7 @@ producer                          consumer
 <li><code>SCAN 服务到磁盘端点才折返；LOOK 到该方向最远请求就折返</code> —— 计算移臂道数时两者的折返点不同。</li>
 <li><code>逻辑设备名 -&gt; LUT -&gt; 物理设备</code> —— 引入逻辑设备名的目的是实现设备无关性。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong><code>I/O</code> 软件的层次结构与一次读请求的上下穿越</strong>：请求自顶向下逐层转换，数据与中断自底向上逐层返回。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>I/O software layers and a read request path
 
@@ -912,27 +912,29 @@ head starts at 53, disk tracks 0 .. 199
     S10 --&gt;|否| S1
     S10 --&gt;|是| S11[&quot;结束本轮调度 统计总寻道道数&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>双缓冲时间公式写成求和：双缓冲处理一块数据的时间是 <code>max(C + M, T_io)</code>，而不是 <code>C + M + T_io</code>；用求和会把并行度算没，结果远大于正确值。</li>
 <li>混淆 <code>SCAN</code> 与 <code>LOOK</code> 的折返点：<code>SCAN</code>（电梯算法）必须移动到<strong>磁盘端点</strong>（如 <code>0</code> 或 <code>199</code>）才折返，<code>LOOK</code> 到达<strong>该方向上最远的请求</strong>即折返；计算移臂道数时两者结果不同。</li>
 <li>把 <code>SPOOLing</code> 的输入井与输出井位置搞错：输入井与输出井都在<strong>磁盘</strong>上（共享设备模拟独占设备），不是内存缓冲区；把 <code>SPOOLing</code> 说成"在内存中开辟缓冲区"是概念错误。</li>
 <li>认为设备驱动程序与设备无关：<strong>设备驱动程序与硬件密切相关</strong>（要操作具体设备的寄存器、时序与命令格式），真正"与设备无关"的是其上层的设备独立性软件；分层归属写反是常见失分点。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2019 年 408 第 30 题（单项选择题，2 分）</span></p>
 <p>某磁盘的磁头当前位于 <code>100</code> 号磁道，磁头正向磁道号增加的方向移动。现有如下磁盘请求序列：<code>55, 58, 39, 18, 90, 160, 150, 38, 184</code>。若采用 <code>SCAN</code>（电梯）调度算法且磁道号范围为 <code>0 ~ 199</code>，则磁头移动的总道数为（ ）。</p>
 <blockquote>
 <p>解析：磁头当前在 <code>100</code> 且向磁道号增加方向移动，故先服务所有大于 <code>100</code> 的请求，按从小到大排序为 <code>150、160、184</code>，并继续移动到磁盘端点 <code>199</code> 才能折返（这是 <code>SCAN</code> 与 <code>LOOK</code> 的关键差别）。然后反向（磁道号减小方向）服务剩余请求，按从大到小为 <code>90、58、55、39、38、18</code>，最后停在 <code>18</code>（若题目未要求移动到 <code>0</code>，则不必到端点）。总移动道数 <code>= (199 - 100) + (199 - 18) = 99 + 181 = 280</code> 道。<strong>判分点是 <code>SCAN</code> 必须先移动到端点 <code>199</code> 折返，以及反向服务时按从大到小排序；把它当成 <code>LOOK</code> 会算成 <code>(184 - 100) + (184 - 18) = 84 + 166 = 250</code> 道而选错。</strong></p>
 </blockquote>
-<hr /></section></main>
+<hr /></div></section></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

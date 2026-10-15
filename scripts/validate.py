@@ -624,7 +624,10 @@ def check_html():
           防止「渲染器退化回裸 Markdown」而无人发觉。
     """
     # ---- 组件完整性：每一章都必须产出各字段对应的组件 ----
-    need_cls = ['class="freq"', '<ul class="facts">', '<ul class="errs">', 'class="q-stem"']
+    # 组件判据用"类名在 class 属性里出现"而不是精确整串匹配：统一版把六段
+    # 标题栏改成 .sec-h 后，信息条变成了 `class="box freq"`，精确匹配会误报
+    # "缺少组件"。用正则按词边界匹配类名，既宽松又不会把 freqX 当成 freq。
+    need_cls = ["freq", "facts", "errs", "q-stem"]
     for k in T.ORDER:
         s = T.SUBJECTS[k]
         for t in T.TOPICS[k]:
@@ -634,9 +637,9 @@ def check_html():
             with open(fp, encoding="utf-8") as fh:
                 body = fh.read()
             for cls in need_cls:
-                if cls not in body:
+                if not re.search(r'class="[^"]*\b%s\b' % re.escape(cls), body):
                     err("408/%s/%s.html" % (s["dir"], t[6]), 0, "F16",
-                        "缺少组件 %s（渲染器可能退化为裸 Markdown）" % cls)
+                        "缺少组件 .%s（渲染器可能退化为裸 Markdown）" % cls)
             if "codebox ascii" not in body and 'class="fig"' not in body:
                 err("408/%s/%s.html" % (s["dir"], t[6]), 0, "F16", "图文组件均缺失")
     # ---- 结构完整性 ----
@@ -1022,14 +1025,9 @@ def check_render_leftovers():
 # 这是**同一套**强制，不是给 site.css 另加一条平行规则。
 SHARED_COMPONENTS = [
     {"path": "assets/site.js", "upstream": ("math2-kaoyan", "数学二", "assets", "site.js")},
-    # ⧗ assets/site.css 的登记在 U1 第 ③ 步（逐字节复制 + 文件头钉 sha256）里加。
-    #   现在登记不了：数学二尚未产出统一版，本地 site.css 也就没有可钉的上游哈希，
-    #   而本条判据要求"文件头必须有 sha256 注记"——提前登记会让门禁在过渡期恒红，
-    #   同时把反向测试的判据打坏（它按"注入后新出现的报错"做差集，前置红噪声会
-    #   淹没注入的错，用例全部假通过）。登记后本条即覆盖 site.css 与 site.js 两者，
-    #   用的仍是这同一套强制，不另加平行规则。
-    # {"path": "assets/site.css",
-    #  "upstream": ("math2-kaoyan", "数学二", "assets", "site.css")},
+    # U1 第 ③ 步已登记：site.css 与 site.js 走**同一套**强制（不另加平行规则）。
+    {"path": "assets/site.css",
+     "upstream": ("math2-kaoyan", "数学二", "assets", "site.css")},
 ]
 
 

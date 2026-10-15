@@ -59,13 +59,13 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>中央处理器 CPU</h1><h1 id="cpu">计算机组成原理 · 中央处理器 CPU</h1>
+<main><div class="inner"><h1>中央处理器 CPU</h1><h1 id="cpu">计算机组成原理 · 中央处理器 CPU</h1>
 <h2 id="cpu_1" id="kp">中央处理器 CPU [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 28 次；涉及年份：2011、2013、2015、2017、2018、2020、2021、2022、2024；分数占比约 18%；主要题型：选择题 + 44 题综合应用题（数据通路、流水线）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 28 次；涉及年份：2011、2013、2015、2017、2018、2020、2021、2022、2024；分数占比约 18%；主要题型：选择题 + 44 题综合应用题（数据通路、流水线）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>CPU 由运算器（ALU、暂存寄存器、通用寄存器组、PSW）与控制器（PC、IR、ID、时序电路、微操作信号发生器）组成，其核心工作是按 <code>PC → IR</code> 取指、译码、执行、访存、写回的顺序，在数据通路中把一串微操作按时序节拍展开。取指周期的微操作序列固定为 <code>(PC) -&gt; MAR</code>、<code>M(MAR) -&gt; MDR</code>、<code>(MDR) -&gt; IR</code>、<code>(PC) + 1 -&gt; PC</code>，此后译码器根据 <code>IR</code> 中的操作码产生后续控制信号。数据通路按总线数目分为单总线与多总线结构：单总线结构每拍只能有一个数据流入/流出总线，完成一次 ALU 运算需 <code>取操作数1 → 暂存 → 取操作数2 → 运算 → 写回</code> 多拍；多总线（如双总线、三总线）可在一拍内同时传送两个操作数，微操作序列更短。控制器分硬布线与微程序两类：硬布线由组合逻辑直接产生微命令，速度快、不易修改，<code>RISC</code> 常用；</p>
 <p>微程序把微命令编成微指令存于控制存储器 CM，一条机器指令对应一段微程序，<code>CM 容量 = 微指令条数 × 微指令字长</code>。微指令编码方式中，水平型微指令并行能力强、字长长、微程序短，垂直型微指令一次只能完成一个微操作、字长短、微程序长，字段直接编码法与字段间接编码法用于压缩互斥微命令。流水线把指令执行划分为 <code>k</code> 个阶段，理想情况下 <code>n</code> 条指令需 <code>k + n - 1</code> 个时钟周期，吞吐率 <code>TP = n / ((k + n - 1) * T)</code>，最大吞吐率 <code>TP_max = 1 / T</code>（<code>T</code> 为最长阶段耗时，即流水线周期）。流水线存在结构冒险（资源冲突）、数据冒险（RAW 为主）、控制冒险（转移指令）三类；数据冒险可用转发（旁路）解决，但 <code>load-use</code> 必须暂停一拍，控制冒险可用分支预测、延迟槽、提前形成转移地址解决，冒险会使实际加速比与效率低于理想值。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>流水线周期 T = max(各阶段耗时)</code> —— 取最长阶段而非平均值，瓶颈段决定节拍。</li>
 <li><code>TP = n / ((k + n - 1) * T)</code>，<code>TP_max = 1 / T</code> —— <code>k</code> 是流水段数，<code>n</code> 是指令条数，两者不可混用。</li>
 <li><code>S = 串行时间 / 流水时间 = (n * k * T) / ((k + n - 1) * T) = n * k / (k + n - 1)</code> —— 理想加速比上限为 <code>k</code>。</li>
@@ -73,7 +73,7 @@
 <li><code>CM 容量 = 微指令条数 × 微指令字长</code> —— 微程序控制器容量计算，与机器指令条数无直接相等关系。</li>
 <li><code>load-use 冒险必须暂停 1 拍</code> —— 转发只能解决 ALU 结果相关，无法把访存结果提前到上一拍。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>取指周期的固定微操作序列与数据通路</strong>：任何数据通路题都从这四步开始，<code>MAR</code>、<code>MDR</code>、<code>IR</code>、<code>PC</code> 之间的传送方向必须记牢。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>fetch cycle micro-operations on a single-bus datapath
 
@@ -164,13 +164,13 @@ control unit comparison
     A4 --&gt; A9
     A9 --&gt; A10[访存 MEM 与写回 WB]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>流水线周期错取各阶段耗时的平均值。正确做法是取最长阶段耗时作为 <code>T</code>，其余阶段都要按 <code>T</code> 补齐，瓶颈段还可再细分以减小 <code>T</code>。</li>
 <li>时空图与吞吐率公式中把阶段数 <code>k</code> 与指令数 <code>n</code> 混用。<code>k + n - 1</code> 中 <code>k</code> 是流水段数、<code>n</code> 是指令条数，代入反了会得到错误的总周期数与 <code>TP</code>。</li>
 <li>把转发当成能解决一切数据冒险。转发只解决 ALU 运算结果相关，<code>load-use</code> 相关中数据在 MEM 段末才可用，必须暂停 1 拍后再转发。</li>
 <li>认为流水线一定提高单条指令执行速度。流水线提高的是吞吐率而非单条指令延迟，且带来冒险开销与额外控制逻辑，<code>S</code> 恒小于理论值 <code>k</code>。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2011 年 408 第 18 题（选择题，2 分）</span></p>
 <p>某 5 段流水线，各段执行时间均为 <code>T</code>，连续执行 <code>n</code> 条指令。下列关于该流水线吞吐率与加速比的叙述中，正确的是（　）。</p>
 <p>A. 吞吐率 <code>TP = n / (k * T)</code>，与 <code>n</code> 无关
@@ -190,15 +190,17 @@ D. 效率 <code>E = S * k</code>，当 <code>n</code> 趋于无穷时趋于 1</p
 非流水串行时间 <code>= 100 * (2 + 2 + 3 + 2 + 2) = 1100 ns</code>，故 <code>S = 1100 / 372 ≈ 2.96</code>。
 结论：<code>T = 3 ns</code>，无冒险 312 ns，实际 372 ns，<code>S ≈ 2.96</code>（低于理论上限 <code>k = 5</code>）。</p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="03-指令系统.html"><span class="cn-dir">← 上一章</span><span class="cn-title">指令系统</span></a><a class="cn-next" href="05-总线.html"><span class="cn-dir">下一章 →</span><span class="cn-title">总线</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="03-指令系统.html"><span class="cn-dir">← 上一章</span><span class="cn-title">指令系统</span></a><a class="cn-next" href="05-总线.html"><span class="cn-dir">下一章 →</span><span class="cn-title">总线</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

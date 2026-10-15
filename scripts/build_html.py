@@ -56,6 +56,25 @@ SECS = [
 
 FIELD_LABELS = ["核心讲解", "关键结论速记", "示意图", "易错点", "真题示例"]
 
+# 六段标题栏（统一版 site.css 的 .sec-h）：图标 + 标题 + 右侧说明。
+# 色相由 `.sec-xxx .sec-h` 规则决定，**不写内联 style**（数学二的 4 条要求之一）。
+SEC_ICON = {
+    "考频统计": ("📊", "历年考察次数与题型"),
+    "核心讲解": ("📖", "逐个考点讲清"),
+    "关键结论速记": ("🔑", "考前扫读"),
+    "示意图": ("🗺", "结构 / 流程"),
+    "易错点": ("⚠️", "踩过的坑"),
+    "真题示例": ("✍️", "自测用"),
+}
+
+
+def sec_h(label):
+    """六段标题栏：`<div class="sec-h">` + .ic/.tt/.hint。"""
+    ic, hint = SEC_ICON.get(label, ("•", ""))
+    return ('<div class="sec-h"><span class="ic" aria-hidden="true">%s</span>'
+            '<h2 class="tt">%s</h2>'
+            '<span class="hint">%s</span></div>' % (ic, label, hint))
+
 
 # ---------------------------------------------------------------------------
 # Markdown → HTML（重组为语义化组件）
@@ -101,6 +120,11 @@ def _style_fields(body):
     body = re.sub(r"\x00FACTS\x00\s*<ul>", '<ul class="facts">', body)
     body = re.sub(r"\x00ERRS\x00\s*<ul>", '<ul class="errs">', body)
     body = body.replace("\x00FACTS\x00", "").replace("\x00ERRS\x00", "")
+    # ⚠️ 必须放在**列表归属之后**：上一步靠 `<p class="lab">` 标记给 ul 挂 .facts/.errs。
+    # 先替换成占位就会让那一步认不出标签，速记/易错点会丢掉列表样式。
+    # 换成占位是因为统一版 site.css 已删掉 .lab，改由 _wrap_sections 产出 .sec-h。
+    for lab, _sid in SECS:
+        body = body.replace('<p class="lab">%s</p>' % lab, "\x00H:%s\x00" % lab)
     # 真题示例：题干段落标出来源行
     body = re.sub(r"<p>(\s*<strong>((?:19|20)\d{2}\s*年[^<]*)</strong>)",
                   r'<p class="q-stem"><span class="q-src">\2</span>', body)
@@ -112,19 +136,24 @@ SEC_IDS = dict(SECS)
 
 
 def _wrap_sections(body):
-    """把六段字段各包成 <section class="sec sec-*" id="sec-*">。
+    """把六段字段包成统一版的结构：
 
-    必须在 _style_fields 的列表归属处理**之后**做：那一步靠 `<p class="lab">`
-    标记的顺序来给 ul 挂 .facts/.errs，先包 section 会把标记隔开。
+        <section class="sec sec-xxx" id="sec-xxx">
+          <div class="sec-h">…图标 + 标题 + 说明…</div>
+          <div class="box">…正文…</div>
+        </section>
 
-    切分点有两类：
-      - 考频统计：_style_fields 已把它变成 `<p class="freq">`（信息条），
-        它的标签不再是 .lab，所以要单独认；
-      - 其余五段：`<p class="lab">标签</p>`，精确匹配以免「真题示例」被
-        别的标签前缀误伤。
+    `_style_fields` 已把字段标签换成了 `\x00H:<字段>\x00` 占位，这里负责切分、
+    换成 `.sec-h`、并给正文套 `.box`（统一版 site.css 的 `.sec>.box` 承担内边距）。
+
+    必须在列表归属处理**之后**做：那一步靠标签顺序给 ul 挂 .facts/.errs，
+    先包 section 会把标记隔开。
     """
-    labs = "|".join(re.escape(lab) for lab, _ in SECS if lab != "考频统计")
-    parts = re.split(r'(<p class="freq">|<p class="lab">(?:%s)</p>)' % labs, body)
+    labs = "|".join(re.escape(lab) for lab, _ in SECS)
+    # 切分点两类：其余五段的 `\x00H:标签\x00` 占位，以及考频统计的信息条
+    # ——考频的标签已被 _style_fields 换成 `<p class="freq">`，不再是 .lab 占位，
+    # 所以必须单独认；漏了它整段考频就落在第一个 section 之外、没有标题栏。
+    parts = re.split(r'(\x00H:(?:%s)\x00|<p class="freq">)' % labs, body)
     out, open_sec = [], False
     # parts[0] 是第一个字段之前的内容（知识点标题等），留在 section 之外
     if parts and parts[0].strip():
@@ -136,18 +165,18 @@ def _wrap_sections(body):
         if tag.startswith('<p class="freq">'):
             lab = "考频统计"
         else:
-            lab = re.fullmatch(r'<p class="lab">(.*?)</p>', tag).group(1)
+            lab = re.fullmatch(r"\x00H:(.*?)\x00", tag).group(1)
         sid = SEC_IDS.get(lab)
         if sid:
             if open_sec:
-                out.append("</section>")
-            out.append('<section class="sec %s" id="%s">' % (sid, sid))
+                out.append("</div></section>")
+            out.append('<section class="sec %s" id="%s">%s<div class="box">'
+                       % (sid, sid, sec_h(lab)))
             open_sec = True
-        out.append(tag)
         out.append(chunk)
         i += 2
     if open_sec:
-        out.append("</section>")
+        out.append("</div></section>")
     return "".join(out)
 
 
@@ -227,14 +256,17 @@ def topbar_for(page, subject_key=None, chapter=None, brand="408 速成复习资�
 
 
 def footer_for(page):
+    """页脚：内容包在 .sf-inner 里（统一版把页脚列宽也放在 .sf-inner 上）。"""
     prefix = asset_prefix(page)
     return """<footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="%sREADME.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="%sLICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>""" % (prefix, prefix)
 
 
@@ -343,7 +375,7 @@ def page(title, sidebar, body, page_kind="chapter", subject_key=None, chapter=No
 <button class="nav-toggle" type="button" aria-label="目录">☰</button>
 <div class="site-body">
 %s
-<main>%s%s%s</main>
+<main><div class="inner">%s%s%s</div></main>
 </div>
 %s
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>

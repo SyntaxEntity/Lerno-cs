@@ -51,7 +51,7 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>计算机组成原理</h1><h1 id="408">计算机组成原理 · 408 速成复习资料</h1>
+<main><div class="inner"><h1>计算机组成原理</h1><h1 id="408">计算机组成原理 · 408 速成复习资料</h1>
 <p><strong>科目分值</strong>：45 分 / 150 分　|　<strong>章节数</strong>：6　|　<strong>统计区间</strong>：2009—2025 年 408 统考真题（17 套）</p>
 <h2 id="_1">本科目章节索引</h2>
 <div class="tw"><table>
@@ -151,12 +151,12 @@
 用于确定复习优先级，不作为命题预测。数据口径与来源见 <code>README.md</code>。</p>
 </blockquote>
 <h2 id="_2">数据表示与运算 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2021、2023 年为典型年份；分数占比约 12%；主要题型：选择题 + 43/44 题计算。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2021、2023 年为典型年份；分数占比约 12%；主要题型：选择题 + 43/44 题计算。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>定点数的编码有四种：<strong>原码</strong>（最高位符号位，其余为绝对值）、<strong>反码</strong>（负数在原码基础上数值位取反）、<strong>补码</strong>（负数在反码基础上末位加 1）、<strong>移码</strong>（在补码基础上符号位取反，用于表示阶码）。<code>n</code> 位补码表示范围是 <code>-2^(n-1)</code> 到 <code>2^(n-1)-1</code>，比原码、反码多表示一个负数 <code>-2^(n-1)</code>，且 <code>0</code> 的表示唯一；<code>n</code> 位移码范围是 <code>-2^(n-1)</code> 到 <code>2^(n-1)-1</code>，其<strong>无符号数值大小顺序与真值顺序一致</strong>，所以移码适合做浮点数的阶码比较。</p>
 <p><strong>补码运算的溢出判断</strong>有两种等价方法：一是双符号位（变形补码）结果的两个符号位为 <code>01</code> 表示正溢出、<code>10</code> 表示负溢出；二是单符号位下判断"最高位进位 <code>C_n</code> 与次高位进位 <code>C_(n-1)</code> 是否异或为 1"。<strong>IEEE 754 单精度</strong>共 32 位，字段为 <code>1 位符号 + 8 位阶码 + 23 位尾数</code>，阶码用<strong>偏移量 127 的移码</strong>（<code>E = e + 127</code>），规格化数的尾数隐含最高位的 <code>1</code>（即 <code>1.M</code>），故真实有效位是 24 位。</p>
 <p>特殊值约定：阶码全 0 且尾数全 0 表示 <code>±0</code>；阶码全 0 而尾数非 0 表示非规格化数（此时隐含位为 0，用于表示接近 0 的数）；阶码全 1 且尾数全 0 表示 <code>±inf</code>；阶码全 1 而尾数非 0 表示 <code>NaN</code>。<strong>浮点数加减</strong>的五个步骤是：对阶（小阶向大阶看齐，尾数右移，移出的位保留为保护位）、尾数加减、规格化（左规或右规，右规一次阶码加 1）、舍入（常用就近舍入即"0 舍 1 入"）、判溢出（阶码溢出才是真溢出，尾数溢出可用右规纠正）。C 语言中 <code>int</code> 到 <code>float</code> 的转换会因 float 只有 24 位有效位而丢失低位，<code>float</code> 转 <code>int</code> 是<strong>向零截断</strong>，这些都必须在位级上理解。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>n 位补码范围 [-2^(n-1), 2^(n-1)-1]</code>、<code>原码/反码范围 [-(2^(n-1)-1), 2^(n-1)-1]</code> —— 补码比原码多一个负数，<code>0</code> 唯一。</li>
 <li><code>补码取负 = 全部位取反加 1</code>；<code>-128 的 8 位补码是 1000 0000</code> —— 该值没有对应的原码与反码。</li>
 <li><code>移码 = 补码的符号位取反</code>、<code>IEEE 754 阶码偏移量为 127（单精度）/ 1023（双精度）</code> —— 偏移量与"移码"的常数不要混淆。</li>
@@ -164,7 +164,7 @@
 <li><code>溢出判断：C_n 异或 C_(n-1)</code>，或双符号位 <code>01</code>/<code>10</code> —— 只有同号相加才可能溢出。</li>
 <li><code>浮点加减顺序：对阶 → 尾数运算 → 规格化 → 舍入 → 判溢出</code> —— 对阶一定"小阶向大阶看齐"。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>定点与浮点的位级字段划分</strong>：定点数只有符号位与数值位，浮点数把数值拆成"阶码 + 尾数"两段以便同时表达范围与精度。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>8-bit fixed point encodings (examples: +13 = 0000 1101)
 
@@ -270,13 +270,13 @@ worked example:  -12.5 = -1100.1B = -1.1001B * 2^3
     F13 --&gt;|是| F14[&quot;上溢报错 或 下溢按 0 处理&quot;]
     F13 --&gt;|否| F15[&quot;输出结果&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>混淆移码偏移量与 IEEE 754 偏移量：<code>n</code> 位纯移码是"补码符号位取反"（偏移 <code>2^(n-1)</code>），而 IEEE 754 单精度的阶码偏移量是 <strong>127</strong>（双精度 1023），两者不能互相代入。</li>
 <li>认为补码与原码表示范围相同：<code>n</code> 位补码比原码、反码多一个负数 <code>-2^(n-1)</code>，且 <code>-2^(n-1)</code> 不存在对应的原码与反码形式；此外补码的 <code>0</code> 表示唯一，原码与反码有 <code>+0</code>、<code>-0</code> 两种表示。</li>
 <li>把尾数溢出当成浮点溢出：尾数相加出现 <code>1x.xxx</code> 只是<strong>尾数溢出</strong>，可通过右规（尾数右移一位、阶码加 1）纠正；真正的溢出是<strong>阶码</strong>超出可表示范围，上溢才报错、下溢按机器零处理。</li>
 <li>对阶时方向搞反：必须<strong>小阶向大阶看齐</strong>（阶码小的数尾数右移），若反过来会让阶码变大而尾数左移，导致高位丢失、结果错误。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2011 年 408 第 13 题（单项选择题，2 分）</span></p>
 <p><code>float</code> 型数据通常用 IEEE 754 单精度浮点格式表示。若编译器将 <code>float</code> 型变量 <code>x</code> 赋值为 <code>-12.5</code>，则该变量的机器数是（ ）。</p>
 <p>A. <code>0xC1480000</code>　B. <code>0xC1480001</code>　C. <code>0xC1480002</code>　D. <code>0xC1480003</code></p>
@@ -285,12 +285,12 @@ worked example:  -12.5 = -1100.1B = -1.1001B * 2^3
 </blockquote>
 <hr />
 <h2 id="_3">存储系统 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 32 次；涉及年份：2009—2025 年几乎年年出现，2010、2013、2015、2018、2020、2022、2024、2025 年为典型年份；分数占比约 22%；主要题型：选择题 + 综合应用题（43 题常考 Cache/主存扩展与地址划分）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 32 次；涉及年份：2009—2025 年几乎年年出现，2010、2013、2015、2018、2020、2022、2024、2025 年为典型年份；分数占比约 22%；主要题型：选择题 + 综合应用题（43 题常考 Cache/主存扩展与地址划分）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>存储层次</strong>的依据是程序访问的局部性：越靠近 CPU 的层次越快、越小、越贵，<code>Cache</code> 与主存之间以<strong>块（行）</strong>为单位交换数据，主存与辅存之间以<strong>页</strong>为单位。<strong>Cache 的地址划分</strong>是本科目最高频的计算：把物理地址从低位到高位切成"块内地址（<code>log2 块大小</code> 位）→ 组号（<code>log2 组数</code> 位）→ 标记"三段。直接映射时"组"就是行，行号 <code>= 主存块号 mod Cache 行数</code>；<code>N</code> 路组相联时组数 <code>= Cache 容量 / (块大小 × N)</code>；全相联只有标记与块内地址两段。<strong>平均访问时间</strong>在"先查 Cache，未命中再访主存"的串行模型下为 <code>T = 命中率 * Tc + 缺失率 * Tm</code>；</p>
 <p>若采用"并行/同时启动"或"流水"模型，公式中的 <code>Tm</code> 要改为"未命中时的额外开销"，必须按题意选择。<strong>Cache 行</strong>除数据外还需<strong>有效位</strong>，写回法还要<strong>脏位</strong>，替换算法用 LRU 时还要计数位或栈位，这些开销在做"Cache 总容量/总位数"题时必须计入。<strong>DRAM</strong> 需要定时刷新（一般取 <code>2 ms</code> 一个刷新周期），刷新按<strong>行</strong>进行、只需行地址，三种方式为集中刷新（有"死时间"）、分散刷新（无死区但存取周期变长）、异步刷新（折中，最常用）。</p>
 <p><strong>主存扩展</strong>分位扩展（数据线加宽，地址线共用）与字扩展（地址空间加大，需片选译码）。<strong>虚拟存储</strong>把逻辑地址翻译成物理地址：查 <code>TLB</code> → 查页表 → 若缺页则触发缺页异常；<code>TLB</code> 命中则不必访存取页表项，<code>Cache</code> 命中则不必访问主存，做时间计算时需按题意枚举四种命中组合。<strong>磁盘</strong>的存取时间 <code>= 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为<strong>旋转半圈</strong>的时间：<code>60 / 转速 / 2</code>。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>组数 = Cache 容量 / (块大小 × 路数)</code>，<code>块内地址位数 = log2(块大小)</code>、<code>组号位数 = log2(组数)</code>、<code>标记位数 = 地址位数 - 组号 - 块内</code> —— Cache 地址划分三步走。</li>
 <li><code>Cache 行总位数 = 标记 + 1 有效位 + 脏位(写回时) + 替换计数位 + 数据位</code> —— 做"总容量"题必须加控制位。</li>
 <li><code>串行模型 T = 命中率 × Tc + 缺失率 × Tm</code> —— 若题中说明"并行访问"则需换成额外开销口径，不能硬套。</li>
@@ -298,7 +298,7 @@ worked example:  -12.5 = -1100.1B = -1.1001B * 2^3
 <li><code>磁盘存取时间 = 寻道 + 旋转延迟 + 传输</code>，<code>平均旋转延迟 = 60 / (2 × 转速)</code> 秒 —— 转速单位 rpm 换算成秒要除以 60。</li>
 <li><code>TLB 命中 → 无需访存查页表；Cache 命中 → 无需访主存</code> —— 计算有效访问时间时必须按题意枚举命中组合。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>Cache 地址划分</strong>：同一个 32 位物理地址，在直接映射与 <code>N</code> 路组相联下切成不同段数；组相联是"直接映射的组索引 + 组内全相联比较"的折中。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>Cache line structure (data block + tag + control bits)
 
@@ -377,13 +377,13 @@ worked example (32-bit address, B = 64 B, 8-way, capacity = 512 KB)
     M9 --&gt;|否| M11[&quot;访问主存取块 按替换算法与写策略更新&quot;]
     M11 --&gt; M10
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>缓存容量计算漏掉控制位：Cache 行除数据块外还有有效位（写回法还有脏位、LRU 还有计数位），题目问"Cache 总位数/标记阵列容量"时必须加上这些位，只算数据位会偏小。</li>
 <li>把"组数"与"行数"混用：直接映射时组数等于行数，而 <code>N</code> 路组相联时 <code>行数 = 组数 × N</code>；若把组数直接当行数去算组号位数，地址划分会整体错位。</li>
 <li>用错平均访问时间模型：<code>T = h·Tc + (1-h)·Tm</code> 只适用于"先查 Cache 再访主存"的串行模型；若题目说"Cache 与主存同时启动"或给出"未命中额外开销"，必须改用对应公式。</li>
 <li>旋转延迟算成一圈：平均旋转延迟是<strong>半圈</strong>时间，即 <code>60 / (2 × 转速)</code> 秒（转速为 rpm）；算成一圈会使结果翻倍，磁盘存取时间题必错。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2014 年 408 第 43 题（综合应用题，8 分）</span></p>
 <p>假设某计算机按字节编址，主存地址为 32 位，采用 8 路组相联映射的 Cache，Cache 数据区容量为 512 KB，每个主存块大小为 64 字节，Cache 采用写回法并含 LRU 替换所需的计数位。要求：给出物理地址中标记、组号与块内地址的位数；求 Cache 中每一行的总位数（含必要的控制位）。</p>
 <blockquote>
@@ -391,12 +391,12 @@ worked example (32-bit address, B = 64 B, 8-way, capacity = 512 KB)
 </blockquote>
 <hr />
 <h2 id="_4">指令系统 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2023、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（指令格式、寻址方式、汇编阅读）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2023、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（指令格式、寻址方式、汇编阅读）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>一条指令由<strong>操作码字段</strong>与<strong>地址码字段</strong>构成。定长指令字中操作码位数固定，可表示 <code>2^k</code> 条指令；<strong>变长指令字</strong>中常用<strong>扩展操作码</strong>技术：把操作码按长度分层，短操作码不能再作为长操作码的前缀，因此设计时必须保证"<strong>短码不是任何长码的前缀</strong>"。以 4 位为基础操作码、需要扩展到 8 位为例，若 4 位编码 0000—1110 分配给 15 条三地址指令，则剩下 1111 作为扩展标志可产生 16 个 8 位编码，用于二地址指令，依此类推。<strong>寻址方式</strong>决定操作数的来源与有效地址 <code>EA</code> 的计算：立即寻址的地址字段就是操作数本身；直接寻址 <code>EA = A</code>；间接寻址 <code>EA = (A)</code>（需访存两次取数，三次含取指）；</p>
 <p>寄存器寻址的操作数在寄存器中，不访存；寄存器间接寻址 <code>EA = (R)</code>；<strong>相对寻址 <code>EA = (PC) + A</code></strong>，其中 <code>PC</code> 已是<strong>取下一条指令后的值</strong>（即已自增）；基址寻址 <code>EA = (BR) + A</code>，基址寄存器由操作系统设定、面向整个程序，用于<strong>程序重定位</strong>；</p>
 <p>变址寻址 <code>EA = (IX) + A</code>，变址寄存器由用户改变、面向数组，用于<strong>数组元素的顺序访问</strong>；堆栈寻址的操作数隐含在栈顶。<code>CISC</code> 与 <code>RISC</code> 的分野在于：<code>RISC</code> 采用<strong>定长指令字、指令条数少且格式规整、只有 Load/Store 访存、通用寄存器多、采用硬布线控制与流水线</strong>，而 <code>CISC</code> 指令变长、寻址方式多、以微程序控制为主。汇编层面必须能读懂"取数—运算—存数"的三段式，重点掌握 <code>mov</code>、<code>add/sub</code>、<code>cmp</code> 与条件转移 <code>jmp/jcc</code>、以及 <code>push/pop</code> 对栈指针的改变。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>扩展操作码约束：短码不得是长码的前缀</code> —— 否则译码时无法判断指令长度。</li>
 <li><code>相对寻址 EA = (PC) + A，PC 已自增到下一条指令</code> —— 这是 408 反复考查的细节，忘记自增会整体偏移。</li>
 <li><code>基址寻址面向程序重定位（基址寄存器由 OS 设定），变址寻址面向数组（变址寄存器由用户改变）</code> —— 两者形式相同、用途不同。</li>
@@ -404,7 +404,7 @@ worked example (32-bit address, B = 64 B, 8-way, capacity = 512 KB)
 <li><code>RISC：定长指令 + 只有 Load/Store 访存 + 多通用寄存器 + 硬布线 + 流水线</code> —— 与 CISC 的对比是固定选择题考点。</li>
 <li><code>指令字长可以小于机器字长，也可以大于机器字长</code> —— 半字长、双字长指令都允许，按字节编址时需注意取指访存次数。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>扩展操作码的编码树</strong>：短操作码保留一个（或若干个）编码作为"扩展出口"，不把编码空间用尽；下图用 4 位基础码扩展一次到 8 位为例。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>opcode tree (4-bit base, extended once to 8-bit)
 
@@ -454,13 +454,13 @@ worked example (32-bit address, B = 64 B, 8-way, capacity = 512 KB)
     R4 --&gt;|否| R6[&quot;将 EA 送入 PC 完成转移&quot;]
     R6 --&gt; R7[&quot;下一条取指从 EA 开始 实现位置无关代码&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>相对寻址忘记 <code>PC</code> 已自增：<code>EA = (PC) + A</code> 中的 <code>PC</code> 是"取下本条指令后已加一个指令长度"的值；若直接用本条指令地址去加偏移量，结果会整体偏差一条指令的长度。</li>
 <li>基址与变址寻址的用途互换：基址寻址的基址寄存器内容由操作系统给出、程序执行中不变，用于<strong>程序浮动/重定位</strong>；变址寻址的变址值由用户改变，用于<strong>数组或字符串的顺序访问</strong>。</li>
 <li>扩展操作码设计违反前缀约束：把 1111 同时用作一条 4 位指令又用作 8 位扩展标志，译码器无法判定指令长度；正确做法是把该编码<strong>只留给扩展</strong>。</li>
 <li>认为指令字长必须等于机器字长：指令字长可以等于、小于或大于机器字长（半字长、双字长指令都常见），只要求是字节的整数倍（按字节编址时），取指所需访存次数由指令字长与存储字长共同决定。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2019 年 408 第 16 题（单项选择题，2 分）</span></p>
 <p>某计算机采用定长指令字，指令字长 16 位，采用扩展操作码方式。若三地址指令有 12 条、二地址指令有 20 条，则一地址指令最多有（ ）条。</p>
 <blockquote>
@@ -468,11 +468,11 @@ worked example (32-bit address, B = 64 B, 8-way, capacity = 512 KB)
 </blockquote>
 <hr />
 <h2 id="cpu">中央处理器 CPU [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 28 次；涉及年份：2011、2013、2015、2017、2018、2020、2021、2022、2024；分数占比约 18%；主要题型：选择题 + 44 题综合应用题（数据通路、流水线）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 28 次；涉及年份：2011、2013、2015、2017、2018、2020、2021、2022、2024；分数占比约 18%；主要题型：选择题 + 44 题综合应用题（数据通路、流水线）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>CPU 由运算器（ALU、暂存寄存器、通用寄存器组、PSW）与控制器（PC、IR、ID、时序电路、微操作信号发生器）组成，其核心工作是按 <code>PC → IR</code> 取指、译码、执行、访存、写回的顺序，在数据通路中把一串微操作按时序节拍展开。取指周期的微操作序列固定为 <code>(PC) -&gt; MAR</code>、<code>M(MAR) -&gt; MDR</code>、<code>(MDR) -&gt; IR</code>、<code>(PC) + 1 -&gt; PC</code>，此后译码器根据 <code>IR</code> 中的操作码产生后续控制信号。数据通路按总线数目分为单总线与多总线结构：单总线结构每拍只能有一个数据流入/流出总线，完成一次 ALU 运算需 <code>取操作数1 → 暂存 → 取操作数2 → 运算 → 写回</code> 多拍；多总线（如双总线、三总线）可在一拍内同时传送两个操作数，微操作序列更短。控制器分硬布线与微程序两类：硬布线由组合逻辑直接产生微命令，速度快、不易修改，<code>RISC</code> 常用；</p>
 <p>微程序把微命令编成微指令存于控制存储器 CM，一条机器指令对应一段微程序，<code>CM 容量 = 微指令条数 × 微指令字长</code>。微指令编码方式中，水平型微指令并行能力强、字长长、微程序短，垂直型微指令一次只能完成一个微操作、字长短、微程序长，字段直接编码法与字段间接编码法用于压缩互斥微命令。流水线把指令执行划分为 <code>k</code> 个阶段，理想情况下 <code>n</code> 条指令需 <code>k + n - 1</code> 个时钟周期，吞吐率 <code>TP = n / ((k + n - 1) * T)</code>，最大吞吐率 <code>TP_max = 1 / T</code>（<code>T</code> 为最长阶段耗时，即流水线周期）。流水线存在结构冒险（资源冲突）、数据冒险（RAW 为主）、控制冒险（转移指令）三类；数据冒险可用转发（旁路）解决，但 <code>load-use</code> 必须暂停一拍，控制冒险可用分支预测、延迟槽、提前形成转移地址解决，冒险会使实际加速比与效率低于理想值。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>流水线周期 T = max(各阶段耗时)</code> —— 取最长阶段而非平均值，瓶颈段决定节拍。</li>
 <li><code>TP = n / ((k + n - 1) * T)</code>，<code>TP_max = 1 / T</code> —— <code>k</code> 是流水段数，<code>n</code> 是指令条数，两者不可混用。</li>
 <li><code>S = 串行时间 / 流水时间 = (n * k * T) / ((k + n - 1) * T) = n * k / (k + n - 1)</code> —— 理想加速比上限为 <code>k</code>。</li>
@@ -480,7 +480,7 @@ worked example (32-bit address, B = 64 B, 8-way, capacity = 512 KB)
 <li><code>CM 容量 = 微指令条数 × 微指令字长</code> —— 微程序控制器容量计算，与机器指令条数无直接相等关系。</li>
 <li><code>load-use 冒险必须暂停 1 拍</code> —— 转发只能解决 ALU 结果相关，无法把访存结果提前到上一拍。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>取指周期的固定微操作序列与数据通路</strong>：任何数据通路题都从这四步开始，<code>MAR</code>、<code>MDR</code>、<code>IR</code>、<code>PC</code> 之间的传送方向必须记牢。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>fetch cycle micro-operations on a single-bus datapath
 
@@ -571,13 +571,13 @@ control unit comparison
     A4 --&gt; A9
     A9 --&gt; A10[访存 MEM 与写回 WB]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>流水线周期错取各阶段耗时的平均值。正确做法是取最长阶段耗时作为 <code>T</code>，其余阶段都要按 <code>T</code> 补齐，瓶颈段还可再细分以减小 <code>T</code>。</li>
 <li>时空图与吞吐率公式中把阶段数 <code>k</code> 与指令数 <code>n</code> 混用。<code>k + n - 1</code> 中 <code>k</code> 是流水段数、<code>n</code> 是指令条数，代入反了会得到错误的总周期数与 <code>TP</code>。</li>
 <li>把转发当成能解决一切数据冒险。转发只解决 ALU 运算结果相关，<code>load-use</code> 相关中数据在 MEM 段末才可用，必须暂停 1 拍后再转发。</li>
 <li>认为流水线一定提高单条指令执行速度。流水线提高的是吞吐率而非单条指令延迟，且带来冒险开销与额外控制逻辑，<code>S</code> 恒小于理论值 <code>k</code>。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2011 年 408 第 18 题（选择题，2 分）</span></p>
 <p>某 5 段流水线，各段执行时间均为 <code>T</code>，连续执行 <code>n</code> 条指令。下列关于该流水线吞吐率与加速比的叙述中，正确的是（　）。</p>
 <p>A. 吞吐率 <code>TP = n / (k * T)</code>，与 <code>n</code> 无关
@@ -599,12 +599,12 @@ D. 效率 <code>E = S * k</code>，当 <code>n</code> 趋于无穷时趋于 1</p
 </blockquote>
 <hr />
 <h2 id="_5">总线 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 14 次；涉及年份：2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 6%；主要题型：选择题为主（总线带宽、总线周期、仲裁）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 14 次；涉及年份：2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 6%；主要题型：选择题为主（总线带宽、总线周期、仲裁）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>总线是连接多个部件的<strong>共享传输介质</strong>，按功能分为<strong>数据总线</strong>（双向，位数决定一次能传多少位）、<strong>地址总线</strong>（单向，由 CPU 指向主存/IO，位数决定寻址空间）、<strong>控制总线</strong>（双向/单向混合，传时序与命令）。按层次分为片内总线、系统总线（含数据/地址/控制三类）、通信总线。</p>
 <p><strong>性能指标</strong>中最常考的是带宽：<code>总线带宽 = 总线工作频率 × (总线宽度 / 8)</code> 字节/秒，若一个总线周期能传送多个数据字，则还要乘上每周期传送的次数；<code>总线传输周期 = 一个地址 + 一个数据字的传送时间</code>，含地址期与数据期，若题中给出"每个总线周期含 <code>k</code> 个时钟"，则带宽 <code>= 总线宽度 / (k × 时钟周期)</code>。<strong>总线仲裁</strong>解决多个主设备争用总线的问题，三种方式的特点必须分清：<strong>链式查询</strong>只需 3 根线（请求、允许、忙），结构简单、扩充容易，但<strong>优先级固定且离控制器越近越高</strong>，且某一环节故障会导致其后所有设备无法获得总线；</p>
 <p><strong>计数器定时查询</strong>用一组设备地址线代替允许线，优先级可通过计数初值改变、较为灵活，但增加 <code>log2 n</code> 根线；<strong>独立请求</strong>每个设备都有独立的请求线与允许线，响应最快、优先级最灵活，但线数最多（<code>2n</code> 根），控制逻辑最复杂。<strong>总线定时</strong>决定数据传送的时序：<strong>同步定时</strong>由统一时钟控制，速度快、协议简单，但各设备必须在同一时钟节拍内完成，适合速度相近的设备；<strong>异步定时</strong>用"请求—应答"握手，分为不互锁（请求方不等回答即撤销）、半互锁（请求方等回答，回答方不等请求撤销）、全互锁（双方都等对方撤销），可靠性高但速度慢；<strong>半同步</strong>在同步基础上加一条 <code>WAIT</code> 线以兼容慢速设备。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>总线带宽 = 工作频率 × 总线宽度 / 8</code>（字节/秒） —— 宽度按<strong>字节</strong>折算，<code>位/秒</code> 则不必除以 8，单位不能混。</li>
 <li><code>带宽也可写为 总线宽度 / 总线传输周期</code> —— 当题目给出"每个总线周期含 k 个时钟"时用此式更稳。</li>
 <li><code>链式查询 3 根线、优先级固定；独立请求 2n 根线、优先级最灵活</code> —— 线数与灵活性的权衡是选择题核心。</li>
@@ -612,7 +612,7 @@ D. 效率 <code>E = S * k</code>，当 <code>n</code> 趋于无穷时趋于 1</p
 <li><code>地址总线位数决定寻址空间：n 位可寻址 2^n 个单元</code> —— 与数据总线宽度决定的"一次传送位数"不要混淆。</li>
 <li><code>总线复用：同一组线在不同时间段传地址与数据</code> —— 复用可减少引脚数，代价是速度下降。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>三总线结构与一次总线传输的时序</strong>：地址线单向送出地址，数据线双向传送数据，控制线给出读/写与握手信号。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>three-bus structure
 
@@ -686,13 +686,13 @@ arbitration comparison
     I6 --&gt;|否| I8[&quot;执行设备服务 处理后恢复现场与屏蔽字&quot;]
     I8 --&gt; I9[&quot;开中断 中断返回 恢复断点继续原程序&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>总线带宽计算漏乘或单位错：<code>总线宽度</code>以位给出时要先除以 8 换算成字节，带宽结果单位是 <code>B/s</code>；若题目问 <code>b/s</code> 则不要除。另外当一个总线周期含 <code>k</code> 个时钟时，必须除以整个周期而不是单个时钟。</li>
 <li>认为链式查询的优先级可以自由设置：链式查询的优先级由设备在链上的<strong>物理位置</strong>决定，离总线控制器越近优先级越高，无法通过软件随意改变；要改变优先级需用计数器定时查询方式。</li>
 <li>把地址总线位数与数据总线位数的作用弄反：<strong>地址总线位数决定可寻址的主存单元个数</strong>（<code>n</code> 位对应 <code>2^n</code> 个单元），<strong>数据总线位数决定一次能并行传送的位数</strong>，两者互不相干。</li>
 <li>混淆异步定时的三种互锁方式：不互锁是请求方不等应答就撤销请求（最快但最不可靠），半互锁是请求方等应答、应答方不等请求撤销，全互锁是双方互相等待（最可靠但最慢）；把半互锁与全互锁的等待关系写反是常见失分点。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2015 年真题改编（单项选择题，2 分）</span></p>
 <p>某同步总线的时钟频率为 <code>100 MHz</code>，总线宽度为 <code>32</code> 位，地址/数据线复用，每传送一个地址或一个数据都占一个时钟周期。该总线支持突发传送方式，一次突发连续传送 <code>8</code> 个数据字（只需送出首地址一次）。则这次突发传送的数据传输率约为（ ）。</p>
 <p>A. <code>356 MB/s</code>　B. <code>400 MB/s</code>　C. <code>800 MB/s</code>　D. <code>3200 MB/s</code></p>
@@ -701,13 +701,13 @@ arbitration comparison
 </blockquote>
 <hr />
 <h2 id="_6">输入输出系统 [高频]</h2>
-</section><section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2025；分数占比约 10%；主要题型：选择题 + 综合应用题（中断、DMA、磁盘时间计算）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+</div></section><section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2025；分数占比约 10%；主要题型：选择题 + 综合应用题（中断、DMA、磁盘时间计算）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><code>I/O</code> 接口（设备控制器）的作用是<strong>数据缓冲、格式转换、状态与命令寄存、地址译码</strong>，它把 CPU 的高速并行总线与设备的低速串行工作方式解耦。<code>I/O</code> 端口的编址有两种：<strong>统一编址</strong>（把端口当作主存单元，用普通访存指令访问，无需专门指令但占用主存地址空间）与<strong>独立编址</strong>（有独立的地址空间与专用 <code>IN/OUT</code> 指令，不占主存空间但指令类型增多）。<code>I/O</code> 控制方式的发展主线是<strong>CPU 干预程度逐步降低</strong>：<strong>程序查询</strong>方式下 CPU 不断读状态寄存器空转等待，CPU 与设备完全串行；</p>
 <p><strong>程序中断</strong>方式下 CPU 发出命令后继续执行原程序，设备就绪时用中断通知 CPU 在<strong>一条指令执行结束后</strong>响应，数据传送仍需 CPU 用指令搬入主存；<strong>DMA</strong> 方式由 DMA 控制器直接在主存与设备之间成块传送，数据<strong>不经过 CPU 的寄存器</strong>，每传送一个字（或一个数据块）占用一次总线（周期挪用/周期窃取），只有在传送前（初始化）与传送后（中断处理）才需要 CPU 参与；<strong>通道</strong>方式由通道处理器执行通道程序，进一步把 CPU 从 <code>I/O</code> 管理中解放出来。</p>
 <p><strong>中断系统</strong>要点：CPU 响应中断的条件是"有中断请求 + 中断允许触发器为 1 + 当前指令执行结束"；响应时由硬件自动执行<strong>中断隐指令</strong>完成三件事——<strong>关中断、保存断点（<code>PC</code>）、取中断向量</strong>；随后由中断服务程序保存现场并执行服务。</p>
 <p><strong>多重中断</strong>（中断嵌套）靠<strong>中断屏蔽字</strong>控制：屏蔽字中某位为 <code>1</code> 表示屏蔽（禁止）对应的中断源，因此优先级越高的中断源，其屏蔽字中"1"的位数越多。<strong>磁盘</strong>的性能指标是存取时间，<code>存取时间 = 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为旋转半圈的时间 <code>60 / (2 × 转速)</code>（转速单位 <code>rpm</code>）；数据传输率与位密度、转速（线速度）相关，<code>数据传输率 = 每条磁道的容量 / 旋转一圈的时间</code>。固态硬盘 <code>SSD</code> 基于闪存，无机械寻道与旋转延迟，随机访问快，但存在<strong>写放大</strong>、<strong>擦除次数受限</strong>（寿命）的问题。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>四种 I/O 方式 CPU 干预程度：程序查询 &gt; 程序中断 &gt; DMA &gt; 通道</code> —— 判据是"CPU 是否需要在传送过程中持续参与"。</li>
 <li><code>DMA 数据不经过 CPU 寄存器，直接在主存与设备间传送</code> —— 这是 DMA 与程序中断方式的本质区别。</li>
 <li><code>中断隐指令由硬件执行：关中断、保存断点、取中断向量</code> —— 它是"指令"但不是程序里的指令。</li>
@@ -715,7 +715,7 @@ arbitration comparison
 <li><code>屏蔽字为 1 表示屏蔽，优先级越高屏蔽的位数越多</code> —— 多重中断靠它实现嵌套。</li>
 <li><code>磁盘存取时间 = 寻道 + 旋转延迟 + 传输</code>，<code>平均旋转延迟 = 60 / (2 × 转速)</code> 秒 —— 旋转延迟取半圈。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>四种 I/O 控制方式的数据通路与 CPU 参与程度</strong>：从程序查询到通道，CPU 的角色从"全程搬运工"逐步退化为"发起与善后"。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>(1) programmed query (polling)
   CPU ---&gt; status reg ---&gt; busy? loop until ready ---&gt; data reg ---&gt; CPU reg ---&gt; memory
@@ -789,28 +789,30 @@ arbitration comparison
     D8 --&gt; D9[&quot;中断处理程序唤醒等待的进程&quot;]
     D9 --&gt; D10[&quot;返回用户态 数据可用&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>认为 DMA 传送完全不需要 CPU 参与：DMA 只在<strong>数据传送过程</strong>中不需要 CPU 干预，传送前的初始化（设置主存地址、设备地址、传送长度、方向）与传送结束后的中断处理都必须由 CPU 完成。</li>
 <li>把中断响应时机写成"任意时刻"或"一个时钟周期后"：可屏蔽中断只在<strong>一条指令执行结束后</strong>响应（这样断点才是一条指令的边界）；若在指令中间响应，断点无法正确保存。</li>
 <li>混淆中断隐指令与中断服务程序：中断隐指令是<strong>硬件自动执行</strong>的（关中断、保存断点、取中断向量），而保存现场、执行设备服务、恢复现场是<strong>中断服务程序</strong>（软件）做的，两者不能混为一谈。</li>
 <li>磁盘旋转延迟算成一圈：平均旋转延迟是<strong>旋转半圈</strong>的时间，即 <code>60 / (2 × 转速)</code> 秒；若按一圈计算，存取时间会偏大一倍。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2012 年真题改编（单项选择题，2 分）</span></p>
 <p>某磁盘的转速为 <code>7200 rpm</code>，平均寻道时间为 <code>8 ms</code>，数据传输率为 <code>20 MB/s</code>。若读取一个 <code>4 KB</code> 的磁盘块，则平均存取时间约为（ ）。</p>
 <p>A. <code>4.2 ms</code>　B. <code>8.2 ms</code>　C. <code>12.4 ms</code>　D. <code>16.5 ms</code></p>
 <blockquote>
 <p>解析：平均存取时间由三段相加。平均旋转延迟 <code>= 60 / (2 × 7200) s = 4.17 ms</code>（旋转<strong>半圈</strong>）；传输时间 <code>= 4 KB / 20 MB/s = 4096 B / (20 × 10^6 B/s) ≈ 0.205 ms</code>；再加上平均寻道时间 <code>8 ms</code>，得 <code>8 + 4.17 + 0.205 ≈ 12.37 ms</code>，最接近 <strong>C</strong>。干扰项 D（<code>16.5 ms</code>）正是把旋转延迟误算成<strong>一整圈</strong>（<code>8.33 ms</code>）的结果，B（<code>8.2 ms</code>）则是完全漏算旋转延迟的结果。<strong>判分点是旋转延迟必须取半圈，以及单位换算（<code>rpm</code> 转秒要除以 60、<code>KB</code> 与 <code>MB</code> 统一为字节）。</strong></p>
 </blockquote>
-<hr /></section></main>
+<hr /></div></section></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

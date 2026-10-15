@@ -59,16 +59,16 @@
 <a class="sb-chap" href="05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>网络层</h1><h1 id="_1">计算机网络 · 网络层</h1>
+<main><div class="inner"><h1>网络层</h1><h1 id="_1">计算机网络 · 网络层</h1>
 <h2 id="_2" id="kp">网络层 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 30 次；涉及年份：2009—2025 年几乎年年出现，2011、2013、2015、2017、2019、2021、2022、2023、2024、2025 年为典型年份；分数占比约 32%；主要题型：选择题 + 47 题综合应用题（IP 分片、子网划分、路由聚合、路由协议）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 30 次；涉及年份：2009—2025 年几乎年年出现，2011、2013、2015、2017、2019、2021、2022、2023、2024、2025 年为典型年份；分数占比约 32%；主要题型：选择题 + 47 题综合应用题（IP 分片、子网划分、路由聚合、路由协议）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>网络层的核心是<strong>逻辑寻址与路由转发</strong>。<code>IPv4</code> 地址长 <code>32</code> 位，传统分类地址为 <code>A</code> 类（<code>0</code> 开头，网络号 <code>8</code> 位，可用网络数 <code>2^7 - 2</code>）、<code>B</code> 类（<code>10</code> 开头，网络号 <code>16</code> 位）、<code>C</code> 类（<code>110</code> 开头，网络号 <code>24</code> 位）、<code>D</code> 类（组播）与 <code>E</code> 类（保留）；每类中<strong>主机号全 <code>0</code> 表示网络地址、全 <code>1</code> 表示广播地址</strong>，故 <code>C</code> 类网络可用主机数为 <code>2^8 - 2 = 254</code>。<strong>子网划分</strong>用子网掩码从主机号中借位，可用主机数 <code>= 2^h - 2</code>（<code>h</code> 为主机号位数）；<strong><code>CIDR</code>（无分类编址）</strong>用"<code>IP/前缀长度</code>"表示，支持<strong>路由聚合</strong>（把若干连续网络合并为一条路由）与<strong>最长前缀匹配</strong>（转发时选前缀最长即最具体的路由）。</p>
 <p><strong><code>IP</code> 数据报首部</strong>固定部分 <code>20 B</code>，关键字段有：版本、首部长度（以 <code>4 B</code> 为单位）、总长度（以 <code>1 B</code> 为单位）、标识、标志（<code>DF</code> 不允许分片、<code>MF</code> 后面还有分片）、<strong>片偏移（以 <code>8 B</code> 为单位）</strong>、生存时间 <code>TTL</code>（每经过一个路由器减 <code>1</code>，为 <code>0</code> 则丢弃）、协议、首部校验和（只校验首部）。<strong>分片计算</strong>的三条规则：每片的数据部分长度必须是 <code>8 B</code> 的整数倍、每片都带自己的 <code>IP</code> 首部、片偏移等于"该片数据在原始数据报数据部分中的位置 ÷ 8"。</p>
 <p><strong>地址解析 <code>ARP</code></strong> 在<strong>同一网段内</strong>用广播请求、单播应答把 <code>IP</code> 地址解析为 <code>MAC</code> 地址；若目的主机不在同一网段，主机解析的是<strong>默认网关的 <code>MAC</code> 地址</strong>，由路由器逐跳转发。<strong>动态主机配置 <code>DHCP</code></strong> 让主机自动获取 <code>IP</code> 地址，交互为 <code>DISCOVER → OFFER → REQUEST → ACK</code> 四步；</p>
 <p><strong>网际控制报文协议 <code>ICMP</code></strong> 用于差错报告（终点不可达、超时、参数问题等）与询问（回送请求/应答即 <code>ping</code>、时间戳请求），而 <strong><code>traceroute</code></strong> 利用逐跳递增 <code>TTL</code> 触发超时报文来发现路径。<strong>路由协议</strong>中，<strong><code>RIP</code></strong> 是基于距离向量、以<strong>跳数</strong>为度量（最大 <code>15</code> 跳，<code>16</code> 表示不可达）的内部网关协议，每 <code>30 s</code> 与相邻路由器交换<strong>整个路由表</strong>，收敛慢且存在"坏消息传得慢"的问题；<strong><code>OSPF</code></strong> 是基于链路状态、用 <code>Dijkstra</code> 算法计算最短路径的内部网关协议，用洪泛法向<strong>全网</strong>发送链路状态，收敛快、支持多路径与区域划分；</p>
 <p><strong><code>BGP</code></strong> 是外部网关协议，基于<strong>路径向量</strong>，在自治系统之间交换可达性信息，力求选择"较好的"而非"最优的"路由。<strong><code>NAT</code></strong> 让私有地址通过路由器转换成公有地址访问因特网，<code>NAPT</code> 还用端口号区分不同内部主机，从而让多台主机共享一个公网地址；<strong><code>IPv6</code></strong> 地址长 <code>128</code> 位，首部固定 <code>40 B</code>，取消了首部校验和与分片字段（分片由源主机完成）。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>可用主机数 = 2^h - 2</code>（<code>h</code> 为主机号位数） —— 减去网络地址（全 <code>0</code>）与广播地址（全 <code>1</code>）。</li>
 <li><code>路由聚合：把若干网络写成二进制取共同前缀</code>；转发时用<strong>最长前缀匹配</strong>。</li>
 <li><code>IP 首部固定 20 B、片偏移以 8 B 为单位、总长度以 1 B 为单位</code> —— 分片计算的三条单位陷阱。</li>
@@ -77,7 +77,7 @@
 <li><code>RIP 距离向量、最大 15 跳；OSPF 链路状态、用 Dijkstra；BGP 路径向量</code> —— 三种路由协议的类型与算法是必考对应关系。</li>
 <li><code>TTL 每经一个路由器减 1，为 0 丢弃并发 ICMP 超时报文</code> —— 这是 <code>traceroute</code> 的原理。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong><code>IP</code> 数据报首部格式与分片字段变化</strong>：分片只改动与长度、标志、偏移相关的字段，标识字段在各片中保持相同。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>IPv4 header (fixed part, 20 bytes)
 
@@ -170,27 +170,29 @@ MTU = 1500 B, so max data per fragment = 1500 - 20 = 1480 B
     A13 --&gt;|否| A8
     A13 --&gt;|是| A14[&quot;目的主机收到并逐层解封&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>片偏移忘记除以 <code>8</code>：<code>片偏移</code>字段的单位是 <code>8 B</code>，因此偏移值 <code>= 该片首字节在原始数据部分中的位置 / 8</code>；直接填字节位置会使偏移量放大 8 倍，是最常见的大题失分点。</li>
 <li>可用主机数忘记减 <code>2</code>：<code>2^h - 2</code> 中的 <code>2</code> 是网络地址（主机号全 <code>0</code>）与广播地址（主机号全 <code>1</code>）；只有在 <code>31</code> 位前缀的点对点链路等特殊场景才不减。</li>
 <li>跨网段时 <code>ARP</code> 解析错对象：<code>ARP</code> 只能解析<strong>同一网段内</strong>的 <code>MAC</code> 地址，跨网段时源主机解析的是<strong>默认网关</strong>的 <code>MAC</code>，而不是远端目的主机的 <code>MAC</code>（源主机根本不知道远端的 <code>MAC</code>）。</li>
 <li>三种路由协议的类型与算法张冠李戴：<code>RIP</code> 是<strong>距离向量</strong>（度量是跳数，最大 <code>15</code> 跳，<code>16</code> 为不可达），<code>OSPF</code> 是<strong>链路状态</strong>（用 <code>Dijkstra</code> 最短路径算法），<code>BGP</code> 是<strong>路径向量</strong>（用于自治系统之间）；把 <code>OSPF</code> 说成距离向量或把 <code>RIP</code> 的度量说成带宽都是错的。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2018 年真题改编（综合应用题，9 分）</span></p>
 <p>某网络中的路由器连接了两个网段，其中 <code>192.168.1.0/24</code> 网段内的主机 <code>A</code>（<code>192.168.1.10</code>）要向 <code>192.168.2.0/24</code> 网段内的主机 <code>B</code>（<code>192.168.2.20</code>）发送一个总长度为 <code>3800 B</code> 的 <code>IP</code> 数据报，途经链路的 <code>MTU</code> 为 <code>1500 B</code>（<code>IP</code> 首部固定 <code>20 B</code>）。要求：说明该数据报需要分成几片；给出各片的片偏移、<code>MF</code> 标志与总长度；并说明主机 <code>A</code> 发送时 <code>ARP</code> 解析的是哪个 <code>IP</code> 地址对应的 <code>MAC</code>。</p>
 <blockquote>
 <p>解析：第一步算数据部分长度——<code>3800 - 20 = 3780 B</code>。第二步算每片能带的最大数据量——<code>MTU - 首部 = 1500 - 20 = 1480 B</code>，且 <code>1480 / 8 = 185</code> 恰好整除，满足"片数据长度必须是 <code>8 B</code> 整数倍"的要求。第三步分片——<code>3780 = 1480 + 1480 + 820</code>，故需要 <strong>3 片</strong>：第 1 片数据 <code>1480 B</code>、片偏移 <code>0/8 = 0</code>、<code>MF = 1</code>、总长度 <code>1500 B</code>；第 2 片数据 <code>1480 B</code>（该片数据在原始数据部分中的起始位置为 <code>1480</code>）、片偏移 <code>1480/8 = 185</code>、<code>MF = 1</code>、总长度 <code>1500 B</code>；第 3 片数据 <code>820 B</code>（起始位置 <code>2960</code>）、片偏移 <code>2960/8 = 370</code>、<code>MF = 0</code>、总长度 <code>840 B</code>。第四步判 <code>ARP</code> 对象——<code>A</code> 与 <code>B</code> 不在同一网段，故 <code>A</code> 必须把数据报发给默认网关，<strong><code>ARP</code> 解析的是默认网关（路由器接口）的 <code>IP</code> 地址所对应的 <code>MAC</code> 地址</strong>，而不是 <code>192.168.2.20</code> 的 <code>MAC</code> 地址。<strong>判分点是片偏移除以 <code>8</code>、<code>MF</code> 最后一片为 <code>0</code>、以及跨网段 <code>ARP</code> 解析网关这两处概念。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="03-数据链路层.html"><span class="cn-dir">← 上一章</span><span class="cn-title">数据链路层</span></a><a class="cn-next" href="05-传输层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">传输层</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="03-数据链路层.html"><span class="cn-dir">← 上一章</span><span class="cn-title">数据链路层</span></a><a class="cn-next" href="05-传输层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">传输层</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

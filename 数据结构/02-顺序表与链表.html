@@ -59,20 +59,20 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>顺序表与链表</h1><h1 id="_1">数据结构 · 顺序表与链表</h1>
+<main><div class="inner"><h1>顺序表与链表</h1><h1 id="_1">数据结构 · 顺序表与链表</h1>
 <h2 id="_2" id="kp">顺序表与链表 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2015、2017、2019、2021、2022、2024；分数占比约 7%；主要题型：选择题 + 综合应用题（链表操作代码）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2015、2017、2019、2021、2022、2024；分数占比约 7%；主要题型：选择题 + 综合应用题（链表操作代码）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>链表用指针把逻辑相邻的元素链接起来，<strong>存储单元可以不连续</strong>，因此不支持随机存取，只能从头指针出发顺序访问。单链表结点由数据域 <code>data</code> 与指针域 <code>next</code> 构成；双链表增加前驱指针 <code>prior</code>；循环链表把尾结点指针指回头结点（或首结点）而形成环；静态链表用数组下标（游标）模拟指针，<code>next == -1</code> 表示链尾。</p>
 <p><strong>带头结点与不带头结点的差别只在第一个数据结点</strong>：带头结点时头指针恒非空，空表条件是 <code>head-&gt;next == NULL</code>，插入删除的第一个数据结点与其余结点逻辑统一，不必特判；不带头结点时空表条件是 <code>head == NULL</code>，在表头插入或删除首元素必须修改头指针本身。链表的按位查找与按值查找都是 <code>O(n)</code>，因为必须从头走。<strong>"插入删除是 <code>O(1)</code>"有前提</strong>：在已知结点 <code>p</code> <strong>之后</strong>插入是 <code>O(1)</code>（<code>s-&gt;next = p-&gt;next; p-&gt;next = s;</code>），但<strong>在 <code>p</code> 之前</strong>插入或删除 <code>p</code> 本身，单链表必须从头找前驱，是 <code>O(n)</code>；双链表因为能直接取到前驱，这两种操作都是 <code>O(1)</code>。头插法建表得到与输入<strong>相反</strong>的序列，尾插法建表得到与输入<strong>相同</strong>的序列，这是判断建表方式的快速依据。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>按位查找 / 按值查找 O(n)</code>、<code>已知前驱的插入删除 O(1)</code> —— 链表的代价集中在"找位置"，一旦定位完成，指针改接是常数时间。</li>
 <li><code>头插法逆序、尾插法同序</code> —— 头插法每次把新结点插在头结点之后，故输出序列是输入序列的逆序。</li>
 <li><code>双链表插入四步不能乱</code> —— 先接新结点的两个指针，再改原结点指针，否则会丢失后继地址而断链。</li>
 <li><code>length 不存储在链表里</code> —— 求表长必须遍历，<code>O(n)</code>；若题目要求 <code>O(1)</code> 求长，需额外维护长度域。</li>
 <li><code>尾指针循环单链表：表尾 O(1)、表头 O(1)</code> —— 因为 <code>rear-&gt;next</code> 就是头结点，取头取尾都只需常数次指针运算。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p>三种链表的结点与指针形态如下；<code>^</code> 表示空指针，<code>H</code> 为头结点（不存数据），<code>rear</code> 为尾指针。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>singly linked list with dummy head (length 3)
 
@@ -155,27 +155,29 @@ static linked list: array slots, cursor -1 means end
     B5 --&gt; B6[&quot;q-&gt;next = p-&gt;next&quot;]
     B6 --&gt; B4
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>认为"链表插入删除一定是 <code>O(1)</code>"：只有在<strong>已定位到前驱结点</strong>（双链表是已定位到该结点）时才是 <code>O(1)</code>；若还要先按值或按位查找，整体是 <code>O(n)</code>。</li>
 <li>指针修改顺序写反导致断链：在 <code>p</code> 之后插入必须<strong>先</strong> <code>s-&gt;next = p-&gt;next</code> <strong>再</strong> <code>p-&gt;next = s</code>；反过来会先覆盖 <code>p-&gt;next</code>，使原后继无法访问。</li>
 <li>不带头结点时忘记特判表头：在第一个数据结点前插入、或删除首元素，都必须修改头指针 <code>head</code>；若函数形参只是 <code>LinkList L</code>（值传递），这些修改不会带回调用者，必须用引用或二级指针。</li>
 <li>把静态链表的游标当成真实指针：<code>next</code> 存的是数组下标，<code>-1</code> 是链尾标志而非"空地址值的随意约定"；且它的"空间"由数组大小固定，属于顺序存储的模拟。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2009 年 408 第 42 题（综合应用题，10 分）</span></p>
 <p>已知一个带有表头结点的单链表，结点结构为 <code>[data | link]</code>，假设该链表只给出了头指针 <code>list</code>。在不改变链表的前提下，请设计一个尽可能高效的算法，查找链表中倒数第 <code>k</code> 个位置上的结点（<code>k</code> 为正整数）。若查找成功，算法输出该结点的 <code>data</code> 域的值，并返回 1；否则，只返回 0。要求：描述算法的基本设计思想；描述算法的详细实现步骤；根据设计思想和实现步骤，采用 C 或 C++ 语言描述算法，关键之处给出注释。</p>
 <blockquote>
 <p>解析：设计思想是<strong>双指针同向平移</strong>——一次遍历即可定位倒数第 <code>k</code> 个结点。实现步骤：令 <code>p</code> 与 <code>q</code> 都指向第一个数据结点，先让 <code>p</code> 沿 <code>link</code> 前进 <code>k</code> 个结点；若前进过程中 <code>p</code> 变为 <code>NULL</code>，说明表长小于 <code>k</code>，返回 0。此后让 <code>p</code>、<code>q</code> 同步前进，直到 <code>p == NULL</code>，此时 <code>q</code> 恰好指向倒数第 <code>k</code> 个结点，输出 <code>q-&gt;data</code> 并返回 1。时间复杂度 <code>O(n)</code>（只遍历一趟），空间复杂度 <code>O(1)</code>。<strong>关键在于"两个指针间隔恒为 <code>k</code> 个结点"，用距离差代替了长度统计。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="01-线性表.html"><span class="cn-dir">← 上一章</span><span class="cn-title">线性表</span></a><a class="cn-next" href="03-栈与队列.html"><span class="cn-dir">下一章 →</span><span class="cn-title">栈与队列</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="01-线性表.html"><span class="cn-dir">← 上一章</span><span class="cn-title">线性表</span></a><a class="cn-next" href="03-栈与队列.html"><span class="cn-dir">下一章 →</span><span class="cn-title">栈与队列</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

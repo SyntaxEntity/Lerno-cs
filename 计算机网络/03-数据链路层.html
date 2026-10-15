@@ -59,16 +59,16 @@
 <a class="sb-chap" href="05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>数据链路层</h1><h1 id="_1">计算机网络 · 数据链路层</h1>
+<main><div class="inner"><h1>数据链路层</h1><h1 id="_1">计算机网络 · 数据链路层</h1>
 <h2 id="_2" id="kp">数据链路层 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 22 次；涉及年份：2010—2025 年高频，2011、2013、2015、2017、2019、2020、2022、2024 年为典型年份；分数占比约 20%；主要题型：选择题 + 综合应用题（滑动窗口、CSMA/CD、以太网帧）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010—2025 年高频，2011、2013、2015、2017、2019、2020、2022、2024 年为典型年份；分数占比约 20%；主要题型：选择题 + 综合应用题（滑动窗口、CSMA/CD、以太网帧）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>数据链路层的三个基本功能是<strong>封装成帧（组帧）、差错控制、流量控制</strong>。<strong>组帧</strong>常用四种方法：字符计数法（用计数字段标明帧长，一旦计数出错就全盘失步）、<strong>字符填充法</strong>（用 <code>SOH</code>/<code>EOT</code> 定界，数据中出现的 <code>SOH</code>/<code>EOT</code> 前插入转义字符 <code>ESC</code>，接收方删除转义）、<strong>零比特填充法</strong>（<code>HDLC</code> 使用：在标志字段 <code>01111110</code> 之外的数据中，每出现 <strong>5 个连续 <code>1</code> 就填入一个 <code>0</code></strong>，接收方每见 5 个连续 <code>1</code> 就删除其后的 <code>0</code>）、<strong>违规编码法</strong>（如曼彻斯特编码中的非法电平组合），后两种是"透明传输"的标准做法。<strong>差错控制</strong>中，<strong>奇偶校验</strong>只能检出奇数个错误；</p>
 <p><strong>循环冗余校验 <code>CRC</code></strong> 用生成多项式做<strong>模 2 除法</strong>求余数作为 <code>FCS</code>，能检出所有单比特错、所有奇数个错以及长度不超过生成多项式阶数的突发错；<strong>海明码</strong>通过 <code>2^r &gt;= k + r + 1</code> 确定所需的<strong>校验位数 <code>r</code></strong>（<code>k</code> 为数据位数），校验位放在 <code>2^i</code> 位置（第 1、2、4、8… 位），可实现<strong>一位纠错</strong>（配合总校验位可做到"纠一位、检两位"）。<strong>流量控制与可靠传输</strong>三种协议必须分清：<strong>停止-等待</strong>发送窗口为 <code>1</code>、每发一帧等一个确认，信道利用率 <code>= T_d / (T_d + RTT + T_a)</code>（<code>T_d</code> 为发送时延、<code>T_a</code> 为确认发送时延）；</p>
 <p><strong>后退 <code>N</code> 帧 <code>GBN</code></strong> 用累计确认，接收窗口为 <code>1</code>，出错后重传从出错帧开始的全部帧，<strong>发送窗口上限为 <code>2^n - 1</code></strong>（<code>n</code> 为序号位数）；<strong>选择重传 <code>SR</code></strong> 逐帧确认、接收方缓存乱序帧，只重传出错帧，<strong>发送窗口与接收窗口上限均为 <code>2^(n-1)</code></strong>，即窗口之和不超过 <code>2^n</code>。<strong>介质访问控制</strong>分三类：<strong>信道划分</strong>（频分 <code>FDM</code>、时分 <code>TDM</code>、码分 <code>CDM</code>，各站点固定分配、无冲突）、<strong>随机访问</strong>（<code>ALOHA</code>、<code>CSMA</code>、<code>CSMA/CD</code>、<code>CSMA/CA</code>）、<strong>轮询访问</strong>（令牌传递）。</p>
 <p><strong><code>CSMA/CD</code></strong> 的工作是"<strong>先听后发、边听边发、冲突停发、随机重发</strong>"：站点发送前先监听信道，发送中继续监听，一旦检测到冲突就立即停止并发送<strong>人为干扰信号</strong>，然后按<strong>截断二进制指数退避</strong>算法等待重发（第 <code>i</code> 次冲突后从 <code>{0, 1, ..., 2^k - 1}</code> 中随机取 <code>r</code>，<code>k = min(i, 10)</code>，等待 <code>r</code> 倍争用期）。<strong>最小帧长</strong>的依据是"发送时延必须不小于往返传播时延（争用期 <code>2τ</code>）"，否则发送方在冲突信号返回前已发完帧而无法检测冲突：<code>最小帧长 = 2 × 传播时延 × 数据率 = 争用期 × 数据率</code>，以太网取 <code>2τ = 51.2 μs</code>、<code>10 Mb/s</code>，故最小帧长 <code>512 bit = 64 B</code>。</p>
 <p><strong>以太网帧</strong>的 <code>MAC</code> 地址为 <code>48</code> 位，帧格式为"目的地址（6 <code>B</code>）+ 源地址（6 <code>B</code>）+ 类型（2 <code>B</code>）+ 数据（46—1500 <code>B</code>）+ <code>FCS</code>（4 <code>B</code>）"，故最小帧 <code>64 B</code>、最大帧 <code>1518 B</code>。<strong>交换机</strong>工作在数据链路层，通过<strong>自学习</strong>建立"<code>MAC</code> 地址 → 端口"的转发表，能隔离冲突域但不能隔离广播域。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>零比特填充：发送方每 5 个连续 1 后插 0，接收方每 5 个连续 1 后删 0</code> —— 保证数据对标志字段 <code>01111110</code> 透明。</li>
 <li><code>海明码校验位数：2^r &gt;= k + r + 1</code>（<code>k</code> 数据位、<code>r</code> 校验位） —— 校验位位于第 1、2、4、8… 位。</li>
 <li><code>CRC 用模 2 除法求余数作为 FCS</code> —— 生成多项式最高次为 <code>r</code> 则余数取 <code>r</code> 位，且模 2 运算不产生进位。</li>
@@ -77,7 +77,7 @@
 <li><code>以太网最小帧 64 B、最大帧 1518 B、数据字段 46—1500 B</code> —— 小于 46 <code>B</code> 需填充。</li>
 <li><code>交换机隔离冲突域但不隔离广播域</code> —— 隔离广播域要靠路由器或 <code>VLAN</code>。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>最小帧长的推导与以太网争用期</strong>：发送方必须在冲突信号返回之前仍在发送，否则无法检测到冲突。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>why a minimum frame size is needed (CSMA/CD)
 
@@ -159,28 +159,30 @@ ethernet frame format (DIX Ethernet V2)
     C11 --&gt; C12[&quot;等待 r 倍争用期 2t 后重新监听&quot;]
     C12 --&gt; C1
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li><code>GBN</code> 与 <code>SR</code> 的窗口上限记反：<code>GBN</code> 的发送窗口上限是 <code>2^n - 1</code>（接收窗口恒为 <code>1</code>），<code>SR</code> 的发送与接收窗口上限都是 <code>2^(n-1)</code>；把两者对调或用 <code>2^n</code> 做上限都会导致序号歧义。</li>
 <li>最小帧长漏乘 <code>2</code>：<code>最小帧长 = 2τ × 数据率</code>，其中 <code>2τ</code> 是<strong>往返</strong>传播时延（争用期）；只乘单程传播时延会把最小帧长算小一半，进而误判"该帧能否被检测到冲突"。</li>
 <li>海明码校验位数公式记错：正确式子是 <code>2^r &gt;= k + r + 1</code>（<code>k</code> 为数据位数），注意不等号右边要<strong>加上 <code>r</code> 本身</strong>（表示"校验位也要被校验"）；漏掉 <code>r</code> 会得到偏小的校验位数。</li>
 <li>混淆交换机与路由器的隔离能力：交换机工作在数据链路层，能隔离<strong>冲突域</strong>但<strong>不隔离广播域</strong>（广播帧会被转发到所有端口）；隔离广播域必须用路由器或划分 <code>VLAN</code>。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2016 年 408 第 36 题（单项选择题，2 分）</span></p>
 <p>若某以太网的传播时延为 <code>25.6 μs</code>，数据传输速率为 <code>10 Mb/s</code>，则其最小帧长应为（ ）。</p>
 <p>A. <code>64 B</code>　B. <code>128 B</code>　C. <code>256 B</code>　D. <code>512 B</code></p>
 <blockquote>
 <p>解析：直接套用"最小帧长 = 争用期 × 数据率"。争用期是<strong>往返</strong>传播时延 <code>2τ = 2 × 25.6 μs = 51.2 μs</code>，故最小帧长 <code>= 51.2 μs × 10 Mb/s = 512 bit = 64 B</code>，答案为 <strong>A</strong>。若忘记乘 2（只取 <code>25.6 μs</code>）会得到 <code>256 bit = 32 B</code> 而不在选项中，从而暴露出错误来源。<strong>判分点是争用期必须是往返传播时延，以及比特与字节的换算（<code>512 bit = 64 B</code>）。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="02-物理层.html"><span class="cn-dir">← 上一章</span><span class="cn-title">物理层</span></a><a class="cn-next" href="04-网络层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">网络层</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="02-物理层.html"><span class="cn-dir">← 上一章</span><span class="cn-title">物理层</span></a><a class="cn-next" href="04-网络层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">网络层</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

@@ -59,15 +59,15 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>输入输出管理</h1><h1 id="_1">操作系统 · 输入输出管理</h1>
+<main><div class="inner"><h1>输入输出管理</h1><h1 id="_1">操作系统 · 输入输出管理</h1>
 <h2 id="_2" id="kp">输入输出管理 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 14 次；涉及年份：2011、2013、2015、2017、2019、2021、2023、2025；分数占比约 8%；主要题型：选择题为主（IO 控制方式、缓冲、假脱机、磁盘调度）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 14 次；涉及年份：2011、2013、2015、2017、2019、2021、2023、2025；分数占比约 8%；主要题型：选择题为主（IO 控制方式、缓冲、假脱机、磁盘调度）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><code>I/O</code> 软件按层次自下而上分为四层：<strong>中断处理程序</strong>（处理设备中断、唤醒等待进程）、<strong>设备驱动程序</strong>（把上层抽象命令翻译为对设备寄存器的具体操作，与硬件密切相关）、<strong>设备独立性软件</strong>（又称设备无关软件，负责逻辑设备名到物理设备名的映射、缓冲、设备分配与保护、差错处理，向用户提供统一的系统调用接口）、<strong>用户层 <code>I/O</code> 软件</strong>（如库函数 <code>printf</code>、<code>scanf</code>）。这四层中，<strong>设备独立性软件是"与设备无关"的部分，设备驱动程序是"与设备相关"的部分</strong>，这是分层的判据。</p>
 <p><strong>缓冲技术</strong>的作用是缓和 <code>CPU</code> 与 <code>I/O</code> 设备的速度差异、减少中断次数、解决数据粒度不匹配问题。<strong>单缓冲</strong>下处理一块数据的时间为 <code>T = max(C, T_io) + M</code>（<code>C</code> 为 <code>CPU</code> 处理时间、<code>T_io</code> 为输入时间、<code>M</code> 为数据传送时间），<strong>双缓冲</strong>下为 <code>T = max(C + M, T_io)</code>，因此双缓冲比单缓冲显著提高并行度；</p>
 <p>当 <code>T_io &gt; C + M</code> 时双缓冲能把设备与 <code>CPU</code> 的并行发挥到最大。<strong>设备分配</strong>中引入<strong>逻辑设备名</strong>是为了实现设备无关性：用户程序使用逻辑设备名，系统查<strong>逻辑设备表 <code>LUT</code></strong> 得到物理设备；设备分配的数据结构包括<strong>设备控制表 <code>DCT</code>、控制器控制表 <code>COCT</code>、通道控制表 <code>CHCT</code> 与系统设备表 <code>SDT</code></strong>。<strong><code>SPOOLing</code>（假脱机）技术</strong>用<strong>输入井与输出井</strong>（磁盘上的缓冲区）、<strong>输入进程与输出进程</strong>以及<strong>井管理程序</strong>，把独占设备（如打印机）改造成可被多个进程"共享"的设备：进程的打印请求被写成输出井中的文件并排队，由输出进程按序真正输出，因此进程不必等待打印机空闲。</p>
 <p><strong>磁盘调度算法</strong>决定多个磁盘请求的服务顺序，以<strong>总寻道时间最短</strong>为目标：<strong><code>FCFS</code></strong> 公平但平均寻道时间长；<strong><code>SSTF</code>（最短寻道时间优先）</strong>每次选离当前磁头最近的请求，性能较好但可能导致远端请求<strong>饥饿</strong>；<strong><code>SCAN</code>（电梯算法）</strong>沿一个方向服务到底再反向，避免饥饿且性能较好；<strong><code>C-SCAN</code>（循环扫描）</strong>只在一个方向服务，返程直接快速回到起始端而不服务请求，使各磁道等待时间更均匀；<strong><code>LOOK</code> 与 <code>C-LOOK</code></strong> 是 <code>SCAN</code>、<code>C-SCAN</code> 的改进——到达该方向上<strong>最远的请求</strong>就折返，不必移动到磁盘末端。<strong>磁盘管理</strong>还包括低级格式化（划分扇区）、分区、逻辑格式化（建立文件系统）、引导块与坏块处理。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>I/O 软件四层（底到顶）：中断处理程序 -&gt; 设备驱动程序 -&gt; 设备独立性软件 -&gt; 用户层软件</code> —— 与设备相关的是驱动层。</li>
 <li><code>单缓冲 T = max(C, T_io) + M，双缓冲 T = max(C + M, T_io)</code> —— 双缓冲的关键是 <code>C + M</code> 与 <code>T_io</code> 取较大者。</li>
 <li><code>SPOOLing 用共享设备（磁盘）模拟独占设备</code> —— 输入井/输出井在磁盘上，靠排队与守护进程实现"虚拟设备"。</li>
@@ -75,7 +75,7 @@
 <li><code>SCAN 服务到磁盘端点才折返；LOOK 到该方向最远请求就折返</code> —— 计算移臂道数时两者的折返点不同。</li>
 <li><code>逻辑设备名 -&gt; LUT -&gt; 物理设备</code> —— 引入逻辑设备名的目的是实现设备无关性。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong><code>I/O</code> 软件的层次结构与一次读请求的上下穿越</strong>：请求自顶向下逐层转换，数据与中断自底向上逐层返回。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>I/O software layers and a read request path
 
@@ -184,27 +184,29 @@ head starts at 53, disk tracks 0 .. 199
     S10 --&gt;|否| S1
     S10 --&gt;|是| S11[&quot;结束本轮调度 统计总寻道道数&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>双缓冲时间公式写成求和：双缓冲处理一块数据的时间是 <code>max(C + M, T_io)</code>，而不是 <code>C + M + T_io</code>；用求和会把并行度算没，结果远大于正确值。</li>
 <li>混淆 <code>SCAN</code> 与 <code>LOOK</code> 的折返点：<code>SCAN</code>（电梯算法）必须移动到<strong>磁盘端点</strong>（如 <code>0</code> 或 <code>199</code>）才折返，<code>LOOK</code> 到达<strong>该方向上最远的请求</strong>即折返；计算移臂道数时两者结果不同。</li>
 <li>把 <code>SPOOLing</code> 的输入井与输出井位置搞错：输入井与输出井都在<strong>磁盘</strong>上（共享设备模拟独占设备），不是内存缓冲区；把 <code>SPOOLing</code> 说成"在内存中开辟缓冲区"是概念错误。</li>
 <li>认为设备驱动程序与设备无关：<strong>设备驱动程序与硬件密切相关</strong>（要操作具体设备的寄存器、时序与命令格式），真正"与设备无关"的是其上层的设备独立性软件；分层归属写反是常见失分点。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2019 年 408 第 30 题（单项选择题，2 分）</span></p>
 <p>某磁盘的磁头当前位于 <code>100</code> 号磁道，磁头正向磁道号增加的方向移动。现有如下磁盘请求序列：<code>55, 58, 39, 18, 90, 160, 150, 38, 184</code>。若采用 <code>SCAN</code>（电梯）调度算法且磁道号范围为 <code>0 ~ 199</code>，则磁头移动的总道数为（ ）。</p>
 <blockquote>
 <p>解析：磁头当前在 <code>100</code> 且向磁道号增加方向移动，故先服务所有大于 <code>100</code> 的请求，按从小到大排序为 <code>150、160、184</code>，并继续移动到磁盘端点 <code>199</code> 才能折返（这是 <code>SCAN</code> 与 <code>LOOK</code> 的关键差别）。然后反向（磁道号减小方向）服务剩余请求，按从大到小为 <code>90、58、55、39、38、18</code>，最后停在 <code>18</code>（若题目未要求移动到 <code>0</code>，则不必到端点）。总移动道数 <code>= (199 - 100) + (199 - 18) = 99 + 181 = 280</code> 道。<strong>判分点是 <code>SCAN</code> 必须先移动到端点 <code>199</code> 折返，以及反向服务时按从大到小排序；把它当成 <code>LOOK</code> 会算成 <code>(184 - 100) + (184 - 18) = 84 + 166 = 250</code> 道而选错。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="06-文件管理.html"><span class="cn-dir">← 上一章</span><span class="cn-title">文件管理</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="06-文件管理.html"><span class="cn-dir">← 上一章</span><span class="cn-title">文件管理</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

@@ -59,14 +59,14 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>指令系统</h1><h1 id="_1">计算机组成原理 · 指令系统</h1>
+<main><div class="inner"><h1>指令系统</h1><h1 id="_1">计算机组成原理 · 指令系统</h1>
 <h2 id="_2" id="kp">指令系统 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2023、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（指令格式、寻址方式、汇编阅读）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2023、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（指令格式、寻址方式、汇编阅读）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>一条指令由<strong>操作码字段</strong>与<strong>地址码字段</strong>构成。定长指令字中操作码位数固定，可表示 <code>2^k</code> 条指令；<strong>变长指令字</strong>中常用<strong>扩展操作码</strong>技术：把操作码按长度分层，短操作码不能再作为长操作码的前缀，因此设计时必须保证"<strong>短码不是任何长码的前缀</strong>"。以 4 位为基础操作码、需要扩展到 8 位为例，若 4 位编码 0000—1110 分配给 15 条三地址指令，则剩下 1111 作为扩展标志可产生 16 个 8 位编码，用于二地址指令，依此类推。<strong>寻址方式</strong>决定操作数的来源与有效地址 <code>EA</code> 的计算：立即寻址的地址字段就是操作数本身；直接寻址 <code>EA = A</code>；间接寻址 <code>EA = (A)</code>（需访存两次取数，三次含取指）；</p>
 <p>寄存器寻址的操作数在寄存器中，不访存；寄存器间接寻址 <code>EA = (R)</code>；<strong>相对寻址 <code>EA = (PC) + A</code></strong>，其中 <code>PC</code> 已是<strong>取下一条指令后的值</strong>（即已自增）；基址寻址 <code>EA = (BR) + A</code>，基址寄存器由操作系统设定、面向整个程序，用于<strong>程序重定位</strong>；</p>
 <p>变址寻址 <code>EA = (IX) + A</code>，变址寄存器由用户改变、面向数组，用于<strong>数组元素的顺序访问</strong>；堆栈寻址的操作数隐含在栈顶。<code>CISC</code> 与 <code>RISC</code> 的分野在于：<code>RISC</code> 采用<strong>定长指令字、指令条数少且格式规整、只有 Load/Store 访存、通用寄存器多、采用硬布线控制与流水线</strong>，而 <code>CISC</code> 指令变长、寻址方式多、以微程序控制为主。汇编层面必须能读懂"取数—运算—存数"的三段式，重点掌握 <code>mov</code>、<code>add/sub</code>、<code>cmp</code> 与条件转移 <code>jmp/jcc</code>、以及 <code>push/pop</code> 对栈指针的改变。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>扩展操作码约束：短码不得是长码的前缀</code> —— 否则译码时无法判断指令长度。</li>
 <li><code>相对寻址 EA = (PC) + A，PC 已自增到下一条指令</code> —— 这是 408 反复考查的细节，忘记自增会整体偏移。</li>
 <li><code>基址寻址面向程序重定位（基址寄存器由 OS 设定），变址寻址面向数组（变址寄存器由用户改变）</code> —— 两者形式相同、用途不同。</li>
@@ -74,7 +74,7 @@
 <li><code>RISC：定长指令 + 只有 Load/Store 访存 + 多通用寄存器 + 硬布线 + 流水线</code> —— 与 CISC 的对比是固定选择题考点。</li>
 <li><code>指令字长可以小于机器字长，也可以大于机器字长</code> —— 半字长、双字长指令都允许，按字节编址时需注意取指访存次数。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>扩展操作码的编码树</strong>：短操作码保留一个（或若干个）编码作为"扩展出口"，不把编码空间用尽；下图用 4 位基础码扩展一次到 8 位为例。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>opcode tree (4-bit base, extended once to 8-bit)
 
@@ -124,27 +124,29 @@
     R4 --&gt;|否| R6[&quot;将 EA 送入 PC 完成转移&quot;]
     R6 --&gt; R7[&quot;下一条取指从 EA 开始 实现位置无关代码&quot;]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>相对寻址忘记 <code>PC</code> 已自增：<code>EA = (PC) + A</code> 中的 <code>PC</code> 是"取下本条指令后已加一个指令长度"的值；若直接用本条指令地址去加偏移量，结果会整体偏差一条指令的长度。</li>
 <li>基址与变址寻址的用途互换：基址寻址的基址寄存器内容由操作系统给出、程序执行中不变，用于<strong>程序浮动/重定位</strong>；变址寻址的变址值由用户改变，用于<strong>数组或字符串的顺序访问</strong>。</li>
 <li>扩展操作码设计违反前缀约束：把 1111 同时用作一条 4 位指令又用作 8 位扩展标志，译码器无法判定指令长度；正确做法是把该编码<strong>只留给扩展</strong>。</li>
 <li>认为指令字长必须等于机器字长：指令字长可以等于、小于或大于机器字长（半字长、双字长指令都常见），只要求是字节的整数倍（按字节编址时），取指所需访存次数由指令字长与存储字长共同决定。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2019 年 408 第 16 题（单项选择题，2 分）</span></p>
 <p>某计算机采用定长指令字，指令字长 16 位，采用扩展操作码方式。若三地址指令有 12 条、二地址指令有 20 条，则一地址指令最多有（ ）条。</p>
 <blockquote>
 <p>解析：设操作码基础长度为 4 位，三地址指令需要 12 个编码，占 <code>0000—1011</code>；剩余 <code>1100、1101、1110、1111</code> 共 4 个编码可作扩展标志。每个扩展标志可扩展出 4 位（地址字段让出 4 位），即每个标志下可得到 <code>2^4 = 16</code> 个 8 位编码，故二地址指令编码空间为 <code>4 × 16 = 64</code> 个。二地址指令实际用了 20 条，剩余 <code>64 - 20 = 44</code> 个 8 位编码可继续作扩展标志，每个再扩展 4 位得到 <code>2^4 = 16</code> 个 12 位编码，故一地址指令最多 <code>44 × 16 = 704</code> 条。<strong>关键是逐层计算"剩余编码数 × 每级扩展倍数"，且绝不能把已用的编码再当扩展标志。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="02-存储系统.html"><span class="cn-dir">← 上一章</span><span class="cn-title">存储系统</span></a><a class="cn-next" href="04-中央处理器.html"><span class="cn-dir">下一章 →</span><span class="cn-title">中央处理器 CPU</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="02-存储系统.html"><span class="cn-dir">← 上一章</span><span class="cn-title">存储系统</span></a><a class="cn-next" href="04-中央处理器.html"><span class="cn-dir">下一章 →</span><span class="cn-title">中央处理器 CPU</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

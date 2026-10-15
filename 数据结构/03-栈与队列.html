@@ -59,13 +59,13 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>栈与队列</h1><h1 id="_1">数据结构 · 栈与队列</h1>
+<main><div class="inner"><h1>栈与队列</h1><h1 id="_1">数据结构 · 栈与队列</h1>
 <h2 id="_2" id="kp">栈与队列 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2011、2013、2015、2018、2020、2022、2023、2025；分数占比约 8%；主要题型：选择题为主（表达式求值、出栈序列、循环队列）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2011、2013、2015、2018、2020、2022、2023、2025；分数占比约 8%；主要题型：选择题为主（表达式求值、出栈序列、循环队列）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>栈是只允许在同一端（栈顶 <code>top</code>）进行插入和删除的线性表，队列是只允许在队尾 <code>rear</code> 插入、队头 <code>front</code> 删除的线性表，二者都是操作受限的线性表。顺序栈用 <code>top</code> 指向栈顶元素（或栈顶元素的下一个位置，两种约定不可混用），判空为 <code>top == -1</code>（或 <code>top == 0</code>），栈满为 <code>top == MaxSize - 1</code>，入栈 <code>++top; data[top] = x</code>。共享栈让两个栈共用一个数组、栈底分别设在两端、栈顶向中间生长，仅当两栈顶指针相邻（<code>top0 + 1 == top1</code>）时才上溢，空间利用率更高。</p>
 <p>循环队列把顺序队列在逻辑上首尾相接，用 <code>front == rear</code> 判空时必须另设计数 <code>size</code>、标志 <code>tag</code> 或牺牲一个单元来区分队满，否则队空与队满无法区分。栈的典型应用有括号匹配、表达式求值（中缀转后缀再求值）、递归调用与函数调用栈；中缀转后缀时，运算符栈规则是遇操作数直接输出，遇运算符先弹出栈中优先级不低于它的运算符再入栈，遇 <code>(</code> 入栈、遇 <code>)</code> 弹出至 <code>(</code>，扫描完把栈中剩余运算符全部弹出。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>n</code> 个不同元素依次入栈，合法出栈序列数为卡特兰数 <code>C(2n,n)/(n+1)</code> —— 出栈序列合法性判定用它计数，如 <code>n = 3</code> 时为 5 个，<code>n = 4</code> 时为 14 个。</li>
 <li>循环队列判满三方案 —— 牺牲一个单元：队满 <code>(rear + 1) % MaxSize == front</code>；增设 <code>size</code>：队满 <code>size == MaxSize</code>、队空 <code>size == 0</code>；增设 <code>tag</code>：<code>front == rear</code> 时 <code>tag == 1</code> 为满、<code>tag == 0</code> 为空。</li>
 <li>元素个数公式（<code>front</code> 指向队头元素）—— <code>count = (rear - front + MaxSize) % MaxSize</code>，出队后 <code>front</code> 后移，<code>rear</code> 始终指向下一个可插入位置。</li>
@@ -73,7 +73,7 @@
 <li>后缀表达式求值 —— 遇操作数入栈，遇运算符连出两次栈，先出的是右操作数、后出的是左操作数，算完 <code>左 op 右</code> 再入栈，最终栈中唯一元素即答案。</li>
 <li>共享栈判满 —— 两栈顶指针相邻即 <code>top0 + 1 == top1</code> 时整个数组才上溢，单个栈使用不会溢出。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p>循环队列在 <code>MaxSize = 7</code>（下标 0 至 6）时的三种状态，空槽留白、<code>x</code> 表示已存元素、<code>f</code> 与 <code>r</code> 分别指向 <code>front</code> 与 <code>rear</code> 所在下标：</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>state 1  empty : front == rear
  idx   0   1   2   3   4   5   6
@@ -152,13 +152,13 @@ state 3  full : (rear + 1) % 7 == front
     A8 --&gt;|是| A9[弹出栈中剩余全部运算符并输出]
     A9 --&gt; A10[得到后缀表达式]
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>错在把 <code>front == rear</code> 直接当成队满。循环队列中它同时满足队空与队满条件，必须靠牺牲一个单元、<code>size</code> 计数或 <code>tag</code> 标志之一区分，选定的约定要与判空判满公式配套使用。</li>
 <li>错在后缀表达式求值时把两个操作数的出栈顺序弄反。栈顶先弹出的是右操作数、后弹出的是左操作数，应计算 <code>左 op 右</code>；减法和除法一旦颠倒必然得到错误结果。</li>
 <li>错在混用 <code>front</code> 的两种约定。<code>front</code> 指向队头元素时元素个数为 <code>(rear - front + MaxSize) % MaxSize</code>，指向队头元素的前一个位置时改为 <code>(rear - front + 1 + MaxSize) % MaxSize</code>，两套公式与判满条件不能互换。</li>
 <li>错在只凭卡特兰数判定出栈序列合法。合法序列总数由 <code>C(2n,n)/(n+1)</code> 给出，但判定某个具体序列仍须模拟栈过程：出栈元素之后出现的、比它先入栈的小元素只能按逆序排列。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2022 年真题改编（选择题，2 分）</span></p>
 <p>已知初始为空的栈，元素 <code>1, 2, 3, 4</code> 依次入栈，入栈过程中允许出栈，则下列出栈序列中不可能的是（　）。</p>
 <p>A. <code>1, 2, 3, 4</code>　B. <code>4, 3, 2, 1</code>　C. <code>3, 1, 2, 4</code>　D. <code>2, 3, 4, 1</code></p>
@@ -171,15 +171,17 @@ state 3  full : (rear + 1) % 7 == front
 <blockquote>
 <p>解析：第一步确认约定，<code>front</code> 指向队头元素，故元素个数公式为 <code>count = (rear - front + MaxSize) % MaxSize</code>。第二步代入数值，<code>count = (40 - 15 + 50) % 50 = 75 % 50 = 25</code>。第三步校验，牺牲一个单元时最多存 <code>MaxSize - 1 = 49</code> 个元素，队满条件 <code>(rear + 1) % 50 == front</code> 即 <code>41 == 15</code> 不成立，与 <code>25 &lt; 49</code> 一致，结果合法。故答案为 B。</p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="02-顺序表与链表.html"><span class="cn-dir">← 上一章</span><span class="cn-title">顺序表与链表</span></a><a class="cn-next" href="04-树与二叉树.html"><span class="cn-dir">下一章 →</span><span class="cn-title">树与二叉树</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="02-顺序表与链表.html"><span class="cn-dir">← 上一章</span><span class="cn-title">顺序表与链表</span></a><a class="cn-next" href="04-树与二叉树.html"><span class="cn-dir">下一章 →</span><span class="cn-title">树与二叉树</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

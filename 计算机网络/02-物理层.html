@@ -59,14 +59,14 @@
 <a class="sb-chap" href="05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>物理层</h1><h1 id="_1">计算机网络 · 物理层</h1>
+<main><div class="inner"><h1>物理层</h1><h1 id="_1">计算机网络 · 物理层</h1>
 <h2 id="_2" id="kp">物理层 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 14 次；涉及年份：2010、2012、2014、2016、2017、2019、2021、2023、2025；分数占比约 8%；主要题型：选择题为主（奈奎斯特/香农、编码、传输介质）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 14 次；涉及年份：2010、2012、2014、2016、2017、2019、2021、2023、2025；分数占比约 8%；主要题型：选择题为主（奈奎斯特/香农、编码、传输介质）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>物理层的任务是<strong>在传输介质上透明地传送比特流</strong>，它定义机械、电气、功能、规程四个方面的特性。<strong><code>Nyquist</code>（奈奎斯特）准则</strong>给出理想无噪声低通信道的极限速率：<code>C = 2 W log2 V</code>（<code>W</code> 为带宽 <code>Hz</code>、<code>V</code> 为码元的离散电平数），它与信噪比无关，只与带宽和电平数有关；<strong><code>Shannon</code> 定理</strong>给出有噪声信道的极限速率：<code>C = W log2(1 + S/N)</code>，其中信噪比常用分贝表示，换算关系为 <code>SNR(dB) = 10 log10(S/N)</code>，因此 <code>30 dB</code> 对应 <code>S/N = 1000</code>。</p>
 <p>两者常联合使用：先用 <code>Shannon</code> 算出信道容量上限，再用 <code>Nyquist</code> 反推"在此速率下每个码元最多需要几个电平"。<strong>编码与调制</strong>要区分：数字数据转数字信号用编码（<code>NRZ</code> 不归零、<code>NRZI</code>、<strong>曼彻斯特编码</strong>、<strong>差分曼彻斯特编码</strong>、<code>4B/5B</code>），数字数据转模拟信号用调制（<code>ASK</code>、<code>FSK</code>、<code>PSK</code>、<code>QAM</code>）。<strong>曼彻斯特编码</strong>在每个码元中间都有一次电平跳变，既传送数据又携带时钟，因此<strong>具有自同步能力</strong>，但<strong>编码效率只有 50%</strong>（波特率是数据率的 2 倍）；</p>
 <p>差分曼彻斯特用"码元开始处有无跳变"表示 <code>0/1</code>，抗干扰能力更强。<code>4B/5B</code> 编码把 4 位数据映射为 5 位码字，保证足够的跳变以利于提取时钟，效率为 <code>80%</code>。<strong>传输介质</strong>中，双绞线（<code>UTP/STP</code>）便宜、易受干扰、距离短；同轴电缆抗干扰较好；<strong>光纤</strong>带宽极大、抗电磁干扰、衰减小、保密性好，分单模（纤芯细、传输距离远、用激光器）与多模（纤芯粗、距离近、用 <code>LED</code>）。<strong>物理层设备</strong>中，<strong>中继器</strong>对信号整形放大以延长传输距离，<strong>集线器</strong>是多端口中继器，二者都工作在物理层，<strong>不隔离冲突域</strong>。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>Nyquist：C = 2 W log2 V</code>（无噪声、理想低通信道） —— 与信噪比无关，<code>V</code> 是码元可取的电平数。</li>
 <li><code>Shannon：C = W log2(1 + S/N)</code>（有噪声信道） —— 与电平数无关，只与带宽和信噪比有关。</li>
 <li><code>SNR(dB) = 10 log10(S/N)</code> —— <code>30 dB</code> 对应 <code>S/N = 1000</code>，代入 <code>Shannon</code> 前必须先换算成比值。</li>
@@ -75,7 +75,7 @@
 <li><code>4B/5B 编码效率 80%</code> —— 用 5 位码字承载 4 位数据以保证时钟同步。</li>
 <li><code>集线器与中继器在物理层，不隔离冲突域</code> —— 共享带宽，同一时刻只能有一个站点发送。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>三种常用编码的波形对比</strong>：数据序列 <code>1 0 1 1 0 0 1 0</code>（单极性表示，高电平为 <code>1</code>）。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>data bits:        1     0     1     1     0     0     1     0
 
@@ -151,28 +151,30 @@
     A8 --&gt; A10[&quot;若再问码元速率 由波特率与数据率关系换算&quot;]
     A9 --&gt; A10
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>混用 <code>Nyquist</code> 与 <code>Shannon</code>：<code>Nyquist</code> 用于<strong>理想无噪声</strong>信道且必须知道电平数 <code>V</code>，<code>Shannon</code> 用于<strong>有噪声</strong>信道且只需带宽与信噪比；题目给出信噪比时若仍用 <code>Nyquist</code> 就会算错。</li>
 <li>把分贝值直接代入 <code>Shannon</code> 公式：<code>Shannon</code> 中的 <code>S/N</code> 是<strong>比值</strong>，题目给出 <code>dB</code> 时必须先按 <code>S/N = 10^(dB/10)</code> 换算（如 <code>20 dB</code> 对应 <code>100</code>、<code>30 dB</code> 对应 <code>1000</code>），直接代入会把信道容量算得极小。</li>
 <li>认为曼彻斯特编码效率是 <code>100%</code>：曼彻斯特编码每个比特中间都有跳变，<strong>波特率是数据率的 2 倍</strong>，编码效率只有 <code>50%</code>；<code>4B/5B</code> 的效率是 <code>80%</code>，两者不要混淆。</li>
 <li>认为集线器可以隔离冲突域：集线器工作在物理层，所有端口共享同一冲突域与带宽，同一时刻只能有一个站点发送；能隔离冲突域的是工作在数据链路层的交换机与网桥。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2016 年 408 第 34 题（单项选择题，2 分）</span></p>
 <p>若某通信链路带宽为 <code>3000 Hz</code>，采用 <code>4</code> 种相位、每种相位有 <code>2</code> 种振幅的 <code>QAM</code> 调制，且信道无噪声，则该链路的极限数据传输速率约为（ ）。</p>
 <p>A. <code>6000 b/s</code>　B. <code>12000 b/s</code>　C. <code>18000 b/s</code>　D. <code>24000 b/s</code></p>
 <blockquote>
 <p>解析：无噪声信道用 <code>Nyquist</code> 准则 <code>C = 2 W log2 V</code>。先求码元状态数 <code>V</code>：<code>4</code> 种相位 × 每种 <code>2</code> 种振幅 <code>= 8</code> 种不同的码元状态，故 <code>V = 8</code>、<code>log2 8 = 3</code> 位/码元。代入得 <code>C = 2 × 3000 × 3 = 18000 b/s</code>，答案为 <strong>C</strong>。若只按相位计算（漏乘振幅，取 <code>V = 4</code>）会得到 <code>12000 b/s</code>（干扰项 B）；若误把 <code>2W</code> 写成 <code>W</code> 又会得到 <code>9000 b/s</code>。<strong>判分点是 <code>V</code> 必须把相位与振幅的组合数都算进去，以及 <code>Nyquist</code> 公式中的系数 <code>2</code> 不能丢。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="01-计算机网络体系结构.html"><span class="cn-dir">← 上一章</span><span class="cn-title">计算机网络体系结构</span></a><a class="cn-next" href="03-数据链路层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">数据链路层</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="01-计算机网络体系结构.html"><span class="cn-dir">← 上一章</span><span class="cn-title">计算机网络体系结构</span></a><a class="cn-next" href="03-数据链路层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">数据链路层</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

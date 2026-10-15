@@ -59,14 +59,14 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>处理机调度与死锁</h1><h1 id="_1">操作系统 · 处理机调度与死锁</h1>
+<main><div class="inner"><h1>处理机调度与死锁</h1><h1 id="_1">操作系统 · 处理机调度与死锁</h1>
 <h2 id="_2" id="kp">处理机调度与死锁 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 16%；主要题型：选择题 + 综合应用题（调度算法计算、银行家算法）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 16%；主要题型：选择题 + 综合应用题（调度算法计算、银行家算法）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>处理机调度</strong>分三级：<strong>高级调度</strong>（作业调度）决定哪些作业从外存进入内存并建立进程，<strong>中级调度</strong>（内存调度）决定挂起的进程何时重新调入内存（对应"就绪挂起 → 就绪"），<strong>低级调度</strong>（进程调度）从就绪队列中选一个进程分配 <code>CPU</code>，是频率最高、必须高效的一级；若系统有<strong>中级调度</strong>就说明采用了<strong>虚拟内存</strong>。评价指标中，<strong>周转时间 = 完成时间 - 到达时间</strong>，<strong>带权周转时间 = 周转时间 / 服务时间</strong>（<code>&gt;= 1</code>，越接近 1 越好），<strong>等待时间</strong>是进程在就绪队列中排队的时间之和（不含执行与 <code>I/O</code> 时间），<strong>响应时间</strong>是从提交请求到首次响应的时间。</p>
 <p><strong><code>FCFS</code></strong>（先来先服务）按到达顺序调度，非抢占、对长作业有利而对短作业不利，且对 <code>I/O</code> 繁忙型作业不利。<strong><code>SJF</code>/<code>SPF</code></strong>（短作业优先）平均周转时间与平均带权周转时间最短，但必须预知运行时间，且对长作业可能造成<strong>饥饿</strong>。<strong><code>HRRN</code></strong>（高响应比优先）用 <code>响应比 = (等待时间 + 服务时间) / 服务时间</code>，兼顾等待时间与服务时间，是非抢占式的折中方案。<strong>时间片轮转 <code>RR</code></strong> 只用于进程调度、按 <code>FCFS</code> 排队并轮流执行一个时间片：时间片过大会退化为 <code>FCFS</code>，过小则切换开销过大；</p>
 <p>它对<strong>响应时间</strong>有利但不保证周转时间。<strong>优先级调度</strong>分抢占式与非抢占式，就绪队列可用<strong>静态/动态优先级</strong>。<strong>多级反馈队列</strong>设置多个优先级递减、时间片递增的队列，新进程进最高级队列，用完时间片未完成则降级，只有高优先级队列为空才调度低优先级队列，因而能较好的满足各类进程需要，是通用性最强的算法。<strong>死锁</strong>是多个进程因竞争资源而互相等待、无外力干预都无法推进的局面，产生死锁的<strong>四个必要条件</strong>是<strong>互斥、不可剥夺、请求并保持、循环等待</strong>，四者同时成立才可能死锁。<strong>死锁预防</strong>通过破坏某个必要条件实现；<strong>死锁避免</strong>在分配前用<strong>银行家算法</strong>判断系统是否处于<strong>安全状态</strong>（存在一个安全序列使所有进程都能完成）；<strong>死锁检测与解除</strong>允许死锁发生，用资源分配图化简（可完全化简则无死锁）检测，再用资源剥夺、撤销进程或进程回退来解除。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>周转时间 = 完成 - 到达</code>，<code>带权周转时间 = 周转 / 服务时间</code> —— 带权周转时间必须除以服务时间，忘除是最常见错误。</li>
 <li><code>SJF 平均周转时间最短，但需预知运行时间且长作业可能饥饿</code> —— 这是"理论最优但工程上受限"的经典结论。</li>
 <li><code>RR 的时间片过大退化为 FCFS，过小则上下文切换开销剧增</code> —— 时间片选择是 RR 的核心权衡。</li>
@@ -74,7 +74,7 @@
 <li><code>死锁四个必要条件：互斥、不可剥夺、请求并保持、循环等待</code> —— 缺一不可，破坏任一即可预防。</li>
 <li><code>银行家算法：Need = Max - Allocation，找 Need &lt;= Available 的进程并回收其资源</code> —— 找得到完整序列则处于安全状态。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>三种调度算法的甘特图对比</strong>：同一组作业（到达时间与服务时间相同）在不同算法下的完成顺序与平均周转时间不同。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>jobs:  A(arrive 0, service 7)  B(arrive 2, service 4)
        C(arrive 4, service 1)  D(arrive 5, service 4)
@@ -163,27 +163,29 @@ RR (time slice q = 4)
     B13 --&gt;|是| B7
     B13 --&gt;|否| B7
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>带权周转时间忘记除以服务时间：<code>带权周转时间 = 周转时间 / 服务时间</code>，量纲是"倍数"且必然 <code>&gt;= 1</code>；只算周转时间就答题会整题失分。</li>
 <li>认为 <code>SJF</code> 一定优于其他算法：<code>SJF</code> 的"平均周转时间最短"是在<strong>所有作业同时到达</strong>的前提下证明的；若到达时间不同，抢占式 <code>SRTN</code> 才更优，且 <code>SJF</code> 会造成长作业<strong>饥饿</strong>。</li>
 <li>把死锁避免与死锁预防混为一谈：<strong>预防</strong>是破坏四个必要条件之一（静态、保守），<strong>避免</strong>是用银行家算法在每次分配前动态判断安全性（允许必要条件存在但保证不进死锁），<strong>检测与解除</strong>则是允许死锁发生后再处理。</li>
 <li>银行家算法中 <code>Need</code> 计算错误或判断条件写反：<code>Need = Max - Allocation</code> 必须先算对；寻找安全序列时判据是 <code>Need &lt;= Available</code>（当前可用量），把 <code>Available</code> 误用成 <code>Max</code> 或 <code>Allocation</code> 都会得到错误结论。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2016 年 408 第 45 题（综合应用题，7 分）</span></p>
 <p>某系统中有 5 个进程 <code>P0 ~ P4</code>，3 类资源 <code>A、B、C</code>，当前时刻的资源分配情况为 <code>Available = (3, 3, 2)</code>，各进程的 <code>Max</code> 与 <code>Allocation</code> 如下表（<code>Need = Max - Allocation</code>）：<code>P0: Max(7,5,3) Alloc(0,1,0)</code>、<code>P1: Max(3,2,2) Alloc(2,0,0)</code>、<code>P2: Max(9,0,2) Alloc(3,0,2)</code>、<code>P3: Max(2,2,2) Alloc(2,1,1)</code>、<code>P4: Max(4,3,3) Alloc(0,0,2)</code>。要求：计算各进程的 <code>Need</code>；判断当前系统是否处于安全状态，若是则给出一个安全序列。</p>
 <blockquote>
 <p>解析：第一步求 <code>Need = Max - Allocation</code>：<code>P0 = (7,4,3)</code>、<code>P1 = (1,2,2)</code>、<code>P2 = (6,0,0)</code>、<code>P3 = (0,1,1)</code>、<code>P4 = (4,3,1)</code>。第二步令 <code>Work = Available = (3,3,2)</code> 并逐个尝试：<code>P1</code> 的 <code>Need (1,2,2) &lt;= (3,3,2)</code> 成立，分配后 <code>P1</code> 完成并释放，<code>Work = (3,3,2) + (2,0,0) = (5,3,2)</code>；<code>P3</code> 的 <code>Need (0,1,1) &lt;= (5,3,2)</code> 成立，<code>Work = (5,3,2) + (2,1,1) = (7,4,3)</code>；<code>P4</code> 的 <code>Need (4,3,1) &lt;= (7,4,3)</code> 成立，<code>Work = (7,4,3) + (0,0,2) = (7,4,5)</code>；<code>P0</code> 的 <code>Need (7,4,3) &lt;= (7,4,5)</code> 成立，<code>Work = (7,4,5) + (0,1,0) = (7,5,5)</code>；<code>P2</code> 的 <code>Need (6,0,0) &lt;= (7,5,5)</code> 成立，<code>Work = (7,5,5) + (3,0,2) = (10,5,7)</code>。全部进程都能完成，故系统<strong>处于安全状态</strong>，一个安全序列为 <strong><code>P1 → P3 → P4 → P0 → P2</code></strong>（安全序列不唯一）。<strong>判分点是 <code>Need</code> 表算对、每次回收后 <code>Work</code> 的更新正确、并明确给出"存在安全序列故安全"的结论。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="02-进程与线程.html"><span class="cn-dir">← 上一章</span><span class="cn-title">进程与线程</span></a><a class="cn-next" href="04-同步与互斥.html"><span class="cn-dir">下一章 →</span><span class="cn-title">同步与互斥</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="02-进程与线程.html"><span class="cn-dir">← 上一章</span><span class="cn-title">进程与线程</span></a><a class="cn-next" href="04-同步与互斥.html"><span class="cn-dir">下一章 →</span><span class="cn-title">同步与互斥</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>

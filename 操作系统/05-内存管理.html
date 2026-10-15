@@ -59,16 +59,16 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><h1>内存管理</h1><h1 id="_1">操作系统 · 内存管理</h1>
+<main><div class="inner"><h1>内存管理</h1><h1 id="_1">操作系统 · 内存管理</h1>
 <h2 id="_2" id="kp">内存管理 [高频]</h2>
-<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 28 次；涉及年份：2009—2025 年几乎年年出现，2011、2014、2016、2018、2019、2021、2022、2024 年为典型年份；分数占比约 26%；主要题型：选择题 + 综合应用题（46 题常考分页/分段/地址翻译/页面置换）。</p>
-</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 28 次；涉及年份：2009—2025 年几乎年年出现，2011、2014、2016、2018、2019、2021、2022、2024 年为典型年份；分数占比约 26%；主要题型：选择题 + 综合应用题（46 题常考分页/分段/地址翻译/页面置换）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>内存管理</strong>要解决四个问题：内存空间的分配与回收、地址转换、扩充、保护。程序的装入有三种方式：<strong>绝对装入</strong>（编译时确定物理地址，只适合单道）、<strong>静态重定位</strong>（装入时一次性修改所有地址，运行期间不能再移动）、<strong>动态重定位</strong>（运行时由<strong>重定位寄存器</strong>加逻辑地址得到物理地址，允许程序在内存中移动）。</p>
 <p><strong>连续分配</strong>中的<strong>动态分区分配</strong>有四种算法：<strong>首次适应</strong>（按地址递增查找第一个满足的空闲分区，性能通常最好、但低地址区被反复分割）、<strong>最佳适应</strong>（按容量递增，选最小满足的分区，会留下大量难以利用的外部碎片）、<strong>最坏适应</strong>（选最大分区，容易把大分区耗尽）、<strong>邻近适应</strong>（从上次结束处继续查找，使高地址大分区也被分割）。<strong>分页存储管理</strong>把逻辑地址空间分成大小相等的<strong>页</strong>、内存分成同样大小的<strong>页框（物理块）</strong>，逻辑地址结构为 <code>页号 P + 页内偏移 W</code>；</p>
 <p>页表存放"页号 → 页框号"的映射，<strong>页表项大小与页框大小、页表项数目共同决定页表长度</strong>，做题时要注意页表项是否按字节取整。<strong>两级页表</strong>把页号再拆成"一级页号 + 二级页号"，使页表本身也可以离散存放、不必连续占用大块内存；其地址结构位数拆分的依据是"每页能放多少个页表项"。<strong>分段存储管理</strong>按程序的逻辑单位（主程序段、子程序段、数据段）划分，逻辑地址为 <code>段号 S + 段内偏移 W</code>，段表项含段长与基址；</p>
 <p><strong>段是逻辑单位、对用户可见，页是物理单位、对用户透明</strong>，因此分页是一维的（只需一个地址），分段是二维的（必须给出段名与段内地址）。<strong>段页式</strong>先分段再分页，地址为 <code>段号 + 页号 + 页内偏移</code>，需要访问三次主存（段表、页表、数据），可用快表减少。<strong>虚拟内存</strong>的三个前提是<strong>多次性、对换性、离散分配</strong>；<strong>请求分页</strong>在访问的页不在内存时产生<strong>缺页中断（属异常/内中断）</strong>，由操作系统调页。</p>
 <p><strong>页面置换算法</strong>：<strong>最佳置换 <code>OPT</code></strong>（置换未来最久不用的页，不可实现，作为性能上界）、<strong>先进先出 <code>FIFO</code></strong>（实现简单，但可能出现 <strong><code>Belady</code> 异常</strong>——分配的页框越多缺页次数反而增加）、<strong>最近最久未使用 <code>LRU</code></strong>（性能接近 <code>OPT</code>，但需硬件支持、开销大）、<strong>时钟 <code>CLOCK</code>（简单时钟）</strong>（用访问位循环扫描，访问位为 1 则清 0 继续，为 0 则置换）、<strong>改进型 <code>CLOCK</code></strong>（同时考虑访问位 <code>A</code> 与修改位 <code>M</code>，优先淘汰 <code>A = 0 且 M = 0</code>，其次 <code>A = 0 且 M = 1</code>，从而减少写回磁盘的开销）。<strong>有效访问时间</strong>必须按题意枚举命中组合，若 <code>TLB</code> 未命中要额外访问一次主存读页表项，若缺页还要加上缺页处理时间。</p>
-</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>逻辑地址 = 页号 P + 页内偏移 W</code>；<code>页号位数 = log2(页数)</code>、<code>页内偏移位数 = log2(页大小)</code>。</li>
 <li><code>两级页表的位数拆分依据"每页可放 2^(页内偏移位数) / 页表项大小 个页表项"</code> —— 页表项大小要向上取整到字节。</li>
 <li><code>分页一维、对用户透明；分段二维、对用户可见</code>；分段便于共享与保护，分页便于内存分配。</li>
@@ -76,7 +76,7 @@
 <li><code>FIFO 可能出现 Belady 异常；LRU 与 OPT 不会（属堆栈类算法）</code> —— 这是判断缺页次数随页框数变化的依据。</li>
 <li><code>改进型 CLOCK 的优先淘汰次序：A=0,M=0 &gt; A=0,M=1 &gt; A=1,M=0 &gt; A=1,M=1</code> —— <code>M=0</code> 优先是为了避免写回。</li>
 </ul>
-</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>三种离散分配方式的地址结构与内存布局对比</strong>：分页的页框大小固定、页可离散存放；分段的段长可变、按逻辑划分；段页式是二者结合。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>(1) paging: logical address = page number P | offset W
 
@@ -172,27 +172,29 @@
     A11 --&gt;|否| A13[&quot;访问主存取数据并调入 Cache&quot;]
     A13 --&gt; A12
 </code></pre></details></div>
-</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>页表项大小与页表占用页数计算错误：页表项大小要<strong>向上取整到字节</strong>（如 <code>20</code> 位需占 <code>3</code> 字节而不是 <code>2.5</code> 字节），页表本身占用页数 <code>= 页表总字节数 / 页大小</code> 需向上取整；忽略这两处取整会得到偏小的答案。</li>
 <li>有效访问时间漏算 <code>TLB</code> 未命中时的访存：<code>TLB</code> 命中时只需一次访存取数据，未命中时要<strong>先访问主存读页表项、再访问主存取数据</strong>共两次；若还缺页则需再加缺页处理时间，必须按题意逐项列出。</li>
 <li>认为 <code>FIFO</code> 一定不会出现 <code>Belady</code> 异常：<code>FIFO</code> 是<strong>唯一</strong>会出现 <code>Belady</code> 异常的常用算法（页框增多而缺页次数反而增加）；<code>LRU</code> 与 <code>OPT</code> 属堆栈类算法，不会出现该异常。</li>
 <li>改进型 <code>CLOCK</code> 的淘汰次序写反：优先淘汰 <code>A = 0 且 M = 0</code>（既没被访问也没被修改，淘汰代价最小），最后才考虑 <code>A = 1 且 M = 1</code>；把"优先淘汰被修改过的页"当成规则会与减少磁盘写回的设计目标相悖。</li>
 </ul>
-</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2016 年 408 第 46 题（综合应用题，8 分）</span></p>
 <p>某 32 位系统采用二级页表的分页存储管理，按字节编址，页大小为 <code>4 KB</code>，页表项大小为 <code>4 B</code>。要求：给出一级页号、二级页号与页内偏移各占多少位；若某进程的代码段大小为 <code>8 MB</code> 且从逻辑地址 <code>0</code> 开始连续存放，求该代码段需要多少个二级页表。</p>
 <blockquote>
 <p>解析：第一步确定位数。页大小 <code>4 KB = 2^12 B</code>，故<strong>页内偏移 <code>W = 12</code> 位</strong>。每个页面能容纳的页表项数 <code>= 4 KB / 4 B = 1024 = 2^10</code>，故<strong>二级页号占 <code>10</code> 位</strong>（一个二级页表恰好占一页）；剩下的位数给一级页号：<code>32 - 12 - 10 = 10</code> 位，即<strong>一级页号占 <code>10</code> 位</strong>。第二步算二级页表个数。代码段大小 <code>8 MB = 2^23 B</code>，需要的页数 <code>= 2^23 / 2^12 = 2^11 = 2048</code> 页；每个二级页表覆盖 <code>2^10 = 1024</code> 个页，故需要 <code>2048 / 1024 = 2</code> 个二级页表。<strong>判分点是"页表项数由页大小除以页表项大小决定"这一拆分依据，以及页数向上取整的处理（本题恰好整除）。</strong></p>
 </blockquote>
-<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="04-同步与互斥.html"><span class="cn-dir">← 上一章</span><span class="cn-title">同步与互斥</span></a><a class="cn-next" href="06-文件管理.html"><span class="cn-dir">下一章 →</span><span class="cn-title">文件管理</span></a></nav></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="04-同步与互斥.html"><span class="cn-dir">← 上一章</span><span class="cn-title">同步与互斥</span></a><a class="cn-next" href="06-文件管理.html"><span class="cn-dir">下一章 →</span><span class="cn-title">文件管理</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
+<div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="../README.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
 </footer>
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>
