@@ -427,17 +427,31 @@ def build():
             with open(os.path.join(src, t[6] + ".md"), encoding="utf-8") as f:
                 body = md_to_html(f.read())
             chapters[(k, t[6])] = body
-            # 单章页面：给知识点标题加锚点，便于目录高亮
-            body = re.sub(r"<h2([^>]*)>", r'<h2\1 id="kp">', body, count=1)
+            # 去掉章节正文自带的 h1 与 h2：
+            #   h1 —— Markdown 归档顶部那一行 "数据结构 · 线性表"，章名已由 page()
+            #         的 <h1>{章名}</h1> 给出，重复渲染会让读者看到同一标题连出三次；
+            #   h2 —— "线性表 [高频]"，同上（`[高频]` 26 个知识点全都有、无区分度，
+            #         而它带来的 `id="_2" id="kp"` 还是**重复 id 属性**，非法 HTML）。
+            # 旧写法 `re.sub(r"<h2([^>]*)>", r'<h2\1 id="kp">', …)` 更糟：给一个已经
+            # 有 id 的 h2 再插一个 id，等于把非法 HTML 固化下来。
+            # 做法照抄数学二 build_html.py 的同一处理（剥掉第一个 h1 与 h2）。
+            # ⚠️ 必须匹配带属性的形式：渲染器开着 markdown 的 `toc` 扩展，
+            # 产出的其实是 `<h1 id="_1">` / `<h2 id="_2">`。只写 `<h1>` 会一条都
+            # 匹配不到、标题照样重复（第一版就是这么错的，靠断言才发现）。
+            body = re.sub(r"<h1\b[^>]*>.*?</h1>", "", body, count=1, flags=re.S)
+            body = re.sub(r"<h2\b[^>]*>.*?</h2>", "", body, count=1, flags=re.S)
             with open(os.path.join(out, t[6] + ".html"), "w", encoding="utf-8") as f:
                 f.write(page("%s · %s" % (s["name"], t[0]),
                              sidebar_for(k, t[6], page="chapter"), body,
                              page_kind="chapter", subject_key=k, chapter=t[0],
                              extra=chapter_nav(k, t[6])))
-        # 科目首页：既是该科入口，也是章节页面包屑的中间一层
+        # 科目首页：既是该科入口，也是章节页面包屑的中间一层。
+        # 同样剥掉总览自带的 h1（`# 数据结构 · 408 速成复习资料`）——页面的
+        # `<h1>{科目名}</h1>` 已经给出，否则又出现"同一标题连着两次"。
+        ov_body = re.sub(r"<h1\b[^>]*>.*?</h1>", "", overviews[k], count=1, flags=re.S)
         with open(os.path.join(out, "index.html"), "w", encoding="utf-8") as f:
             f.write(page("%s · 科目首页" % s["name"],
-                         sidebar_for(k, None, page="overview"), overviews[k],
+                         sidebar_for(k, None, page="overview"), ov_body,
                          page_kind="overview", subject_key=k, chapter=s["name"]))
 
     # 全科单页合集（落地页）

@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>线性表</h1><h1 id="_1">数据结构 · 线性表</h1>
-<h2 id="_2" id="kp">线性表 [高频]</h2>
+<main><div class="inner"><h1>线性表</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 24 次；涉及年份：2009—2025 年多次出现，其中 2010、2013、2016、2019、2021、2023 年为典型年份；分数占比约 8%；主要题型：选择题为主，偶见于综合应用题背景。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>线性表是 <code>n</code> 个数据元素的有限序列，元素之间是<strong>一对一</strong>的逻辑关系，除首尾外每个元素有且仅有一个直接前驱和一个直接后继。顺序存储把逻辑相邻的元素放在物理相邻的存储单元，因而支持<strong>随机存取</strong>：<code>LOC(a_i) = LOC(a_1) + (i-1) * L</code>，其中 <code>L</code> 是单个元素占用的字节数。设表长 <code>n</code>、数组容量 <code>MaxSize</code>，则<strong>长度是实际元素个数、容量是数组能容纳的最大个数</strong>，两者不可混用。插入的合法位置是 <code>1..n+1</code>，在第 <code>i</code> 个位置插入需把第 <code>i..n</code> 个元素整体后移，移动次数为 <code>n-i+1</code>；</p>

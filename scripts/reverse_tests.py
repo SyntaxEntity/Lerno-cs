@@ -50,13 +50,19 @@ ERROR_LINE = re.compile(r"\[F\d+\]")
 _BASELINE = {}
 
 
-def case(code, name, target, mutate, expect_kw=None, mode="full", mermaid=False):
+def case(code, name, target, mutate, expect_kw=None, mode="full", mermaid=False,
+         expect_pass=False):
     """mermaid=True 的用例会**不跳过**真实解析器跑校验（用于验 F3 的解析器层）。
 
     其余用例一律带 `--no-mermaid`：不是为了省事，而是因为若反例破坏了围栏闭合，
     解析器层的报错会**盖过**被测规则本来要报的那个错，反而看不出规则是否生效。
+
+    expect_pass=True 是**否定用例**：注入后该规则**不得**报错。用来钉住"不许误报"——
+    例如 F29 必须先剥注释再数花括号，若退化成朴素计数，一份完全正确的 CSS
+    （注释里有 `{}`）就会被判错。这类用例与"必须报错"同等重要，所以显式建模，
+    而不是塞进 expect_kw 里靠约定。
     """
-    CASES.append((code, name, target, mutate, expect_kw, mode, mermaid))
+    CASES.append((code, name, target, mutate, expect_kw, mode, mermaid, expect_pass))
 
 
 def run_validate(mode, allow_mermaid=False):
@@ -301,6 +307,25 @@ case("F27", "规则集合里多出一条没被覆盖的规则", VALIDATE,
 case("F27", "反向测试引用了不存在的规则", os.path.abspath(__file__),
      lambda t: t.replace(_DELETE_F7, _GHOST, 1), expect_kw="不存在的规则")
 
+# F29：site.css 语法自检
+#   注意反例都注入在 CSS 的**真实代码区**（不能落在注释里）——F29 会先剥注释，
+#   落在注释里的坏字符是"合法"的，用例会假失败。
+SITECSS = os.path.join(SITE, "assets", "site.css")
+case("F29", "花括号少一个（吃掉后续规则）", SITECSS,
+     lambda t: t.replace(".site-topbar{", ".site-topbar ", 1),
+     expect_kw="未配平")
+case("F29", "选择器以裸 `-` 结尾", SITECSS,
+     lambda t: t.replace(".site-topbar{", ".site-topbar-{", 1),
+     expect_kw="裸 `-`")
+case("F29", "注释里的 {} 不得误判（否定用例：应保持通过）", SITECSS,
+     lambda t: t.replace("/* ---------- 基础元素 ---------- */",
+                         "/* 说明：示例 .foo{bar} 与 \"x{y}\" 都合法 */\n"
+                         "/* ---------- 基础元素 ---------- */", 1),
+     expect_pass=True)
+case("F29", "@media 块未闭合", SITECSS,
+     lambda t: t.replace("@media (max-width:1080px){", "@media (max-width:1080px)", 1),
+     expect_kw="配平")
+
 # F28：文档/CI 不得硬编码规则范围
 case("F28", "README 写死规则范围", os.path.join(ROOT, "README.md"),
      lambda t: t + "\n\n本仓库校验覆盖 F1—F26。\n", expect_kw="不得硬编码规则范围")
@@ -343,7 +368,7 @@ def main():
     print("使用解释器：%s" % PY)
     passed = failed = 0
     covered = set()
-    for code, name, target, mutate, _kw, mode, mermaid in CASES:
+    for code, name, target, mutate, _kw, mode, mermaid, expect_pass in CASES:
         rel = os.path.relpath(target, ROOT)
         if not os.path.exists(target):
             print("  ? %-5s %-40s 跳过（目标文件不存在：%s）" % (code, name, rel))
@@ -366,6 +391,16 @@ def main():
             out = run_validate(mode, allow_mermaid=mermaid)
             fresh = {ln.strip() for ln in out.split("\n") if ERROR_LINE.search(ln)} - base
             hit = [ln for ln in fresh if ("[%s]" % code) in ln]
+            if expect_pass:
+                # 否定用例：注入后该规则**不得**报错
+                if hit:
+                    failed += 1
+                    print("  ✗ %-5s %-40s **误报（该规则本不该报错）**" % (code, name))
+                else:
+                    passed += 1
+                    covered.add(code)
+                    print("  ✓ %-5s %-40s 未误报" % (code, name))
+                continue
             if hit:
                 passed += 1
                 covered.add(code)

@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>查找</h1><h1 id="_1">数据结构 · 查找</h1>
-<h2 id="_2" id="kp">查找 [高频]</h2>
+<main><div class="inner"><h1>查找</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 18 次；涉及年份：2009、2011、2013、2015、2017、2019、2022、2024；分数占比约 9%；主要题型：选择题为主（折半查找判定树、B 树、散列表）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>折半查找</strong>要求表<strong>顺序存储且按关键字有序</strong>，每次用 <code>mid = floor((low+high)/2)</code> 与目标比较，把查找区间折半，故比较次数不超过判定树高度，时间复杂度 <code>O(log2 n)</code>。折半查找的<strong>判定树</strong>是由"取中点为根"递归生成的<strong>平衡二叉树</strong>（不是完全二叉树）：含 <code>n</code> 个结点的判定树高度 <code>h = floor(log2 n) + 1 = ceil(log2(n+1))</code>，等概率成功查找的平均查找长度 <code>ASL = ((n+1)/n) * log2(n+1) - 1</code>（当 <code>n = 2^h - 1</code> 时恰为 <code>ASL = h</code>，例如 <code>n = 11</code> 时 <code>ASL = 3</code>）。</p>

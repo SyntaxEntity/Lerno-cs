@@ -59,8 +59,8 @@
 <a class="sb-chap" href="05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>数据链路层</h1><h1 id="_1">计算机网络 · 数据链路层</h1>
-<h2 id="_2" id="kp">数据链路层 [高频]</h2>
+<main><div class="inner"><h1>数据链路层</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010—2025 年高频，2011、2013、2015、2017、2019、2020、2022、2024 年为典型年份；分数占比约 20%；主要题型：选择题 + 综合应用题（滑动窗口、CSMA/CD、以太网帧）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>数据链路层的三个基本功能是<strong>封装成帧（组帧）、差错控制、流量控制</strong>。<strong>组帧</strong>常用四种方法：字符计数法（用计数字段标明帧长，一旦计数出错就全盘失步）、<strong>字符填充法</strong>（用 <code>SOH</code>/<code>EOT</code> 定界，数据中出现的 <code>SOH</code>/<code>EOT</code> 前插入转义字符 <code>ESC</code>，接收方删除转义）、<strong>零比特填充法</strong>（<code>HDLC</code> 使用：在标志字段 <code>01111110</code> 之外的数据中，每出现 <strong>5 个连续 <code>1</code> 就填入一个 <code>0</code></strong>，接收方每见 5 个连续 <code>1</code> 就删除其后的 <code>0</code>）、<strong>违规编码法</strong>（如曼彻斯特编码中的非法电平组合），后两种是"透明传输"的标准做法。<strong>差错控制</strong>中，<strong>奇偶校验</strong>只能检出奇数个错误；</p>

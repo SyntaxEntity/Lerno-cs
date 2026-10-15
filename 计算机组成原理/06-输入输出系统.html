@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>输入输出系统</h1><h1 id="_1">计算机组成原理 · 输入输出系统</h1>
-<h2 id="_2" id="kp">输入输出系统 [高频]</h2>
+<main><div class="inner"><h1>输入输出系统</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2025；分数占比约 10%；主要题型：选择题 + 综合应用题（中断、DMA、磁盘时间计算）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><code>I/O</code> 接口（设备控制器）的作用是<strong>数据缓冲、格式转换、状态与命令寄存、地址译码</strong>，它把 CPU 的高速并行总线与设备的低速串行工作方式解耦。<code>I/O</code> 端口的编址有两种：<strong>统一编址</strong>（把端口当作主存单元，用普通访存指令访问，无需专门指令但占用主存地址空间）与<strong>独立编址</strong>（有独立的地址空间与专用 <code>IN/OUT</code> 指令，不占主存空间但指令类型增多）。<code>I/O</code> 控制方式的发展主线是<strong>CPU 干预程度逐步降低</strong>：<strong>程序查询</strong>方式下 CPU 不断读状态寄存器空转等待，CPU 与设备完全串行；</p>

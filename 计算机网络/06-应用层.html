@@ -59,8 +59,8 @@
 <a class="toclink" href="#sec-real">真题示例</a>
 </div>
 </div></nav>
-<main><div class="inner"><h1>应用层</h1><h1 id="_1">计算机网络 · 应用层</h1>
-<h2 id="_2" id="kp">应用层 [高频]</h2>
+<main><div class="inner"><h1>应用层</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 18 次；涉及年份：2009、2011、2013、2015、2017、2018、2020、2022、2024；分数占比约 12%；主要题型：选择题为主（DNS、HTTP、电子邮件、DHCP）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>应用层的两种体系结构是<strong>客户/服务器（<code>C/S</code>）</strong>与<strong>对等（<code>P2P</code>）</strong>：<code>C/S</code> 中客户主动请求、服务器被动等待且必须一直运行，可扩展性受服务器性能限制；<code>P2P</code> 中每个结点既是客户又是服务器，可扩展性好但管理困难。<strong>域名系统 <code>DNS</code></strong> 把域名解析为 <code>IP</code> 地址，采用<strong>分布式层次数据库</strong>：根域名服务器、顶级域名服务器、权限域名服务器、本地域名服务器。查询方式分两种：<strong>主机向本地域名服务器的查询通常采用递归查询</strong>（本地域名服务器代替主机继续查询并把最终结果返回），<strong>本地域名服务器向根/顶级/权限域名服务器的查询通常采用迭代查询</strong>（被查询的服务器只返回"下一步该问谁"的地址，由本地域名服务器继续追问）。</p>

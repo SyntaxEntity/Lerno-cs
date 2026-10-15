@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>处理机调度与死锁</h1><h1 id="_1">操作系统 · 处理机调度与死锁</h1>
-<h2 id="_2" id="kp">处理机调度与死锁 [高频]</h2>
+<main><div class="inner"><h1>处理机调度与死锁</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 16%；主要题型：选择题 + 综合应用题（调度算法计算、银行家算法）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>处理机调度</strong>分三级：<strong>高级调度</strong>（作业调度）决定哪些作业从外存进入内存并建立进程，<strong>中级调度</strong>（内存调度）决定挂起的进程何时重新调入内存（对应"就绪挂起 → 就绪"），<strong>低级调度</strong>（进程调度）从就绪队列中选一个进程分配 <code>CPU</code>，是频率最高、必须高效的一级；若系统有<strong>中级调度</strong>就说明采用了<strong>虚拟内存</strong>。评价指标中，<strong>周转时间 = 完成时间 - 到达时间</strong>，<strong>带权周转时间 = 周转时间 / 服务时间</strong>（<code>&gt;= 1</code>，越接近 1 越好），<strong>等待时间</strong>是进程在就绪队列中排队的时间之和（不含执行与 <code>I/O</code> 时间），<strong>响应时间</strong>是从提交请求到首次响应的时间。</p>

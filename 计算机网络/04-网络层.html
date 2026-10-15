@@ -59,8 +59,8 @@
 <a class="sb-chap" href="05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>网络层</h1><h1 id="_1">计算机网络 · 网络层</h1>
-<h2 id="_2" id="kp">网络层 [高频]</h2>
+<main><div class="inner"><h1>网络层</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 30 次；涉及年份：2009—2025 年几乎年年出现，2011、2013、2015、2017、2019、2021、2022、2023、2024、2025 年为典型年份；分数占比约 32%；主要题型：选择题 + 47 题综合应用题（IP 分片、子网划分、路由聚合、路由协议）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>网络层的核心是<strong>逻辑寻址与路由转发</strong>。<code>IPv4</code> 地址长 <code>32</code> 位，传统分类地址为 <code>A</code> 类（<code>0</code> 开头，网络号 <code>8</code> 位，可用网络数 <code>2^7 - 2</code>）、<code>B</code> 类（<code>10</code> 开头，网络号 <code>16</code> 位）、<code>C</code> 类（<code>110</code> 开头，网络号 <code>24</code> 位）、<code>D</code> 类（组播）与 <code>E</code> 类（保留）；每类中<strong>主机号全 <code>0</code> 表示网络地址、全 <code>1</code> 表示广播地址</strong>，故 <code>C</code> 类网络可用主机数为 <code>2^8 - 2 = 254</code>。<strong>子网划分</strong>用子网掩码从主机号中借位，可用主机数 <code>= 2^h - 2</code>（<code>h</code> 为主机号位数）；<strong><code>CIDR</code>（无分类编址）</strong>用"<code>IP/前缀长度</code>"表示，支持<strong>路由聚合</strong>（把若干连续网络合并为一条路由）与<strong>最长前缀匹配</strong>（转发时选前缀最长即最具体的路由）。</p>

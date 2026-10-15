@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>图</h1><h1 id="_1">数据结构 · 图</h1>
-<h2 id="_2" id="kp">图 [高频]</h2>
+<main><div class="inner"><h1>图</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 14%；主要题型：选择题 + 综合应用题（42 题常考图的最短路径/拓扑/关键路径）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>图 <code>G = (V, E)</code> 由顶点集 <code>V</code> 与边集 <code>E</code> 组成，无向图边数满足 <code>0 &lt;= e &lt;= n(n-1)/2</code>（完全图），有向图满足 <code>0 &lt;= e &lt;= n(n-1)</code>；含 <code>n</code> 个顶点的连通图至少 <code>n-1</code> 条边，生成树恰有 <code>n-1</code> 条边。存储上，邻接矩阵用 <code>n x n</code> 数组存边，空间 <code>O(n^2)</code>，判断任意两点是否相邻为 <code>O(1)</code>，适合稠密图；</p>

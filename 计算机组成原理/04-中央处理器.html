@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>中央处理器 CPU</h1><h1 id="cpu">计算机组成原理 · 中央处理器 CPU</h1>
-<h2 id="cpu_1" id="kp">中央处理器 CPU [高频]</h2>
+<main><div class="inner"><h1>中央处理器 CPU</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 28 次；涉及年份：2011、2013、2015、2017、2018、2020、2021、2022、2024；分数占比约 18%；主要题型：选择题 + 44 题综合应用题（数据通路、流水线）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>CPU 由运算器（ALU、暂存寄存器、通用寄存器组、PSW）与控制器（PC、IR、ID、时序电路、微操作信号发生器）组成，其核心工作是按 <code>PC → IR</code> 取指、译码、执行、访存、写回的顺序，在数据通路中把一串微操作按时序节拍展开。取指周期的微操作序列固定为 <code>(PC) -&gt; MAR</code>、<code>M(MAR) -&gt; MDR</code>、<code>(MDR) -&gt; IR</code>、<code>(PC) + 1 -&gt; PC</code>，此后译码器根据 <code>IR</code> 中的操作码产生后续控制信号。数据通路按总线数目分为单总线与多总线结构：单总线结构每拍只能有一个数据流入/流出总线，完成一次 ALU 运算需 <code>取操作数1 → 暂存 → 取操作数2 → 运算 → 写回</code> 多拍；多总线（如双总线、三总线）可在一拍内同时传送两个操作数，微操作序列更短。控制器分硬布线与微程序两类：硬布线由组合逻辑直接产生微命令，速度快、不易修改，<code>RISC</code> 常用；</p>

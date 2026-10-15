@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>栈与队列</h1><h1 id="_1">数据结构 · 栈与队列</h1>
-<h2 id="_2" id="kp">栈与队列 [高频]</h2>
+<main><div class="inner"><h1>栈与队列</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2011、2013、2015、2018、2020、2022、2023、2025；分数占比约 8%；主要题型：选择题为主（表达式求值、出栈序列、循环队列）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>栈是只允许在同一端（栈顶 <code>top</code>）进行插入和删除的线性表，队列是只允许在队尾 <code>rear</code> 插入、队头 <code>front</code> 删除的线性表，二者都是操作受限的线性表。顺序栈用 <code>top</code> 指向栈顶元素（或栈顶元素的下一个位置，两种约定不可混用），判空为 <code>top == -1</code>（或 <code>top == 0</code>），栈满为 <code>top == MaxSize - 1</code>，入栈 <code>++top; data[top] = x</code>。共享栈让两个栈共用一个数组、栈底分别设在两端、栈顶向中间生长，仅当两栈顶指针相邻（<code>top0 + 1 == top1</code>）时才上溢，空间利用率更高。</p>

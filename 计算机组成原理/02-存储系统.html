@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>存储系统</h1><h1 id="_1">计算机组成原理 · 存储系统</h1>
-<h2 id="_2" id="kp">存储系统 [高频]</h2>
+<main><div class="inner"><h1>存储系统</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 32 次；涉及年份：2009—2025 年几乎年年出现，2010、2013、2015、2018、2020、2022、2024、2025 年为典型年份；分数占比约 22%；主要题型：选择题 + 综合应用题（43 题常考 Cache/主存扩展与地址划分）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>存储层次</strong>的依据是程序访问的局部性：越靠近 CPU 的层次越快、越小、越贵，<code>Cache</code> 与主存之间以<strong>块（行）</strong>为单位交换数据，主存与辅存之间以<strong>页</strong>为单位。<strong>Cache 的地址划分</strong>是本科目最高频的计算：把物理地址从低位到高位切成"块内地址（<code>log2 块大小</code> 位）→ 组号（<code>log2 组数</code> 位）→ 标记"三段。直接映射时"组"就是行，行号 <code>= 主存块号 mod Cache 行数</code>；<code>N</code> 路组相联时组数 <code>= Cache 容量 / (块大小 × N)</code>；全相联只有标记与块内地址两段。<strong>平均访问时间</strong>在"先查 Cache，未命中再访主存"的串行模型下为 <code>T = 命中率 * Tc + 缺失率 * Tm</code>；</p>

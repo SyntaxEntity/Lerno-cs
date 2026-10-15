@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>数据表示与运算</h1><h1 id="_1">计算机组成原理 · 数据表示与运算</h1>
-<h2 id="_2" id="kp">数据表示与运算 [高频]</h2>
+<main><div class="inner"><h1>数据表示与运算</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2021、2023 年为典型年份；分数占比约 12%；主要题型：选择题 + 43/44 题计算。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>定点数的编码有四种：<strong>原码</strong>（最高位符号位，其余为绝对值）、<strong>反码</strong>（负数在原码基础上数值位取反）、<strong>补码</strong>（负数在反码基础上末位加 1）、<strong>移码</strong>（在补码基础上符号位取反，用于表示阶码）。<code>n</code> 位补码表示范围是 <code>-2^(n-1)</code> 到 <code>2^(n-1)-1</code>，比原码、反码多表示一个负数 <code>-2^(n-1)</code>，且 <code>0</code> 的表示唯一；<code>n</code> 位移码范围是 <code>-2^(n-1)</code> 到 <code>2^(n-1)-1</code>，其<strong>无符号数值大小顺序与真值顺序一致</strong>，所以移码适合做浮点数的阶码比较。</p>

@@ -741,6 +741,17 @@ def check_shell():
         if "<main>" not in body:
             err(rel, 0, "F22", "缺少 <main>")
 
+        # ---- 标题与 id 唯一性（U1 收尾）----
+        # 判据来自两个真实的线上缺陷：章节页曾同时出现
+        #   <h1>线性表</h1> / <h1>数据结构 · 线性表</h1> / <h2>线性表 [高频]</h2>
+        # 三行重复标题；以及 `<h2 id="_2" id="kp">` 这种**重复 id 属性**（非法 HTML）。
+        # 根因是没剥掉 Markdown 归档自带的 h1/h2（渲染器的 toc 扩展还会给它加 id）。
+        n_h1 = len(re.findall(r"<h1\b", body))
+        if n_h1 != 1:
+            err(rel, 0, "F22", "页面应有且仅有 1 个 <h1>（页标题），实为 %d 个" % n_h1)
+        if re.search(r'<[a-zA-Z][^>]*\bid="[^"]*"[^>]*\bid="', body):
+            err(rel, 0, "F22", "同一标签出现重复 id 属性（非法 HTML）")
+
         # ---- site.js 钩子（契约 2.4.1-A）：这些是脚本真正查询的名字，
         #      改名等于让行为静默失效（按钮点了没反应），所以逐条强制 ----
         for cls, what in (("theme-toggle", "主题切换按钮"), ("nav-toggle", "窄屏抽屉按钮"),
@@ -1168,12 +1179,13 @@ def coverage_codes():
 # 它们的受检数天然可以为 0。
 SCAN_RULES_MUST_BE_NONZERO = [
     "F0", "F1", "F3", "F8", "F12", "F15", "F16", "F17", "F22", "F23", "F24", "F26",
+    "F29",
 ]
 OBJECT_STAT_KEY = {
     "F0": "F0_files", "F1": "F1_sections", "F3": "F3_objects", "F8": "F8_objects",
     "F12": "orig", "F15": "F15_objects", "F16": "F16_objects", "F17": "F17_objects",
     "F22": "shell_nav_pages", "F23": "F23_objects", "F24": "F24_objects",
-    "F26": "site_js_tests",
+    "F26": "site_js_tests", "F29": "F29_objects",
 }
 
 
@@ -1224,6 +1236,150 @@ def check_meta():
             err("scripts", 0, "F27",
                 "%s 的受检对象数为 0（stats[%r]）——该规则实际什么都没检查"
                 % (code, key))
+
+
+def check_css_syntax():
+    """F29: site.css 语法自检（契约 §5.2.3.1）。
+
+    为什么需要：两边的校验器原先只查「HTML 里有没有这个类名」，**没有任何规则
+    检查 CSS 本身能否解析**。408 因此把一个坏编辑提交并上线了——它吃掉了
+    `.chapter-nav{display:flex}` 整条规则，上一章/下一章从"并排"变成"竖着堆"，
+    而所有判据都是绿的。这与 P4 那三条同属"产物坏了、判据却绿着"。
+
+    判据（1–3 来自契约，第 4 条是本仓库按同一场事故补的）：
+      1. 花括号配平；
+      2. 规则头完整性：选择器不得以裸 `-` 结尾，`{` 前必须有非空选择器；
+      3. `@media` / `@supports` 块配平（关键字出现次数 == 用它们开头的块数）；
+      4. 括号 `()` / `[]` 配平（同上那场事故里两条规则被吃掉，也值得一并兜住）。
+
+    ⚠️ **必须先剔除注释与字符串再计数**：本文件注释里有 5 处 `{}`，朴素的
+    `count("{") == count("}")` 会把一份**完全正确**的 CSS 判成错误（实测：
+    原始 204/205，剥注释后 202/202）。所以这里用一个带状态的小扫描器，
+    而不是逐字符计数。扫描器同时还能报出"第几行"未配对，便于定位。
+    """
+    for rel in ("assets/site.css",):
+        fp = os.path.join(SITE, rel)
+        if not os.path.exists(fp):
+            err(rel, 0, "F29", "缺少样式表")
+            continue
+        with open(fp, encoding="utf-8") as fh:
+            src = fh.read()
+        # 注意用 defaultdict 的取值写法：`stats.get(k, 0) + 1` **不会建键**，
+        # 于是 F27 的 `key not in stats` 仍会报"未上报受检数"（踩过一次）。
+        stats["F29_objects"] += 1
+        code, errors = _strip_css(src)
+        for line, kind, detail in errors:
+            if kind == "unterminated-comment":
+                err(rel, line, "F29", "注释未闭合（`/*` 没有对应的 `*/`）")
+            elif kind == "unterminated-string":
+                err(rel, line, "F29", "字符串未闭合（引号没有配对）")
+        # 1) 花括号配平
+        depth = 0
+        line = 1
+        last_bad = None
+        for ch in code:
+            if ch == "\n":
+                line += 1
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth < 0:
+                    err(rel, line, "F29", "多余的 `}`（没有与之配对的 `{`）")
+                    depth = 0
+        if depth > 0:
+            err(rel, 0, "F29",
+                "花括号未配平：多出 %d 个 `{`（剥注释与字符串后统计，"
+                "所以不是注释里的 `{}` 造成的）" % depth)
+        # 4) 圆括号 / 方括号配平
+        for op, cl, name in (("(", ")", "圆括号"), ("[", "]", "方括号")):
+            d = 0
+            for ch in code:
+                if ch == op:
+                    d += 1
+                elif ch == cl:
+                    d -= 1
+                    if d < 0:
+                        err(rel, 0, "F29", "多余的 `%s`（%s不配平）" % (cl, name))
+                        d = 0
+            if d:
+                err(rel, 0, "F29", "%s不配平：多出 %d 个 `%s`" % (name, d, op))
+        # 2) 规则头完整性：逐个 `{` 回头看它的选择器
+        for m in re.finditer(r"\{", code):
+            head = code[:m.start()]
+            # 选择器 = 上一个块定界符（{ } ; ）之后的全部内容
+            cut = max(head.rfind("}"), head.rfind("{"), head.rfind(";"))
+            sel = head[cut + 1:].strip()
+            ln = code.count("\n", 0, m.start()) + 1
+            if not sel:
+                err(rel, ln, "F29", "`{` 之前没有选择器（空规则头）")
+            elif sel.endswith("-"):
+                err(rel, ln, "F29",
+                    "选择器以裸 `-` 结尾：%r —— 多半个类名/标识符，"
+                    "会把紧随其后的整条规则吃掉" % sel[-28:])
+        # 3) @media / @supports 块配平
+        for kw in ("@media", "@supports"):
+            heads = len(re.findall(re.escape(kw) + r"\b[^{}]*\{", code))
+            total = len(re.findall(re.escape(kw) + r"\b", code))
+            if heads != total:
+                err(rel, 0, "F29",
+                    "%s 块数与关键字数不符（%d vs %d）——可能有块没闭合"
+                    % (kw, heads, total))
+
+
+def _strip_css(src):
+    """把注释与字符串替换成等长空白/占位，返回 (结果, 错误列表)。
+
+    用状态机而不是正则：正则很容易在"字符串里有 `/*`"或"注释里有引号"时跑偏。
+    返回的错误用于报"未闭合的注释/字符串"——那本身就是语法错误。
+    """
+    out = []
+    errors = []
+    i, n = 0, len(src)
+    line = 1
+    while i < n:
+        ch = src[i]
+        if ch == "\n":
+            line += 1
+            out.append(ch)
+            i += 1
+            continue
+        if ch == "/" and i + 1 < n and src[i + 1] == "*":
+            end = src.find("*/", i + 2)
+            if end < 0:
+                errors.append((line, "unterminated-comment", ""))
+                out.append(" " * (n - i))
+                break
+            chunk = src[i:end + 2]
+            out.append("\n" * chunk.count("\n") + " " * (len(chunk) - chunk.count("\n")))
+            line += chunk.count("\n")
+            i = end + 2
+            continue
+        if ch in ("'", '"'):
+            j = i + 1
+            ok = False
+            while j < n:
+                if src[j] == "\\":
+                    j += 2
+                    continue
+                if src[j] == ch:
+                    ok = True
+                    break
+                if src[j] == "\n":
+                    break
+                j += 1
+            if not ok:
+                errors.append((line, "unterminated-string", ch))
+                out.append(" ")
+                i += 1
+                continue
+            chunk = src[i:j + 1]
+            out.append(" " * len(chunk))
+            i = j + 1
+            continue
+        out.append(ch)
+        i += 1
+    return "".join(out), errors
 
 
 def check_doc_scope():
@@ -1294,6 +1450,10 @@ def main():
     check_render_leftovers()
     check_shared_components()
     check_site_js_behavior()
+    # ⚠️ 顺序有依赖：F27 会断言"扫描型规则的受检对象数 > 0"，所以**上报受检数的
+    # 规则必须跑在 check_meta() 之前**。F29 上报 F29_objects，故排在它前面
+    # （踩过一次：放在后面时 F27 报"F29 未上报受检对象数"）。
+    check_css_syntax()
     check_meta()
     check_doc_scope()
     run_mermaid_parser(DOCS)

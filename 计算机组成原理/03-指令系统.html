@@ -59,8 +59,8 @@
 <a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
 </div></nav>
-<main><div class="inner"><h1>指令系统</h1><h1 id="_1">计算机组成原理 · 指令系统</h1>
-<h2 id="_2" id="kp">指令系统 [高频]</h2>
+<main><div class="inner"><h1>指令系统</h1>
+
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2023、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（指令格式、寻址方式、汇编阅读）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p>一条指令由<strong>操作码字段</strong>与<strong>地址码字段</strong>构成。定长指令字中操作码位数固定，可表示 <code>2^k</code> 条指令；<strong>变长指令字</strong>中常用<strong>扩展操作码</strong>技术：把操作码按长度分层，短操作码不能再作为长操作码的前缀，因此设计时必须保证"<strong>短码不是任何长码的前缀</strong>"。以 4 位为基础操作码、需要扩展到 8 位为例，若 4 位编码 0000—1110 分配给 15 条三地址指令，则剩下 1111 作为扩展标志可产生 16 个 8 位编码，用于二地址指令，依此类推。<strong>寻址方式</strong>决定操作数的来源与有效地址 <code>EA</code> 的计算：立即寻址的地址字段就是操作数本身；直接寻址 <code>EA = A</code>；间接寻址 <code>EA = (A)</code>（需访存两次取数，三次含取指）；</p>
