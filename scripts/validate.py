@@ -27,6 +27,7 @@
 用法： python3 scripts/validate.py [--stats]
 """
 import glob
+import hashlib
 import json
 import os
 import re
@@ -60,6 +61,9 @@ SEC_IDS_FOR_CHECK = [
     ("易错点", "sec-err"),
     ("真题示例", "sec-real"),
 ]
+# F24：公式区间里的 `*` 是合法的（如 A^{*}），统计字面 `**` 前要先把公式挖掉
+INLINE_MATH = re.compile(r"(?<!\$)\$([^$\n]+?)\$(?!\$)")
+DISPLAY_MATH = re.compile(r"\$\$.+?\$\$", re.S)
 ALLOW_NO_MERMAID = "--no-mermaid" in sys.argv
 # 防止 F14 换解释器重跑时无限递归（见 render_check）
 NO_REEXEC = "--no-reexec" in sys.argv
@@ -714,13 +718,28 @@ def check_shell():
         if "<main>" not in body:
             err(rel, 0, "F22", "缺少 <main>")
 
-        # ---- 面包屑必须是「首页 › 科目 › 章节」三级 ----
+        # ---- site.js 钩子（契约 2.4.1-A）：这些是脚本真正查询的名字，
+        #      改名等于让行为静默失效（按钮点了没反应），所以逐条强制 ----
+        for cls, what in (("theme-toggle", "主题切换按钮"), ("nav-toggle", "窄屏抽屉按钮"),
+                          ("to-top", "回到顶部按钮"), ("read-progress", "阅读进度条"),
+                          ("sb-filter", "侧栏筛选框"), ("sb-group", "侧栏分组"),
+                          ("sb-group-t", "侧栏分组标题")):
+            if 'class="%s"' % cls not in body:
+                err(rel, 0, "F22", "缺少 site.js 钩子 .%s（%s）" % (cls, what))
+        if not re.search(r'<a id="top">', body):
+            err(rel, 0, "F22", '缺少 <a id="top"></a>（页脚「回到顶部」的目标，契约 2.4.1-B.6）')
+
+        # ---- 面包屑：≥1 项、末项 aria-current、多于一项时必须有分隔符（2.4.1-B.7）----
         crumbs = re.search(r'<nav class="tb-crumbs".*?</nav>', body, re.S)
         if crumbs:
             seg = crumbs.group(0)
+            n_item = len(re.findall(r"<a [^>]*>", seg)) + seg.count('aria-current="page"')
             n_sep = seg.count('class="tb-sep"')
-            if n_sep != 2:
-                err(rel, 0, "F22", "面包屑分隔符 %d 个，应为 2 个（首页›科目›章节）" % n_sep)
+            if n_item < 1:
+                err(rel, 0, "F22", "面包屑至少要有 1 项")
+            if n_sep != n_item - 1:
+                err(rel, 0, "F22", "面包屑 %d 项应有 %d 个 .tb-sep，实为 %d"
+                    % (n_item, n_item - 1, n_sep))
             if seg.count('aria-current="page"') != 1:
                 err(rel, 0, "F22", "面包屑应恰有 1 个 aria-current=\"page\" 标记当前页")
             if kind == "chapter" and slug:
@@ -737,7 +756,7 @@ def check_shell():
             if 'class="sec %s"' % sid not in body:
                 err(rel, 0, "F22", "缺少六段容器 .sec.%s（%s）" % (sid, lab))
 
-        # ---- 章节页专属：prev/next 与侧栏六段锚点 ----
+        # ---- 章节页专属：章节导航、翻章数据、侧栏六段锚点 ----
         if kind == "chapter" and slug:
             topics = [t[6] for t in T.TOPICS[k]]
             i = topics.index(slug)
@@ -764,10 +783,25 @@ def check_shell():
                                                             m.group(1).split("#")[0]))
                         if not os.path.exists(tgt):
                             err(rel, 0, "F22", "%s 指向不存在的页面：%s" % (cls, m.group(1)))
-            if '<div class="sb-secs">' not in body:
-                err(rel, 0, "F22", "侧栏缺少当前章六段锚点 .sb-secs")
+            # 键盘翻章数据必须与 .chapter-nav 的可见链接一致（契约 2.4.1-B.5）
+            mb = re.search(r"<body([^>]*)>", body)
+            bp = re.search(r'data-prev="([^"]*)"', mb.group(1)) if mb else None
+            bn = re.search(r'data-next="([^"]*)"', mb.group(1)) if mb else None
+            if mb is None or bp is None or bn is None:
+                err(rel, 0, "F22", "body 缺少 data-prev/data-next（键盘翻章目标）")
+            else:
+                want_p = "%s.html" % topics[i - 1] if i > 0 else ""
+                want_n = "%s.html" % topics[i + 1] if i + 1 < len(topics) else ""
+                if bp.group(1) != want_p:
+                    err(rel, 0, "F22", "body data-prev 应为 %r，实为 %r"
+                        % (want_p, bp.group(1)))
+                if bn.group(1) != want_n:
+                    err(rel, 0, "F22", "body data-next 应为 %r，实为 %r"
+                        % (want_n, bn.group(1)))
+            if '<div class="tocbox">' not in body:
+                err(rel, 0, "F22", "侧栏缺少当前章六段锚点容器 .tocbox")
             for lab, sid in SEC_IDS_FOR_CHECK:
-                if 'class="sec-link" href="#%s"' % sid not in body:
+                if 'class="toclink" href="#%s"' % sid not in body:
                     err(rel, 0, "F22", "侧栏六段锚点缺少 #%s（%s）" % (sid, lab))
             nav_pages += 1
 
@@ -794,6 +828,20 @@ def check_shell():
         if home.find('class="home-subjects"') > home.find('class="kp"'):
             err("index.html", 0, "F22", "科目卡片应排在单页合集之前")
     stats["shell_nav_pages"] = nav_pages
+
+    # ---- 跳转桩必须保持极简（契约 2.3.1：只有科目首页/章节页套完整外壳）----
+    # 注意 README.html **不在此列**：契约 2.3.1 的表里写「README.html 不加外壳」，
+    # 但数学二的 deploy 产物里 README.html 是带完整外壳的（site-topbar/sidebar/
+    # site.js 都在），其 F22 也是对全部页面强制外壳。以实际为准，
+    # 故这里只对 .md 跳转桩做"不得套壳"的负向检查。
+    for fp in glob.glob(os.path.join(SITE, "*", "*.md.html")):
+        rel = os.path.relpath(fp, ROOT)
+        with open(fp, encoding="utf-8") as fh:
+            body = fh.read()
+        for cls in ("site-topbar", "site-sidebar", "chapter-nav", "assets/site.js"):
+            if cls in body:
+                err(rel, 0, "F22", "跳转桩不应套用完整外壳（契约 2.3.1）")
+                break
 
 
 def check_assets():
@@ -831,6 +879,15 @@ def check_assets():
             err(rel, 0, "F23", "页面未引用 assets/site.css")
         if "assets/site.js" not in body:
             err(rel, 0, "F23", "页面未引用 assets/site.js")
+        else:
+            # 契约 2.4.1-B.4：必须在 <head> 里**同步**引入，不可 defer。
+            # 主题类要在首屏绘制前定下来，defer 会闪白。
+            head_seg = body[:body.find("</head>")] if "</head>" in body else ""
+            m = re.search(r'<script[^>]*assets/site\.js[^>]*>', body)
+            if m and m.group(0) not in head_seg:
+                err(rel, 0, "F23", "assets/site.js 必须在 <head> 内引入（否则首屏闪白）")
+            if m and re.search(r'\bdefer\b', m.group(0)):
+                err(rel, 0, "F23", "assets/site.js 不得用 defer（主题类须在首屏前生效）")
         # 页面内不得再有内联 <style>（外置的意义就是消除每页 9 KB 冗余）
         if "<style>" in body:
             err(rel, 0, "F23", "页面仍有内联 <style>，样式未真正外置")
@@ -843,6 +900,146 @@ def check_assets():
             tgt = os.path.normpath(os.path.join(os.path.dirname(fp), m.group(1)))
             if not os.path.exists(tgt):
                 err(rel, 0, "F23", "脚本不可达：%s" % m.group(1))
+
+
+def check_render_leftovers():
+    """F24: 渲染后不得残留字面 Markdown 记号（`**`）。
+
+    为什么要有：`**错在…。**正确做法` 这类写法里，闭合定界符后面紧跟汉字/标点，
+    按 CommonMark 的侧翼规则**无法闭合**，页面上会直接露出 `**`。这种错误在源文件里
+    看起来完全正常，只有渲染出来才看得见——所以既查成品 HTML，也查内容源。
+
+    两侧判据等价（契约 §2.4.1-D）：数学二的 F24 同样是"渲染后统计字面 `**`"。
+    与本站生成器无关，是内容/渲染层面的缺陷，两个项目都可能有。
+    """
+    # ---- 成品 HTML：只看 <main> 内，且排除代码块 ----
+    pages = [os.path.join(SITE, "index.html"), os.path.join(SITE, "README.html")]
+    for k in T.ORDER:
+        s = T.SUBJECTS[k]
+        d = os.path.join(SITE, s["dir"])
+        pages.append(os.path.join(d, "index.html"))
+        for t in T.TOPICS[k]:
+            pages.append(os.path.join(d, t[6] + ".html"))
+    for fp in pages:
+        if not os.path.exists(fp):
+            continue
+        rel = os.path.relpath(fp, ROOT)
+        with open(fp, encoding="utf-8") as fh:
+            text = fh.read()
+        body = re.sub(r"<pre.*?</pre>|<code.*?</code>|<script.*?</script>|<style.*?</style>",
+                      "", text, flags=re.S)
+        if "<main>" in body:
+            body = body[body.find("<main>"):]
+        # 行内公式区间里的 `*` 是合法的（如 A^{*}）
+        body = DISPLAY_MATH.sub("", body)
+        body = INLINE_MATH.sub("", body)
+        n = body.count("**")
+        if n:
+            err(rel, 0, "F24", "渲染后残留字面 `**` %d 处（加粗定界符没闭合，"
+                               "页面上会直接显示星号）" % n)
+
+    # ---- 内容源：按真实流水线渲染一遍，让写手在 build 前就看到 ----
+    try:
+        import markdown as _md
+    except ImportError:
+        return
+    for f in sorted(glob.glob(os.path.join(ROOT, "parts", "*", "*.md"))):
+        rel = os.path.relpath(f, ROOT)
+        with open(f, encoding="utf-8") as fh:
+            raw = fh.read()
+        # 只检查会被渲染成正文的段落：代码围栏里的 `**` 是合法内容
+        raw = re.sub(r"```.*?```", "", raw, flags=re.S)
+        body = _md.markdown(raw, extensions=["tables", "fenced_code", "sane_lists"])
+        body = DISPLAY_MATH.sub("", body)
+        body = INLINE_MATH.sub("", body)
+        n = body.count("**")
+        if n:
+            err(rel, 0, "F24", "内容源渲染后残留字面 `**` %d 处" % n)
+
+
+def check_site_js_pin():
+    """F25: assets/site.js 必须是上游的逐字复制（契约 §2.4.1-D）。
+
+    该文件是两个项目共用的行为契约实现。文件头注记里钉了上游正文的 sha256，
+    这里核对"注记之后的全部内容"是否等于该哈希——所以任何对正文的本地改动
+    都会失败，逼着改动走契约而不是就地分叉。
+
+    若同工作区存在上游文件，再额外做一次**逐字节**比对（更直接）。
+    """
+    fp = os.path.join(SITE, "assets", "site.js")
+    if not os.path.exists(fp):
+        err("assets/site.js", 0, "F25", "缺少共用行为脚本")
+        return
+    with open(fp, encoding="utf-8") as fh:
+        text = fh.read()
+    m = re.search(r"sha256\s*=\s*([0-9a-f]{64})", text)
+    if not m:
+        err("assets/site.js", 0, "F25",
+            "文件头缺少上游 sha256 注记（无法证明是逐字复制）")
+        return
+    pinned = m.group(1)
+    if "*/\n" not in text:
+        err("assets/site.js", 0, "F25", "文件头注记格式异常（缺少 */ 收尾）")
+        return
+    body = text.split("*/\n", 1)[1]
+    got = hashlib.sha256(body.encode("utf-8")).hexdigest()
+    if got != pinned:
+        err("assets/site.js", 0, "F25",
+            "正文与上游不一致（本地 sha256 %s…，注记 %s…）——"
+            "不要就地改这个共用件，先改契约再同步两个项目" % (got[:12], pinned[:12]))
+    # 同工作区能读到上游时，直接逐字节比对
+    upstream = os.path.join(os.path.dirname(ROOT), "math2-kaoyan", "数学二", "assets", "site.js")
+    if os.path.exists(upstream):
+        with open(upstream, encoding="utf-8") as fh:
+            up = fh.read()
+        if up != body:
+            err("assets/site.js", 0, "F25",
+                "与上游 math2-kaoyan/数学二/assets/site.js 不是逐字节一致")
+        stats["site_js_identical"] = 1
+
+
+def check_site_js_behavior():
+    """F26: 外壳脚本的行为测试（jsdom，复用数学二的 12 条断言）。
+
+    `assets/site.js` 是共用件，光"能解析"不够——主题类、筛选、键盘翻章这些
+    行为必须在真实 DOM 上跑过。测试脚本由数学二提供并带 `--site-js` 参数，
+    408 直接复用它跑自己的副本（契约 §2.4.1-D 要求两边都跑通）。
+
+    缺 node / jsdom / 测试脚本都是 error，不是跳过：否则这条门禁会静默失效。
+    """
+    # 优先用本仓库的副本（CI 里只有本仓库）；没有就退回同工作区的上游原件
+    local = os.path.join(ROOT, "scripts", "test_site_js.mjs")
+    upstream = os.path.join(os.path.dirname(ROOT), "math2-kaoyan", "数学二",
+                            "scripts", "test_site_js.mjs")
+    tester = local if os.path.exists(local) else (upstream if os.path.exists(upstream) else None)
+    if tester is None:
+        err("scripts", 0, "F26",
+            "找不到外壳行为测试脚本（scripts/test_site_js.mjs）；这是 408 的复用副本，必须入库")
+        return
+    if shutil.which("node") is None:
+        err("site.js", 0, "F26", "找不到 node，无法跑外壳行为测试")
+        return
+    if _node_version("jsdom") is None:
+        err("site.js", 0, "F26", "缺少 jsdom（见 scripts/tools-package.json）")
+        return
+    site_js = os.path.join(SITE, "assets", "site.js")
+    try:
+        r = subprocess.run(["node", tester, "--site-js", site_js, "--strict"],
+                           cwd=ROOT, capture_output=True, text=True, timeout=300)
+    except Exception as e:                                   # noqa: BLE001
+        err("site.js", 0, "F26", "调用行为测试失败：%s" % e)
+        return
+    if r.returncode != 0:
+        tail = (r.stderr or r.stdout or "").strip().splitlines()
+        err("site.js", 0, "F26", "外壳行为测试未通过：%s" % (tail[-1] if tail else "")[:200])
+        return
+    # 人读摘要走 stderr（JSON 走 stdout），两处都找一下
+    m = re.search(r"(\d+)/(\d+)\s*通过", (r.stderr or "") + (r.stdout or ""))
+    if m:
+        stats["site_js_tests"] = int(m.group(1))
+        stats["site_js_total"] = int(m.group(2))
+    else:
+        err("site.js", 0, "F26", "行为测试未产出可解析的通过计数，无法确认真的跑了")
 
 
 def main():
@@ -858,6 +1055,8 @@ def main():
         # 内层循环也要有图形校验：写手在这里就该看到自己刚写坏的 mermaid，
         # 而不是等 build 之后才暴露。所以 --parts 扫 parts/ 而不是 .docs/。
         run_mermaid_parser(os.path.join(ROOT, "parts"))
+        # F24 同样在内容源阶段就跑：写手改完 parts 立刻能看到没闭合的 `**`
+        check_render_leftovers()
         return report("parts 半成品校验报告", parts_mode=True)
 
     for key in T.ORDER:
@@ -881,6 +1080,9 @@ def main():
     check_html()
     check_shell()
     check_assets()
+    check_render_leftovers()
+    check_site_js_pin()
+    check_site_js_behavior()
     run_mermaid_parser(DOCS)
     return report("408 复习资料校验报告")
 
@@ -1055,6 +1257,9 @@ def report(title, parts_mode=False):
     if stats.get("mermaid_blocks"):
         print("  Mermaid 真实解析 %d/%d 通过" % (stats.get("mermaid_parsed", 0),
                                                  stats["mermaid_blocks"]))
+    if stats.get("site_js_tests"):
+        print("  外壳行为测试 %d/%d 通过（jsdom，复用数学二）"
+              % (stats["site_js_tests"], stats.get("site_js_total", 0)))
     print("-" * 74)
     if errors:
         print("  ✗ 错误 %d 条：" % len(errors))

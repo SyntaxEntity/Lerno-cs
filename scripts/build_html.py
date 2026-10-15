@@ -54,41 +54,6 @@ SECS = [
     ("真题示例", "sec-real"),
 ]
 
-# ---------------------------------------------------------------------------
-# 外壳运行时
-# ---------------------------------------------------------------------------
-
-
-MERMAID_INIT = """
-(function () {
-  var nodes = document.querySelectorAll('.mermaid');
-  if (!nodes.length) return;
-  if (!window.mermaid) {
-    nodes.forEach(function (el) {
-      el.insertAdjacentHTML('beforebegin',
-        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
-        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
-      var pre = document.createElement('pre'), code = document.createElement('code');
-      code.textContent = el.textContent; pre.appendChild(code);
-      el.innerHTML = ''; el.appendChild(pre);
-    });
-    return;
-  }
-  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
-    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
-    state: { useMaxWidth: true } });
-  nodes.forEach(function (el, i) {
-    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
-      el.innerHTML = r.svg;
-    }).catch(function (e) {
-      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
-      var pre = document.createElement('pre'), code = document.createElement('code');
-      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
-    });
-  });
-})();
-"""
-
 FIELD_LABELS = ["核心讲解", "关键结论速记", "示意图", "易错点", "真题示例"]
 
 
@@ -276,22 +241,21 @@ def footer_for(page):
 def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter"):
     """侧栏目录：四科分组 + 当前章的六段锚点 + 关键词筛选。
 
+    DOM 与钩子类名严格照 math2-kaoyan 的 assets/site.js 契约（PLAN 2.4.1）：
+    .sb-head/.sb-title/.sb-home/.sb-filter/.sb-group/.sb-group-t/.sb-chap/
+    .tocbox/.toclink —— site.js 只认这一套，改名前先改契约。
+
     page: "chapter" 章节页 | "overview" 科目首页 | "root" 仓库根页面。
     """
     prefix = asset_prefix(page)
-    out = ['<div class="sb-brand">408 速成复习资料'
-           '<small>四科 · 26 个知识点 · 离线可读</small></div>',
-           '<input id="q" placeholder="筛选知识点…" autocomplete="off">']
-    if single_page:
-        out.append('<a class="home" href="#top">⌂ 回到顶部</a>')
-    else:
-        out.append('<a class="home" href="%sindex.html">⌂ 全科单页合集</a>' % prefix)
+    out = ['<div class="sb-head"><span class="sb-title">408 速成复习资料</span>'
+           '<a class="sb-home" href="%sindex.html">全科合集</a></div>' % prefix,
+           '<input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）"'
+           ' aria-label="筛选章节">']
     for k in T.ORDER:
         s = T.SUBJECTS[k]
-        opened = " open" if (single_page or subject_key == k) else ""
-        out.append('<details class="grp"%s><summary><span>%s</span>'
-                   '<span class="n">%d 分 · %d 点</span></summary>'
-                   % (opened, s["name"], s["score"], len(T.TOPICS[k])))
+        out.append('<div class="sb-group"><div class="sb-group-t">%s（%d 分 · %d 个知识点）</div>'
+                   % (s["name"], s["score"], len(T.TOPICS[k])))
         for t in T.TOPICS[k]:
             if single_page:
                 href, attr = "#%s-%s" % (k, t[6]), ' data-anchor="%s-%s"' % (k, t[6])
@@ -305,20 +269,25 @@ def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter
                 else:
                     href = "%s/%s.html" % (s["dir"], t[6])
                 attr = ""
-            cls = "item cur" if (current == t[6] and subject_key == k) else "item"
-            out.append('<a class="%s" href="%s"%s>%s</a>' % (cls, href, attr, t[0]))
+            cls = "sb-chap cur" if (current == t[6] and subject_key == k) else "sb-chap"
+            out.append('<a class="%s" href="%s"%s>%s <span class="tag">高频</span></a>'
+                       % (cls, href, attr, t[0]))
             # 当前章的六段锚点：直接跳到「只看易错点」那一段
             if current == t[6] and subject_key == k:
-                out.append('<div class="sb-secs">')
+                out.append('<div class="tocbox">')
                 for lab, sid in SECS:
-                    out.append('<a class="sec-link" href="#%s">%s</a>' % (sid, lab))
+                    out.append('<a class="toclink" href="#%s">%s</a>' % (sid, lab))
                 out.append("</div>")
-        out.append("</details>")
+        out.append("</div>")
     return '<nav class="site-sidebar">%s</nav>' % "\n".join(out)
 
 
 def chapter_nav(subject_key, slug):
-    """章节 prev/next：按 topics.py 的 TOPICS 顺序（也就是阅读顺序）。"""
+    """章节 prev/next：按 topics.py 的 TOPICS 顺序（也就是阅读顺序）。
+
+    `.cn-prev`/`.cn-next` 是**样式用**类名（PLAN 2.4.1 明确保留）；
+    键盘翻章由 body[data-prev|data-next] 驱动，见 page()。
+    """
     topics = T.TOPICS[subject_key]
     idx = next((i for i, t in enumerate(topics) if t[6] == slug), None)
     if idx is None:
@@ -336,41 +305,61 @@ def chapter_nav(subject_key, slug):
     return "".join(out)
 
 
+def nav_targets(subject_key, slug):
+    """键盘翻章目标（body[data-prev|data-next]，契约 2.4.1-B.5）。"""
+    topics = T.TOPICS[subject_key]
+    idx = next((i for i, t in enumerate(topics) if t[6] == slug), None)
+    if idx is None:
+        return "", ""
+    prev = "%s.html" % topics[idx - 1][6] if idx > 0 else ""
+    nxt = "%s.html" % topics[idx + 1][6] if idx + 1 < len(topics) else ""
+    return prev, nxt
+
+
 def page(title, sidebar, body, page_kind="chapter", subject_key=None, chapter=None,
          extra=""):
     """渲染一个完整页面。
 
-    page_kind 决定外壳资源的相对前缀（见 asset_prefix），不能再靠传入
-    mermaid_src 字符串来隐式表达深度——那样很容易在新增页面时传错。
+    page_kind 决定外壳资源的相对前缀（见 asset_prefix）与 body 上的翻章数据；
+    site.js 在 <head> 里**同步**引入（不可 defer）——主题类要在首屏绘制前定下来。
     """
     p = asset_prefix(page_kind)
     head = "<h1>%s</h1>" % html.escape(chapter) if chapter else ""
+    prev, nxt = ("", "")
+    if page_kind == "chapter" and subject_key and chapter:
+        prev, nxt = nav_targets(subject_key, _slug_of(subject_key, chapter))
+    body_attr = ' data-prev="%s" data-next="%s"' % (prev, nxt) if page_kind == "chapter" else ""
     return """<!DOCTYPE html>
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>%s</title>
 <link rel="stylesheet" href="%sassets/site.css">
-<script src="%smermaid.min.js"></script></head>
-<body>
-<div id="bar"></div>
+<script src="%smermaid.min.js"></script>
+<script src="%sassets/site.js"></script></head>
+<body%s>
+<a id="top"></a>
+<div class="read-progress"></div>
 %s
-<button id="menu" type="button" aria-label="目录">☰</button>
+<button class="nav-toggle" type="button" aria-label="目录">☰</button>
 <div class="site-body">
 %s
 <main>%s%s%s</main>
 </div>
 %s
-<button class="totop" type="button" aria-label="回到顶部">↑</button>
-<button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script src="%sassets/site.js"></script>
-<script>%s</script>
-</body></html>""" % (html.escape(title), p,
-                     p,
+<button class="to-top" type="button" aria-label="回到顶部">↑</button>
+<button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>
+</body></html>""" % (html.escape(title), p, p, p, body_attr,
                      topbar_for(page_kind, subject_key, chapter),
                      sidebar,
                      head, body, extra,
-                     footer_for(page_kind),
-                     p, MERMAID_INIT)
+                     footer_for(page_kind))
+
+
+def _slug_of(subject_key, chapter_name):
+    for t in T.TOPICS[subject_key]:
+        if t[0] == chapter_name:
+            return t[6]
+    return ""
 
 
 

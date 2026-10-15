@@ -44,19 +44,18 @@ jobs:
       - name: 安装 Python 校验依赖（读 scripts/requirements.txt）
         run: python3 -m pip install --quiet -r scripts/requirements.txt
 
-      # F3 用官方 mermaid 解析器逐块真解析（正则查不出「标签含圆括号未加引号」
-      # 这类直接解析失败的写法）。版本必须与站点内置运行时一致，否则校验的语法
-      # 和线上渲染的不是同一个版本——tools-package.json 里锁的就是仓库根
-      # mermaid.min.js 的版本，validate.py 会在版本不符时直接报 error。
-      - name: 安装 Node 校验依赖（F3 真实 mermaid 解析）
+      # jsdom 同时供 F26（外壳行为测试）使用：assets/site.js 是两边共用的外壳脚本，
+      # scripts/test_site_js.mjs 在真实 DOM 上跑 12 条断言——光"能解析"不算过。
+      - name: 安装 Node 校验依赖（F3 真实 mermaid 解析 + F26 外壳行为测试）
         run: >-
           npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund
           mermaid@12.1.0 jsdom@30.1.2
 
       # 门禁：模板字段、考频数字与 topics.py 逐字一致、图语法（含 mermaid 真解析）、
-      # ASCII 对齐、真题年份、链接可达、交付物完整性。
+      # ASCII 对齐、真题年份、链接可达、交付物完整性、统一外壳（F22/F23）、
+      # 渲染残留（F24）、共用件一致性（F25）、外壳行为测试（F26）。
       # 有 error 时退出码为 1，直接中止部署。缺 node/依赖同样是 error，不会静默跳过。
-      - name: 发布前校验（F1—F17）
+      - name: 发布前校验（F1—F26）
         run: python3 scripts/validate.py
 
       - uses: actions/configure-pages@v5

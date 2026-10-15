@@ -71,50 +71,45 @@ body{
 }
 .site-sidebar::-webkit-scrollbar{width:9px}
 .site-sidebar::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-.sb-brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
-.sb-brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
-#q{
-  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
+.sb-head{display:flex;align-items:baseline;justify-content:space-between;
+  gap:8px;margin:0 6px 4px}
+.sb-title{font-size:15px;font-weight:700;letter-spacing:.2px}
+.sb-home{font-size:12.5px;color:var(--acc);text-decoration:none;white-space:nowrap}
+.sb-home:hover{text-decoration:underline}
+.sb-filter{
+  width:100%;margin:10px 0 8px;padding:8px 11px;border:1px solid var(--line);
   border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
 }
-#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
-.site-sidebar .home{
-  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
-  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
+.sb-filter:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
+.sb-group{margin:2px 0 8px}
+.sb-group-t{
+  padding:7px 10px;font-size:13px;font-weight:650;color:var(--fg2);
+  border-radius:8px;line-height:1.45;
 }
-.site-sidebar .home:hover{filter:brightness(.97)}
-details.grp{margin:2px 0}
-details.grp>summary{
-  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
-  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-details.grp>summary::-webkit-details-marker{display:none}
-details.grp>summary:hover{background:var(--line2)}
-details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
-details.grp[open]>summary{color:var(--acc)}
-.site-sidebar a.item{
+.site-sidebar a.sb-chap{
   display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
   text-decoration:none;border-radius:7px;border-left:2px solid transparent;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.site-sidebar a.item:hover{background:var(--line2);color:var(--fg)}
-.site-sidebar a.item.cur{background:var(--acc-soft);color:var(--acc);
+.site-sidebar a.sb-chap:hover{background:var(--line2);color:var(--fg)}
+.site-sidebar a.sb-chap.cur{background:var(--acc-soft);color:var(--acc);
   border-left-color:var(--acc);font-weight:600}
+.site-sidebar a.sb-chap .tag{margin-left:2px}
 /* 当前章的六段锚点（二级子项） */
-.sb-secs{margin:2px 0 6px;padding:0 0 0 20px;display:grid;gap:1px}
-.site-sidebar a.sec-link{
+.tocbox{margin:2px 0 6px;padding:0 0 0 20px;display:grid;gap:1px}
+.site-sidebar a.toclink{
   display:block;padding:4px 9px;font-size:12.5px;color:var(--mut);
   text-decoration:none;border-radius:6px;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;
 }
-.site-sidebar a.sec-link:hover{background:var(--line2);color:var(--fg)}
-.site-sidebar a.sec-link.cur{color:var(--acc);font-weight:600;background:var(--acc-soft)}
+.site-sidebar a.toclink:hover{background:var(--line2);color:var(--fg)}
+.site-sidebar a.toclink.cur{color:var(--acc);font-weight:600;background:var(--acc-soft)}
 
 main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;
   padding:34px 60px 90px}
 
 /* ---------- 进度条 ---------- */
-#bar{position:fixed;top:52px;left:0;height:3px;width:0;background:var(--acc);z-index:54}
+.read-progress{position:fixed;top:52px;left:0;height:3px;width:0;background:var(--acc);z-index:54}
 
 /* ---------- 标题 ---------- */
 h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
@@ -232,7 +227,7 @@ tr:last-child td{border-bottom:none}
 tbody tr:hover{background:var(--line2)}
 
 /* ---------- 章节上一页/下一页 ---------- */
-.chapter-nav{
+.chapter-
   display:flex;justify-content:space-between;gap:12px;margin:44px 0 0;
   padding-top:20px;border-top:1px solid var(--line);
 }
@@ -279,20 +274,20 @@ tbody tr:hover{background:var(--line2)}
   padding:11px 15px;font-size:14px;margin:14px 0;
 }
 .tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
-.totop{
+.to-top{
   position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
   border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
   font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
   transition:opacity .2s;z-index:40;
 }
-.totop.on{opacity:1;pointer-events:auto}
-.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
-#theme{
+.to-top.on{opacity:1;pointer-events:auto}
+.to-top:hover,.theme-toggle:hover{border-color:var(--acc);color:var(--acc)}
+.theme-toggle{
   position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
   border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
   font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
 }
-#menu{
+.nav-toggle{
   display:none;position:fixed;left:14px;top:62px;z-index:70;width:40px;height:40px;
   border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
   cursor:pointer;align-items:center;justify-content:center;font-size:17px;
@@ -306,17 +301,17 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
     transform:translateX(-100%);transition:transform .22s;
     box-shadow:4px 0 22px rgba(0,0,0,.12);
   }
-  .site-sidebar.open{transform:none}
+  body.navopen .site-sidebar{transform:none}
   main{padding:22px 18px 70px;max-width:none}
-  #menu{display:flex}
+  .nav-toggle{display:flex}
   .kp{padding:20px 18px 24px}
   .tb-crumbs{font-size:12px}
-  .chapter-nav{flex-direction:column}
+  .chapter-flex-direction:column}
   .chapter-nav a:only-child{max-width:none}
 }
 /* ---------- 打印 ---------- */
 @media print{
-  .site-topbar,.site-sidebar,#bar,.totop,#theme,#menu,.codebox .bar,.fig details,
+  .site-topbar,.site-sidebar,.read-progress,.to-top,.theme-toggle,.nav-toggle,.codebox .bar,.fig details,
   .chapter-nav,.home-subjects{display:none!important}
   .site-footer{border:none;padding:0}
   body{background:#fff;font-size:11pt}

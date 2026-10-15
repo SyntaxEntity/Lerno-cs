@@ -3,61 +3,62 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>计算机组成原理 · 数据表示与运算</title>
 <link rel="stylesheet" href="../assets/site.css">
-<script src="../mermaid.min.js"></script></head>
-<body>
-<div id="bar"></div>
+<script src="../mermaid.min.js"></script>
+<script src="../assets/site.js"></script></head>
+<body data-prev="" data-next="02-存储系统.html">
+<a id="top"></a>
+<div class="read-progress"></div>
 <header class="site-topbar">
 <a class="tb-brand" href="../index.html">408 速成复习资料</a>
 <nav class="tb-crumbs" aria-label="面包屑"><a href="../index.html">首页</a><span class="tb-sep">›</span><a href="index.html">计算机组成原理</a><span class="tb-sep">›</span><span aria-current="page">数据表示与运算</span></nav>
 <button class="tb-search" type="button" aria-label="搜索">搜索</button>
 </header>
-<button id="menu" type="button" aria-label="目录">☰</button>
+<button class="nav-toggle" type="button" aria-label="目录">☰</button>
 <div class="site-body">
-<nav class="site-sidebar"><div class="sb-brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
-<input id="q" placeholder="筛选知识点…" autocomplete="off">
-<a class="home" href="../index.html">⌂ 全科单页合集</a>
-<details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
-<a class="item" href="../数据结构/01-线性表.html">线性表</a>
-<a class="item" href="../数据结构/02-顺序表与链表.html">顺序表与链表</a>
-<a class="item" href="../数据结构/03-栈与队列.html">栈与队列</a>
-<a class="item" href="../数据结构/04-树与二叉树.html">树与二叉树</a>
-<a class="item" href="../数据结构/05-图.html">图</a>
-<a class="item" href="../数据结构/06-查找.html">查找</a>
-<a class="item" href="../数据结构/07-排序.html">排序</a>
-</details>
-<details class="grp" open><summary><span>计算机组成原理</span><span class="n">45 分 · 6 点</span></summary>
-<a class="item cur" href="01-数据表示与运算.html">数据表示与运算</a>
-<div class="sb-secs">
-<a class="sec-link" href="#sec-freq">考频统计</a>
-<a class="sec-link" href="#sec-core">核心讲解</a>
-<a class="sec-link" href="#sec-key">关键结论速记</a>
-<a class="sec-link" href="#sec-fig">示意图</a>
-<a class="sec-link" href="#sec-err">易错点</a>
-<a class="sec-link" href="#sec-real">真题示例</a>
+<nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
+<input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/04-树与二叉树.html">树与二叉树 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/05-图.html">图 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<a class="item" href="02-存储系统.html">存储系统</a>
-<a class="item" href="03-指令系统.html">指令系统</a>
-<a class="item" href="04-中央处理器.html">中央处理器 CPU</a>
-<a class="item" href="05-总线.html">总线</a>
-<a class="item" href="06-输入输出系统.html">输入输出系统</a>
-</details>
-<details class="grp"><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
-<a class="item" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
-<a class="item" href="../操作系统/02-进程与线程.html">进程与线程</a>
-<a class="item" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁</a>
-<a class="item" href="../操作系统/04-同步与互斥.html">同步与互斥</a>
-<a class="item" href="../操作系统/05-内存管理.html">内存管理</a>
-<a class="item" href="../操作系统/06-文件管理.html">文件管理</a>
-<a class="item" href="../操作系统/07-输入输出管理.html">输入输出管理</a>
-</details>
-<details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
-<a class="item" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构</a>
-<a class="item" href="../计算机网络/02-物理层.html">物理层</a>
-<a class="item" href="../计算机网络/03-数据链路层.html">数据链路层</a>
-<a class="item" href="../计算机网络/04-网络层.html">网络层</a>
-<a class="item" href="../计算机网络/05-传输层.html">传输层</a>
-<a class="item" href="../计算机网络/06-应用层.html">应用层</a>
-</details></nav>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<a class="sb-chap cur" href="01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
+<div class="tocbox">
+<a class="toclink" href="#sec-freq">考频统计</a>
+<a class="toclink" href="#sec-core">核心讲解</a>
+<a class="toclink" href="#sec-key">关键结论速记</a>
+<a class="toclink" href="#sec-fig">示意图</a>
+<a class="toclink" href="#sec-err">易错点</a>
+<a class="toclink" href="#sec-real">真题示例</a>
+</div>
+<a class="sb-chap" href="02-存储系统.html">存储系统 <span class="tag">高频</span></a>
+<a class="sb-chap" href="03-指令系统.html">指令系统 <span class="tag">高频</span></a>
+<a class="sb-chap" href="04-中央处理器.html">中央处理器 CPU <span class="tag">高频</span></a>
+<a class="sb-chap" href="05-总线.html">总线 <span class="tag">高频</span></a>
+<a class="sb-chap" href="06-输入输出系统.html">输入输出系统 <span class="tag">高频</span></a>
+</div>
+<div class="sb-group"><div class="sb-group-t">操作系统（35 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/02-进程与线程.html">进程与线程 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/04-同步与互斥.html">同步与互斥 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/05-内存管理.html">内存管理 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/06-文件管理.html">文件管理 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/07-输入输出管理.html">输入输出管理 <span class="tag">高频</span></a>
+</div>
+<div class="sb-group"><div class="sb-group-t">计算机网络（25 分 · 6 个知识点）</div>
+<a class="sb-chap" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/02-物理层.html">物理层 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/03-数据链路层.html">数据链路层 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/04-网络层.html">网络层 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
+</div></nav>
 <main><h1>数据表示与运算</h1><h1 id="_1">计算机组成原理 · 数据表示与运算</h1>
 <h2 id="_2" id="kp">数据表示与运算 [高频]</h2>
 <section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2021、2023 年为典型年份；分数占比约 12%；主要题型：选择题 + 43/44 题计算。</p>
@@ -202,36 +203,6 @@ worked example:  -12.5 = -1100.1B = -1.1001B * 2^3
 <a href="../LICENSE">许可协议</a>
 <a class="ft-top" href="#">回到顶部 ↑</a>
 </footer>
-<button class="totop" type="button" aria-label="回到顶部">↑</button>
-<button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script src="../assets/site.js"></script>
-<script>
-(function () {
-  var nodes = document.querySelectorAll('.mermaid');
-  if (!nodes.length) return;
-  if (!window.mermaid) {
-    nodes.forEach(function (el) {
-      el.insertAdjacentHTML('beforebegin',
-        '<p class="warn">未加载到 mermaid 运行时（mermaid.min.js 不在预期位置），' +
-        '下图以源码显示，可复制到任意 mermaid 编辑器查看。</p>');
-      var pre = document.createElement('pre'), code = document.createElement('code');
-      code.textContent = el.textContent; pre.appendChild(code);
-      el.innerHTML = ''; el.appendChild(pre);
-    });
-    return;
-  }
-  mermaid.initialize({ startOnLoad: false, securityLevel: 'loose', theme: 'neutral',
-    fontFamily: 'inherit', flowchart: { useMaxWidth: true, htmlLabels: true },
-    state: { useMaxWidth: true } });
-  nodes.forEach(function (el, i) {
-    mermaid.render('mmd-' + i, el.textContent.trim()).then(function (r) {
-      el.innerHTML = r.svg;
-    }).catch(function (e) {
-      el.innerHTML = '<p class="warn">该图渲染失败：' + e.message + '</p>';
-      var pre = document.createElement('pre'), code = document.createElement('code');
-      code.textContent = el.dataset.src || ''; pre.appendChild(code); el.appendChild(pre);
-    });
-  });
-})();
-</script>
+<button class="to-top" type="button" aria-label="回到顶部">↑</button>
+<button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>
 </body></html>

@@ -33,7 +33,7 @@ website/408-kaoyan/
 │                                静态站点：index.html、01-….html、01-….md.html
 ├── assets/                      ★ 外壳样式与行为（手写源，必须入库）
 │   ├── site.css                 站点外壳样式（配色 token 本项目自定）
-│   └── site.js                  站点外壳行为（暂为占位，待逐字替换为数学二版本）
+│   └── site.js                  外壳行为（与 math2-kaoyan **逐字节相同**，勿就地改）
 ├── README.html                  总览页（站点版 ＝ .docs/00-总览.md 渲染）
 ├── README.md                    仓库说明（部署 / 许可 / 数据可信度口径）
 ├── mermaid.min.js               本地 Mermaid 运行时（离线渲染）
@@ -50,6 +50,13 @@ website/408-kaoyan/
 > 契约钦定：`.site-topbar`/`.tb-*`、`.site-sidebar`、`#sec-freq`…`#sec-real`、
 > `.chapter-nav`/`.cn-prev`/`.cn-next`、`.site-footer`、`.home-subjects`/`.hs-*`、
 > `html.dark`、`←/→ j/k` 翻章。**改类名前先改契约**，不要在本仓库发明例外。
+>
+> 另有 `site.js` **钩子契约**（§2.4.1；这些是脚本真正查询的名字，改名会让行为
+> 静默失效）：`.theme-toggle` `.nav-toggle` `.to-top` `.read-progress`
+> `.sb-filter` `.sb-group` `.sb-group-t` `.sb-chap` `.tocbox` `.toclink`
+> `.tb-search`、`localStorage['kaoyan-theme']`、`body[data-prev|data-next]`、
+> `<a id="top">`。`site.js` 必须在 `<head>` **同步**引入（不可 `defer`），
+> 页面不得有内联 `<style>`/`<script>`。
 
 ## 三、再生成与校验（在本目录内执行）
 
@@ -66,7 +73,7 @@ python3 scripts/split_explain.py   # 长段落自动分段
 python3 scripts/build.py           # parts/ + topics.py → .docs/ 的 Markdown
 python3 scripts/gen_summary.py     # 刷新 .docs/00-总览.md 的考频总表
 python3 scripts/build_html.py      # .docs/ → 仓库根的静态站点
-python3 scripts/validate.py        # 校验 F1—F23（含 mermaid 真实解析，缺依赖即报错）
+python3 scripts/validate.py        # 校验 F1—F26（含 mermaid 真解析与外壳行为测试）
 python3 scripts/validate.py --parts   # 校验 parts/ 半成品（写内容时的内层循环）
 ```
 
@@ -80,8 +87,10 @@ python3 scripts/validate.py --parts   # 校验 parts/ 半成品（写内容时�
   手工改会在下次生成时被覆盖。
 - `assets/site.css` 与 `assets/site.js` 是**手写源**（不是生成物），必须入库；
   但页面外壳的 DOM 与 class 名是**跨项目契约**，改类名/锚点 id 前先改
-  `../PLAN-对齐与改版.md`，再同步两个项目。`site.js` 目前是占位实现，
-  待数学二抽出后**整体逐字替换**，不要两边各维护一份。
+  `../PLAN-对齐与改版.md`，再同步两个项目。`assets/site.js` 已是上游
+  （math2-kaoyan，冻结于 `9fec899`）的**逐字复制**，由 `F25` 用钉在文件头的
+  sha256 强制；`scripts/test_site_js.mjs` 同样来自上游，由 `F26` 在门禁里跑。
+  **这两份都不要就地改。**
 - `scripts/topics.py` 是**考频数字的唯一数据源**，正文里的数字由 `build.py` 注入，
   不要在两处各写一份。
 - 考频/真题数据凡不能核实的，标注「考频待补充」或「真题改编」，**不许编造**。
