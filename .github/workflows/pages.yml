@@ -1,0 +1,54 @@
+# 把仓库根目录作为静态站点发布到 GitHub Pages。
+#
+# 为什么用工作流而不是「Deploy from a branch」：
+#   1. 发布前跑一遍 scripts/validate.py（F1—F17），校验不过就不部署——
+#      分支部署没有任何地方能挂这道门禁，生成器悄悄退化了也会直接上线。
+#   2. 自定义工作流不占用「每小时 10 次构建」的软性限制。
+#
+# 不用 Jekyll（站点是纯静态 HTML；仓库根另有 .nojekyll 兜底）。
+name: Deploy static site to Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # validate.py 只需要 markdown 一个第三方包（sympy/matplotlib 不在本仓库的校验路径上）
+      - name: 安装校验依赖
+        run: python3 -m pip install --quiet 'Markdown==3.11.1'
+
+      # 门禁：模板字段、考频数字与 topics.py 逐字一致、图语法、ASCII 对齐、
+      # 真题年份、链接可达、交付物完整性。有 error 时退出码为 1，直接中止部署。
+      - name: 发布前校验（F1—F17）
+        run: python3 scripts/validate.py
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
