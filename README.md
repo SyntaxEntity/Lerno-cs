@@ -84,12 +84,11 @@
 
 | 平台 | 要点 |
 | --- | --- |
-| **Cloudflare Pages** | 免费、可连**私有**仓库、国内连通性通常较好（推荐） |
-| GitHub Pages | 仓库 Settings → Pages → Source 选 `main` / `root`；**公开仓库才免费** |
+| **GitHub Pages** | 本仓库已带工作流 `.github/workflows/pages.yml`：推 `main` 即自动发布，且**发布前先跑 `scripts/validate.py`**（F1—F17），校验不过不会上线；免费账户需**公开仓库** |
+| **Cloudflare Pages** | 免费、可连**私有**仓库、国内连通性通常较好 |
 | Vercel / Netlify | 直接导入仓库，Framework 选 Other，Output 留空 |
 
-> 若平台用 Jekyll 处理，本仓库不含下划线开头的站点目录，无需额外配置；
-> 如遇问题可加一个空的 `.nojekyll` 文件。
+> 仓库根已有空的 `.nojekyll`，Jekyll 不会插手，纯静态站点按原样发布。
 
 ## 六、本地再生成与校验
 
