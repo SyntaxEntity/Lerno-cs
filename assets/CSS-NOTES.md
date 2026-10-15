@@ -137,6 +137,36 @@
 
 合并时**请全部保留**已定义的 55 个；缺规则的见 §3。
 
+## 6.5 六段标题的统一形态：`.sec-h`（来自 `../配色候选/组件预览.html`）
+
+408 现在**没有** `.sec-h`：六段标题靠 `.lab::before`（统一 `--acc` 色块）+
+`.sec-key` 的浅底块。而用户选定的预览里，六段标题是**统一的色条形态**：
+
+```html
+<div class="sec-h" style="border-left-color:var(--<语义色>)">考频统计</div>
+```
+
+| 小节 | 预览写法 | **应改用的契约 token** |
+| --- | --- | --- |
+| 考频统计 | `var(--freq)` | `var(--sec-freq)` |
+| 核心讲解 | `var(--acc)` | `var(--acc)`（= `--sec-core`） |
+| 关键结论速记 | `var(--key)` | `var(--sec-key)` |
+| 示意图 | `var(--fig)` | `var(--sec-fig)` |
+| 易错点 | `var(--err)` | `var(--sec-err)` |
+| 真题示例 | `var(--real)` | `var(--sec-real)` |
+
+> **⚠️ 预览里的 token 名是简写，不要照抄**：它写的是 `--accsoft` `--codebg`
+> `--warnbg` `--warnline` `--realbg` `--realline`，以及语义色 `--freq` `--key`
+> `--fig` `--err` `--real`。契约 §5.2.2 明令成对用 `-bg`/`-line` 后缀、语义色
+> 带 `--sec-` 前缀，且**已把上面这些简写列为废弃旧名**。以契约表为准。
+
+**对 408 的影响**：统一版若采用 `.sec-h` 色条形态，408 要做的适配是
+生成器把六段标签从 `<p class="lab">考频统计</p>` 改成
+`<div class="sec-h" style="border-left-color:var(--sec-freq)">考频统计</div>`，
+并去掉 `.sec-key` 的浅底块（避免"色条 + 色块"重复编码）。
+**这属于生成器改动**（`build_html.py` 的 `_style_fields`），408 已记下，
+待统一版 `site.css` 到手后一并做，不在本次类清单范围内。
+
 ## 7. ⚠️ 408 侧仍需处理的技术债（合并时请一并考虑）
 
 1. **元素选择器大量存在，不是"已全部改成类"**（更正本文件早期的一处臆断）。
