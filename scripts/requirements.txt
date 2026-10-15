@@ -1,0 +1,19 @@
+# 408 速成资料 · Python 侧依赖（锁定版本）
+#
+# 装到仓库内的 .tools/venv（.tools/ 已 gitignore，可随时删掉重建）：
+#
+#   python3 -m venv .tools/venv
+#   .tools/venv/bin/python -m pip install -r scripts/requirements.txt
+#
+# 为什么锁定版本：`validate.py` 的 F14 用真实 Markdown 渲染器断言「六段字段各自
+# 独立成段」，换版本可能改变段落切分，校验结论就会跟着变。锁定后用同一套版本
+# 重跑，结论才可复现；这也保证**本地校验与 CI 门禁用的是同一个版本**——
+# 否则门禁通过不等于本地通过。
+#
+# 依赖缺 markdown 时 F14 会静默跳过（见 validate.py 的 render_check），
+# 所以版本漂移本身不会报错，只会让一条校验项悄悄失效。这里锁死来杜绝这种情况。
+#
+# Node 侧依赖（mermaid 真实解析 + 站点内置运行时）另见 tools-package.json：
+#   npm install --prefix .tools --cache /tmp/npm-cache mermaid@12.1.0 jsdom@30.1.2
+
+Markdown==3.11.1

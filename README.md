@@ -95,22 +95,34 @@
 工具链依赖 Python 与（可选的）Node 依赖：
 
 ```bash
-python3 scripts/normalize_md.py    # Markdown 空行规范化（幂等）
-python3 scripts/split_explain.py   # 长段落自动分段
-python3 scripts/build.py           # 由 parts/ + meta 数据组装 .docs/ 的 Markdown
-python3 scripts/gen_summary.py     # 刷新 .docs/00-总览.md 的考频总表
-python3 scripts/build_html.py      # 由 .docs/ 生成仓库根的静态站点
-python3 scripts/validate.py        # 校验：模板/数字一致性/图/链接/组件
+# 一次性安装依赖（.tools/ 已 gitignore，可随时删掉重建）
+python3 -m venv .tools/venv
+.tools/venv/bin/python -m pip install -r scripts/requirements.txt
+npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund \
+  mermaid@12.1.0 jsdom@30.1.2        # 版本见 scripts/tools-package.json
 
-# 可选：真实 Mermaid 语法校验（需要 node 依赖）
-npm install --prefix .tools mermaid jsdom
-node scripts/check_mermaid.mjs
+# 一键跑通全流水线（推荐）：规范化 → 分段 → 组装 → 总表 → 站点 → 校验
+python3 scripts/run_all.py           # 加 --quick 可跳过规范化与分段
+
+# 或按需单步执行（顺序不可颠倒）
+python3 scripts/normalize_md.py      # Markdown 空行规范化（幂等）
+python3 scripts/split_explain.py     # 长段落自动分段
+python3 scripts/build.py             # 由 parts/ + topics.py 组装 .docs/ 的 Markdown
+python3 scripts/gen_summary.py       # 刷新 .docs/00-总览.md 的考频总表
+python3 scripts/build_html.py        # 由 .docs/ 生成仓库根的静态站点
+python3 scripts/validate.py          # 校验 F1—F17，含 mermaid 真实解析
+python3 scripts/validate.py --parts  # 校验 parts/ 半成品（写内容时的内层循环）
 ```
 
+依赖版本由 `scripts/requirements.txt` 与 `scripts/tools-package.json` 锁定，
+不再散落在命令或工作流里——**本地校验与 CI 门禁用的是同一套版本**，否则"门禁通过"
+不等于"本地通过"。其中 `mermaid` 的版本必须等于仓库根 `mermaid.min.js` 的版本，
+`validate.py` 会在两者不一致时直接报错。
+
 `validate.py` 覆盖 `F1`—`F17`：模板字段齐全与顺序、考频数字与单一数据源逐字一致、
-代码块与图语法、ASCII 图全角字符、真题年份、图数量、段落与条目数区间、
-README 声明与正文标注双向一致、块级元素空行、**渲染验证字段独立成段**、
-相对链接可达、交付物与组件完整性（防止渲染器静默退化）、
+代码块与图语法（**含 mermaid 真实解析，缺依赖即报错而非跳过**）、ASCII 图全角字符、
+真题年份、图数量、段落与条目数区间、README 声明与正文标注双向一致、块级元素空行、
+**渲染验证字段独立成段**、相对链接可达、交付物与组件完整性（防止渲染器静默退化）、
 **全站断链校验（含 `.md` 跳转页目标存在性）**。
 
 ## 七、修改内容请只改 `parts/`

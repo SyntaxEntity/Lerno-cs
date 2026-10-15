@@ -45,14 +45,25 @@ website/408-kaoyan/
 ## 三、再生成与校验（在本目录内执行）
 
 ```bash
+# 依赖（版本锁定在 scripts/requirements.txt 与 scripts/tools-package.json）
+python3 -m venv .tools/venv
+.tools/venv/bin/python -m pip install -r scripts/requirements.txt
+npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund \
+  mermaid@12.1.0 jsdom@30.1.2
+
+python3 scripts/run_all.py         # 一键跑通全链（推荐）；--quick 跳过规范化与分段
 python3 scripts/normalize_md.py    # Markdown 空行规范化（幂等）
 python3 scripts/split_explain.py   # 长段落自动分段
 python3 scripts/build.py           # parts/ + topics.py → .docs/ 的 Markdown
 python3 scripts/gen_summary.py     # 刷新 .docs/00-总览.md 的考频总表
 python3 scripts/build_html.py      # .docs/ → 仓库根的静态站点
-python3 scripts/validate.py        # 校验 F1—F17
-node scripts/check_mermaid.mjs     # 可选，需 .tools/ 下的 node 依赖
+python3 scripts/validate.py        # 校验 F1—F17（含 mermaid 真实解析，缺依赖即报错）
+python3 scripts/validate.py --parts   # 校验 parts/ 半成品（写内容时的内层循环）
 ```
+
+> `mermaid` 的真实解析（`scripts/check_mermaid.mjs`）已并入 `validate.py` 的 F3，
+> **不再是"可选"**：缺 node 或 `.tools` 依赖会报 error 而不是跳过。
+> 确实要离线跑，须显式加 `--no-mermaid`。
 
 ## 四、硬性约定
 

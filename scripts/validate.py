@@ -6,7 +6,10 @@
   F1 每个 ## 小节必须含 6 个模板字段，且顺序为
      考频统计→核心讲解→关键结论速记→示意图→易错点→真题示例
   F2 考频统计行必须与 scripts/topics.py 的权威数据逐字一致
-  F3 代码围栏必须成对闭合，且示意图必须带语言标签（text/mermaid）
+  F3 代码围栏必须成对闭合，示意图必须带语言标签（text/mermaid）；
+     mermaid 除静态规则外**必须交给官方解析器真解析**（scripts/check_mermaid.mjs），
+     解析失败、解析器不在、node 或 .tools 依赖缺失、一张图都没扫到——全是 error，
+     不静默跳过（离线时须显式加 --no-mermaid）
   F4 禁止占位符（TODO / 待补充讲解 / XXX / 略 等）
   F5 ASCII 示意图不得混入全角/中文字符（会破坏等宽对齐），不得含制表符
   F6 真题示例必须标注年份，且年份落在 2009—2025 区间
@@ -24,8 +27,11 @@
 用法： python3 scripts/validate.py [--stats]
 """
 import glob
+import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 import unicodedata
 from collections import Counter, defaultdict
@@ -36,6 +42,18 @@ import topics as T  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓库根
 DOCS = os.path.join(ROOT, ".docs")                                   # Markdown 归档
 SITE = ROOT                                                          # HTML 站点就在仓库根
+
+MERMAID_CHECKER = os.path.join(ROOT, "scripts", "check_mermaid.mjs")
+NODE_DEPS_HINT = ("装依赖：npm install --prefix .tools --cache /tmp/npm-cache "
+                  "--no-audit --no-fund mermaid@12.1.0 jsdom@30.1.2"
+                  "（版本见 scripts/tools-package.json）；"
+                  "实在离线可加 --no-mermaid 显式跳过")
+PY_DEPS_HINT = ("装依赖：python3 -m venv .tools/venv && "
+                ".tools/venv/bin/python -m pip install -r scripts/requirements.txt"
+                "（F14 用真实 Markdown 渲染器，缺它这项校验无法进行）")
+ALLOW_NO_MERMAID = "--no-mermaid" in sys.argv
+# 防止 F14 换解释器重跑时无限递归（见 render_check）
+NO_REEXEC = "--no-reexec" in sys.argv
 
 FIELD_ORDER = ["**考频统计**", "**核心讲解**", "**关键结论速记**", "**示意图**", "**易错点**", "**真题示例**"]
 FENCE_LANGS = ("text", "mermaid")
@@ -460,6 +478,18 @@ def render_check(rel, text):
     try:
         import markdown
     except ImportError:
+        # 本进程 import 失败是**确定的事实**（不是"探测不到"），所以这里直接换用
+        # 仓库内的 .tools/venv 重跑自己：静默 return 会让 F14 悄悄失效，
+        # 出现"校验全绿其实少跑了一项"。venv 见 scripts/requirements.txt。
+        venv = os.path.join(ROOT, ".tools", "venv", "bin", "python")
+        if (not NO_REEXEC and os.path.exists(venv)
+                and os.path.abspath(venv) != os.path.abspath(sys.executable)):
+            r = subprocess.run([venv, os.path.abspath(__file__)] + sys.argv[1:] + ["--no-reexec"],
+                               capture_output=True, text=True)
+            sys.stdout.write(r.stdout)
+            sys.stderr.write(r.stderr)
+            sys.exit(r.returncode)
+        err(rel, 0, "F14", "当前解释器缺少 markdown，无法做渲染验证。%s" % PY_DEPS_HINT)
         return
     labels = ["考频统计", "核心讲解", "关键结论速记", "示意图", "易错点", "真题示例"]
     html = markdown.markdown(text, extensions=["tables", "fenced_code"])
@@ -645,7 +675,10 @@ def main():
                     err("parts/%s" % key, 0, "F0", "缺少半成品 %s.md" % t[6])
                     continue
                 validate_partial(key, t, p)
-        return report("parts 半成品校验报告")
+        # 内层循环也要有图形校验：写手在这里就该看到自己刚写坏的 mermaid，
+        # 而不是等 build 之后才暴露。所以 --parts 扫 parts/ 而不是 .docs/。
+        run_mermaid_parser(os.path.join(ROOT, "parts"))
+        return report("parts 半成品校验报告", parts_mode=True)
 
     for key in T.ORDER:
         d = os.path.join(DOCS, T.SUBJECTS[key]["dir"])
@@ -666,7 +699,131 @@ def main():
     check_links()
     check_site_links()
     check_html()
+    run_mermaid_parser(DOCS)
     return report("408 复习资料校验报告")
+
+
+def _node_version(name):
+    p = os.path.join(ROOT, ".tools", "node_modules", name, "package.json")
+    try:
+        with open(p, encoding="utf-8") as f:
+            return json.load(f).get("version")
+    except Exception:                                        # noqa: BLE001
+        return None
+
+
+def _bundled_mermaid_version():
+    """从站点内置 mermaid.min.js 抠出版本号（须通读全文，见 run_all.py 的说明）。"""
+    try:
+        with open(os.path.join(ROOT, "mermaid.min.js"), encoding="utf-8",
+                  errors="ignore") as f:
+            text = f.read()
+    except Exception:                                        # noqa: BLE001
+        return None
+    best = None
+    for m in re.finditer(r'version\s*:\s*"(\d+)\.(\d+)\.(\d+)"', text):
+        v = m.group(0).split('"')[1]
+        if v == "0.0.0":                                     # 无关组件的占位版本
+            continue
+        if best is None or tuple(map(int, v.split("."))) > tuple(map(int, best.split("."))):
+            best = v
+    return best
+
+
+def check_node_deps():
+    """先决条件：.tools 下的 mermaid/jsdom 是否就位，且版本与站点运行时一致。
+
+    返回 True/False。版本漂移必须报出来：F3 用 `mermaid` 解析、站点用仓库根的
+    `mermaid.min.js` 渲染——两者版本不同，就会出现「校验通过但页面渲染不出来」
+    这种最难查的情况。
+    """
+    problems = []
+    for name in ("mermaid", "jsdom"):
+        if _node_version(name) is None:
+            problems.append("缺少 %s" % name)
+    have = _node_version("mermaid")
+    bundled = _bundled_mermaid_version()
+    if have and bundled and have != bundled:
+        problems.append("mermaid 与站点内置运行时不一致：.tools 是 %s，"
+                        "仓库根 mermaid.min.js 是 %s" % (have, bundled))
+    if problems:
+        err("scripts", 0, "F3", "Node 依赖不可用：%s。%s" % ("；".join(problems), NODE_DEPS_HINT))
+        return False
+    return True
+
+
+def run_mermaid_parser(scan_dir):
+    """F3 的真实解析器层：调用 node + 官方 mermaid parse()。
+
+    这里的**每一条失败路径都必须是 error 而不是 warning**：解析器不在、node 不在、
+    装不起来、返回码非 0、一块图都没扫到——这些情况都会让 F3 退化成「永远通过」，
+    而页面上的图会静默变空白。宁可整个校验失败，也不许它假装检查过了。
+    真要离线跳过，必须显式加 `--no-mermaid`（命令行会留下痕迹）。
+
+    `scan_dir` 跟着模式走：`--parts` 时扫内容源 `parts/`，成品模式扫 `.docs/`。
+    否则写手在「改 parts → validate --parts」的内层循环里看不到自己刚写坏的
+    mermaid，要等 build 之后才暴露——那就等于内层循环没有图形校验。
+    """
+    if ALLOW_NO_MERMAID:
+        warn("mermaid", 0, "F3", "已按 --no-mermaid 跳过真实解析（命令行显式要求）")
+        return
+    if not os.path.exists(MERMAID_CHECKER):
+        err("scripts", 0, "F3", "找不到 mermaid 解析器脚本 scripts/check_mermaid.mjs")
+        return
+    if shutil.which("node") is None:
+        err("mermaid", 0, "F3", "找不到 node 可执行文件，无法做真实解析。%s" % NODE_DEPS_HINT)
+        return
+    if not check_node_deps():
+        return
+    try:
+        r = subprocess.run(["node", MERMAID_CHECKER, "--content", scan_dir],
+                           cwd=ROOT, capture_output=True, text=True, timeout=900)
+    except Exception as e:                                   # noqa: BLE001
+        err("mermaid", 0, "F3", "调用 mermaid 解析器失败：%s" % e)
+        return
+    try:
+        data = json.loads((r.stdout or "").strip().splitlines()[-1])
+    except Exception:                                        # noqa: BLE001
+        err("mermaid", 0, "F3",
+            "mermaid 解析器未产出 JSON（返回码 %d）：%s%s"
+            % (r.returncode, (r.stderr or r.stdout or "")[-200:], NODE_DEPS_HINT))
+        return
+    if data.get("fatal"):
+        err("mermaid", 0, "F3", "mermaid 解析器无法运行：%s" % str(data["fatal"])[:200])
+        return
+    if r.returncode != 0:
+        err("mermaid", 0, "F3", "mermaid 解析器返回码 %d" % r.returncode)
+        return
+    stats["mermaid_parsed"] = data.get("ok", 0)
+    stats["mermaid_blocks"] = data.get("total", 0)
+    for f in data.get("failed", []):
+        err(os.path.relpath(f["file"], ROOT), f.get("line", 0), "F3",
+            "mermaid 真实解析器拒绝：%s" % str(f.get("error", ""))[:200])
+    if data.get("total", 0) == 0:
+        err("mermaid", 0, "F3",
+            "在 %s 下没有任何 mermaid 图被解析——扫描范围为空，等于 F3 没生效"
+            % os.path.relpath(scan_dir, ROOT))
+
+
+
+    """F12: README 声明的"已核对原题"清单必须与正文标注逐条一致。"""
+    import glob
+    actual = set()
+    for f in glob.glob(os.path.join(ROOT, "parts", "*", "*.md")):
+        with open(f, encoding="utf-8") as fh:
+            for line in fh:
+                m = re.match(r"^\*\*((?:19|20)\d{2}) 年 408 第 (\d+) 题", line.strip())
+                if m:
+                    actual.add((m.group(1), m.group(2)))
+    rp = os.path.join(DOCS, "00-总览.md")
+    with open(rp, encoding="utf-8") as fh:
+        readme = fh.read()
+    declared = set(re.findall(r"\| `(\d{4})` 第 `(\d+)` 题", readme))
+    for item in sorted(declared - actual):
+        err("README.md", 0, "F12", "声明为已核对原题但正文未标注：%s 年第 %s 题" % item)
+    for item in sorted(actual - declared):
+        err("README.md", 0, "F12", "正文标注为原题但未在 README 声明清单中：%s 年第 %s 题" % item)
+    stats["orig"] = len(actual)
 
 
 def check_readme_citations():
@@ -690,7 +847,7 @@ def check_readme_citations():
     stats["orig"] = len(actual)
 
 
-def report(title):
+def report(title, parts_mode=False):
     print("=" * 74)
     print(title)
     print("=" * 74)
@@ -698,9 +855,24 @@ def report(title):
         print("  %-46s 知识点 %2d | ASCII 图 %2d | Mermaid %2d | %6d 字"
               % (k, v["sections"], v["ascii"], v["mermaid"], v["chars"]))
     print("-" * 74)
-    print("  文件 %d 个 | 知识点 %d 个 | ASCII 图 %d | Mermaid 图 %d | 总计 %d 字"
-          % (len(per_file), stats["sections"], stats["ascii"], stats["mermaid"], stats["chars"]))
-    print("  高频标记 %d 个 | 真题原题 %d 道" % (stats["hot"], stats.get("orig", 0)))
+    # 「知识点」的口径随模式走，两种模式必须各按各的算，否则会出现
+    # 「逐文件说知识点 1、汇总说知识点 0」这种自相矛盾：
+    #   成品模式：知识点 = 标题以 [高频] 结尾的小节（= 26）；
+    #             其余 ## 小节是四科总览里的元小节，混进去会把 26 报成 64。
+    #   parts 模式：一个半成品文件就是一个知识点，且文件里没有 [高频] 标题
+    #             （高频标记由 build.py 注入），所以按文件数算。
+    if parts_mode:
+        kp = len(per_file)
+    else:
+        kp = stats["hot"]
+    print("  文件 %d 个 | 知识点 %d | 小节 %d | ASCII 图 %d | Mermaid 图 %d | 总计 %d 字"
+          % (len(per_file), kp, stats["sections"], stats["ascii"], stats["mermaid"],
+             stats["chars"]))
+    if not parts_mode:
+        print("  高频标记 %d 个 | 真题原题 %d 道" % (stats["hot"], stats.get("orig", 0)))
+    if stats.get("mermaid_blocks"):
+        print("  Mermaid 真实解析 %d/%d 通过" % (stats.get("mermaid_parsed", 0),
+                                                 stats["mermaid_blocks"]))
     print("-" * 74)
     if errors:
         print("  ✗ 错误 %d 条：" % len(errors))
