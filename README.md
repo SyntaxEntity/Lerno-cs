@@ -116,7 +116,7 @@ python3 scripts/run_all.py           # 加 --quick 可跳过规范化与分段
 # 或按需单步执行（顺序不可颠倒）
 python3 scripts/normalize_md.py      # Markdown 空行规范化（幂等）
 python3 scripts/split_explain.py     # 长段落自动分段
-python3 scripts/build.py             # 由 parts/ + topics.py 组装 .docs/ 的 Markdown
+python3 scripts/build.py             # 由 parts/ + meta.py 组装 .docs/ 的 Markdown
 python3 scripts/gen_summary.py       # 刷新 .docs/00-总览.md 的考频总表
 python3 scripts/build_html.py        # 由 .docs/ 生成仓库根的静态站点
 python3 scripts/validate.py          # 校验形式层，含 mermaid 真实解析

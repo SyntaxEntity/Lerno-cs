@@ -70,7 +70,7 @@ npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund \
 python3 scripts/run_all.py         # 一键跑通全链（推荐）；--quick 跳过规范化与分段
 python3 scripts/normalize_md.py    # Markdown 空行规范化（幂等）
 python3 scripts/split_explain.py   # 长段落自动分段
-python3 scripts/build.py           # parts/ + topics.py → .docs/ 的 Markdown
+python3 scripts/build.py           # parts/ + meta.py → .docs/ 的 Markdown
 python3 scripts/gen_summary.py     # 刷新 .docs/00-总览.md 的考频总表
 python3 scripts/build_html.py      # .docs/ → 仓库根的静态站点
 python3 scripts/validate.py        # 校验形式层（含 mermaid 真解析与外壳行为测试）
@@ -97,7 +97,7 @@ python3 scripts/reverse_tests.py       # 反向测试：每条规则注入反例
   元校验用钉在文件头的 sha256 强制；`scripts/test_site_js.mjs` 同样来自上游，
   由外壳行为测试在门禁里跑。
   **这两份都不要就地改。**
-- `scripts/topics.py` 是**考频数字的唯一数据源**，正文里的数字由 `build.py` 注入，
+- `scripts/meta.py` 是**考频数字的唯一数据源**，正文里的数字由 `build.py` 注入，
   不要在两处各写一份。
 - 考频/真题数据凡不能核实的，标注「考频待补充」或「真题改编」，**不许编造**。
   数据口径与可信度分级见 `README.md` 第三节。

@@ -124,7 +124,7 @@ case("F0", "parts 半成品文件缺失", P01, lambda t: t, mode="parts", expect
 case("F1", "改坏「关键结论速记」字段标签", D01,
      lambda t: t.replace("**关键结论速记**：", "**关键结论速记XX**："), expect_kw="关键结论速记")
 
-# F2：考频统计行必须与 topics.py 逐字一致
+# F2：考频统计行必须与 meta.py 逐字一致
 case("F2", "改坏考频统计行", D01,
      lambda t: re.sub(r"^\*\*考频统计\*\*.*$",
                       "**考频统计**：考察次数 999 次（篡改）", t, count=1, flags=re.M),

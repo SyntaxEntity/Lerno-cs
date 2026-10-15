@@ -51,7 +51,7 @@ jobs:
           npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund
           mermaid@12.1.0 jsdom@30.1.2
 
-      # 门禁：模板字段、考频数字与 topics.py 逐字一致、图语法（含 mermaid 真解析）、
+      # 门禁：模板字段、考频数字与 meta.py 逐字一致、图语法（含 mermaid 真解析）、
       # ASCII 对齐、真题年份、链接可达、交付物完整性、统一外壳（F22/F23）、
       # 渲染残留（F24）、共用件一致性（F25）、外壳行为测试（F26）。
       # 有 error 时退出码为 1，直接中止部署。缺 node/依赖同样是 error，不会静默跳过。

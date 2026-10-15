@@ -5,7 +5,7 @@
 顺序是有讲究的：
   1. `normalize_md.py`  先规范化内容源空行 —— 后面所有步骤都假定空行已规范；
   2. `split_explain.py` 长段落自动分段（同样只该在规范化之后做）；
-  3. `build.py`         由 parts/ + topics.py 组装成 .docs/ 的 Markdown；
+  3. `build.py`         由 parts/ + meta.py 组装成 .docs/ 的 Markdown；
   4. `gen_summary.py`   把考频总表注入 .docs/00-总览.md（依赖上一步的产物）；
   5. `build_html.py`    由 .docs/ 生成仓库根的静态站点（依赖 3、4 的产物）；
   6. `validate.py`      校验成品：F1—F17，含链接可达与 mermaid 真实解析。

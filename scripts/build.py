@@ -4,7 +4,7 @@
 
 职责划分（保证全局一致性）：
   - 模板骨架（**考频统计** 行、**核心讲解** 标题、**示意图** 标题等）由本脚本生成；
-  - 考频数据来自 scripts/topics.py（唯一数据源），作者只写内容不写数字；
+  - 考频数据来自 scripts/meta.py（唯一数据源），作者只写内容不写数字；
   - 作者写 parts/<slug>.md，格式见 PARTS_FORMAT。
 
 parts 文件格式（顺序固定）：
@@ -26,7 +26,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import topics as T  # noqa: E402
+import meta as T  # noqa: E402
 import normalize_md as NM  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓库根

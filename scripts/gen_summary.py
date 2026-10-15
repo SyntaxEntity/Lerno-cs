@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""把考频总表注入 .docs/00-总览.md 的标记区（保证 README 与 topics.py 数据一致）。
+"""把考频总表注入 .docs/00-总览.md 的标记区（保证 README 与 meta.py 数据一致）。
 
 用法： python3 scripts/gen_summary.py
 """
@@ -8,7 +8,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import topics as T  # noqa: E402
+import meta as T  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓库根
 DOCS = os.path.join(ROOT, ".docs")                                   # Markdown 归档（README 所在处）

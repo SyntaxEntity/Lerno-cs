@@ -5,7 +5,7 @@
 校验项（F1—F17）：
   F1 每个 ## 小节必须含 6 个模板字段，且顺序为
      考频统计→核心讲解→关键结论速记→示意图→易错点→真题示例
-  F2 考频统计行必须与 scripts/topics.py 的权威数据逐字一致
+  F2 考频统计行必须与 scripts/meta.py 的权威数据逐字一致
   F3 代码围栏必须成对闭合，示意图必须带语言标签（text/mermaid）；
      mermaid 除静态规则外**必须交给官方解析器真解析**（scripts/check_mermaid.mjs），
      解析失败、解析器不在、node 或 .tools 依赖缺失、一张图都没扫到——全是 error，
@@ -38,7 +38,7 @@ import unicodedata
 from collections import Counter, defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import topics as T  # noqa: E402
+import meta as T  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓库根
 DOCS = os.path.join(ROOT, ".docs")                                   # Markdown 归档
@@ -211,7 +211,7 @@ def validate_file(path, subject_key, is_overview=False):
                     break
             if expect is None:
                 # 小节标题不与注册表知识点名匹配
-                err(rel, start + 1, "F2", "小节《%s》无法在 topics.py 中匹配到知识点" % title)
+                err(rel, start + 1, "F2", "小节《%s》无法在 meta.py 中匹配到知识点" % title)
             elif freq_lines[0].strip() != expect:
                 err(rel, start + 1, "F2", "考频统计与权威数据不一致\n    实际: %s\n    期望: %s"
                     % (freq_lines[0].strip(), expect))

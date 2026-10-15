@@ -28,7 +28,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import topics as T  # noqa: E402
+import meta as T  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DOCS = os.path.join(ROOT, ".docs")     # Markdown 归档（输入）
@@ -283,7 +283,7 @@ def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter
 
 
 def chapter_nav(subject_key, slug):
-    """章节 prev/next：按 topics.py 的 TOPICS 顺序（也就是阅读顺序）。
+    """章节 prev/next：按 meta.py 的 TOPICS 顺序（也就是阅读顺序）。
 
     `.cn-prev`/`.cn-next` 是**样式用**类名（PLAN 2.4.1 明确保留）；
     键盘翻章由 body[data-prev|data-next] 驱动，见 page()。
