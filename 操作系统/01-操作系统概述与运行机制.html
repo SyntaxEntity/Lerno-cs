@@ -1,220 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light"><head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>操作系统 · 操作系统概述与运行机制</title><style>
-*,*::before,*::after{box-sizing:border-box}
-:root{
-  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
-  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
-  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
-  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
-  --radius:10px; --mw:780px;
-}
-html[data-theme="dark"]{
-  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
-  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
-  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
-  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
-}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
-       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  text-rendering:optimizeLegibility;
-}
-/* ---------- 布局 ---------- */
-#wrap{display:flex;align-items:flex-start;min-height:100vh}
-nav{
-  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
-  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
-}
-nav::-webkit-scrollbar{width:9px}
-nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
-nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
-#q{
-  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
-  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
-}
-#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
-nav .home{
-  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
-  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
-}
-nav .home:hover{filter:brightness(.97)}
-details.grp{margin:2px 0}
-details.grp>summary{
-  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
-  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-details.grp>summary::-webkit-details-marker{display:none}
-details.grp>summary:hover{background:var(--line2)}
-details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
-details.grp[open]>summary{color:var(--acc)}
-nav a.item{
-  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
-  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-nav a.item:hover{background:var(--line2);color:var(--fg)}
-nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
-/* ---------- 进度条 ---------- */
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
-/* ---------- 标题 ---------- */
-h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
-h2{
-  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
-  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
-}
-h3{font-size:18px;margin:28px 0 12px}
-p{margin:0 0 14px}
-/* ---------- 知识点卡片 ---------- */
-.kp{
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
-}
-.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
-/* ---------- 字段 ---------- */
-.fld{margin:24px 0 0}
-.lab{
-  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
-  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
-}
-.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
-.freq{
-  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
-  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
-}
-.freq b{color:var(--fg)}
-html[data-theme="dark"] .freq{color:#f2e8cc}
-/* 结论速记 → 公式卡 */
-ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.facts li{
-  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
-  padding:11px 15px;font-size:15px;margin:0;
-}
-ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
-/* 易错点 → 卡片 */
-ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.errs li{
-  position:relative;background:var(--panel);border:1px solid var(--line);
-  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
-}
-ul.errs li::before{
-  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
-  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
-}
-html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
-/* 解析 */
-blockquote{
-  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
-  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
-}
-blockquote p:last-child{margin-bottom:0}
-blockquote strong{color:var(--fg)}
-/* 真题题干 */
-.q-stem{
-  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
-}
-.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
-/* ---------- 代码 ---------- */
-code{
-  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
-  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
-  word-break:break-word;
-}
-.codebox{margin:14px 0}
-.codebox .bar{
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
-}
-.codebox button{
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  border-radius:6px;padding:2px 9px;font-size:11.5px;
-}
-.codebox button:hover{border-color:var(--acc);color:var(--acc)}
-pre{
-  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
-  padding:14px 16px;overflow:auto;margin:0;
-}
-pre code{background:none;padding:0;font-size:13px;line-height:1.5}
-/* ASCII 示意图：深色面板，保证等宽对齐可读 */
-.codebox.ascii .bar{color:var(--fg2);font-weight:600}
-.codebox.ascii pre{
-  background:var(--dark);border-color:#000;color:var(--dark-fg);
-  font-size:12.5px;line-height:1.45;padding:18px;
-}
-.codebox.ascii pre code{color:var(--dark-fg)}
-/* Mermaid */
-.fig{margin:16px 0}
-.mermaid{
-  background:var(--panel);border:1px solid var(--line);border-radius:8px;
-  padding:16px;overflow:auto;text-align:center;min-height:44px;
-}
-.mermaid svg{max-width:100%;height:auto}
-.fig details{margin-top:8px}
-.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
-.fig summary:hover{color:var(--acc)}
-/* ---------- 表格 ---------- */
-.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
-th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
-th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--line2)}
-/* ---------- 杂项 ---------- */
-.warn{
-  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
-  padding:11px 15px;font-size:14px;margin:14px 0;
-}
-.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
-.totop{
-  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
-  transition:opacity .2s;z-index:40;
-}
-.totop.on{opacity:1;pointer-events:auto}
-.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
-#theme{
-  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
-}
-#menu{
-  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
-  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
-  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
-}
-hr{border:none;border-top:1px solid var(--line);margin:32px 0}
-/* ---------- 窄屏 ---------- */
-@media (max-width:1000px){
-  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
-      box-shadow:4px 0 22px rgba(0,0,0,.12)}
-  nav.open{transform:none}
-  main{padding:22px 18px 130px;max-width:none}
-  #menu{display:flex}
-  .kp{padding:20px 18px 24px}
-}
-/* ---------- 打印 ---------- */
-@media print{
-  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
-  body{background:#fff;font-size:11pt}
-  main{max-width:none;padding:0}
-  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
-  h2{break-after:avoid}
-  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
-  .mermaid{border-color:#ccc}
-  a{color:#000;text-decoration:none}
-}
-</style>
+<title>操作系统 · 操作系统概述与运行机制</title>
+<link rel="stylesheet" href="../assets/site.css">
 <script src="../mermaid.min.js"></script></head>
 <body>
 <div id="bar"></div>
+<header class="site-topbar">
+<a class="tb-brand" href="../index.html">408 速成复习资料</a>
+<nav class="tb-crumbs" aria-label="面包屑"><a href="../index.html">首页</a><span class="tb-sep">›</span><a href="index.html">操作系统</a><span class="tb-sep">›</span><span aria-current="page">操作系统概述与运行机制</span></nav>
+<button class="tb-search" type="button" aria-label="搜索">搜索</button>
+</header>
 <button id="menu" type="button" aria-label="目录">☰</button>
-<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<div class="site-body">
+<nav class="site-sidebar"><div class="sb-brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
 <input id="q" placeholder="筛选知识点…" autocomplete="off">
 <a class="home" href="../index.html">⌂ 全科单页合集</a>
 <details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
@@ -236,6 +35,14 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 </details>
 <details class="grp" open><summary><span>操作系统</span><span class="n">35 分 · 7 点</span></summary>
 <a class="item cur" href="01-操作系统概述与运行机制.html">操作系统概述与运行机制</a>
+<div class="sb-secs">
+<a class="sec-link" href="#sec-freq">考频统计</a>
+<a class="sec-link" href="#sec-core">核心讲解</a>
+<a class="sec-link" href="#sec-key">关键结论速记</a>
+<a class="sec-link" href="#sec-fig">示意图</a>
+<a class="sec-link" href="#sec-err">易错点</a>
+<a class="sec-link" href="#sec-real">真题示例</a>
+</div>
 <a class="item" href="02-进程与线程.html">进程与线程</a>
 <a class="item" href="03-处理机调度与死锁.html">处理机调度与死锁</a>
 <a class="item" href="04-同步与互斥.html">同步与互斥</a>
@@ -250,14 +57,15 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <a class="item" href="../计算机网络/04-网络层.html">网络层</a>
 <a class="item" href="../计算机网络/05-传输层.html">传输层</a>
 <a class="item" href="../计算机网络/06-应用层.html">应用层</a>
-</details></nav><main><h1>操作系统 ｜ 操作系统概述与运行机制</h1><h1 id="_1">操作系统 · 操作系统概述与运行机制</h1>
+</details></nav>
+<main><h1>操作系统概述与运行机制</h1><h1 id="_1">操作系统 · 操作系统概述与运行机制</h1>
 <h2 id="_2" id="kp">操作系统概述与运行机制 [高频]</h2>
-<p class="freq"><b>考频</b>　考察次数 16 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 10%；主要题型：选择题为主（内核态/用户态、系统调用、中断与异常）。</p>
-<p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 16 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 10%；主要题型：选择题为主（内核态/用户态、系统调用、中断与异常）。</p>
+</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
 <p>操作系统是管理计算机硬件的系统软件，其四个基本特征是<strong>并发、共享、虚拟、异步</strong>，其中<strong>并发与共享互为存在条件</strong>（没有并发就无需共享，没有共享则并发程序无法推进）；虚拟建立在离散分配与多次性之上，异步是"程序走走停停、以不可预知的速度推进"。CPU 的执行状态分为<strong>内核态（管态）</strong>与<strong>用户态（目态）</strong>：只有内核态才能执行<strong>特权指令</strong>（如开关中断、设置时钟、清主存、修改 <code>PSW</code>、<code>I/O</code> 指令）并访问全部寄存器与存储空间；用户态只能执行非特权指令。<strong><code>PSW</code> 中的状态位</strong>标识当前处于哪一态，而<strong>由用户态进入内核态的唯一途径是中断或异常</strong>（系统调用本质上是通过<strong>陷入指令 <code>trap</code></strong> 触发的一次特殊异常）。</p>
 <p>注意 <code>trap</code> 指令本身<strong>不是特权指令</strong>——它需要在用户态执行才能完成"进入内核态"的动作。<strong>中断（外中断）</strong>来自 CPU 外部的事件（时钟中断、<code>I/O</code> 完成中断、控制台中断），<strong>异常（内中断）</strong>由当前执行的指令引起，分为故障 <code>fault</code>（如缺页、除零，可能被修复后重新执行该指令）、自陷 <code>trap</code>（如系统调用、断点，处理后返回到下一条指令）、终止 <code>abort</code>（如硬件故障，不返回）。<strong>系统调用</strong>的过程是：用户程序传递参数 → 执行陷入指令（<code>trap</code>/<code>syscall</code>，硬件将 <code>PSW</code> 改为内核态并转入内核入口）→ 内核按系统调用号查表执行服务例程 → 返回用户态。</p>
 <p>操作系统内核通常包含<strong>时钟管理、中断处理、原语、进程管理、存储管理、设备管理</strong>等功能，<strong>原语</strong>是"执行期间不可中断"的原子操作，靠<strong>关中断</strong>实现。体系结构上，<strong>宏内核</strong>把所有功能放在内核态、效率高但可靠性差；<strong>微内核</strong>只把最基本的功能（进程调度、中断处理、消息传递）留在内核，其余移出为用户态服务进程，可靠性高但频繁的消息传递带来开销。</p>
-<p class="lab">关键结论速记</p><ul class="facts">
+</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
 <li><code>四个特征：并发、共享、虚拟、异步</code> —— 并发与共享互为存在条件，是最常考的相互关系。</li>
 <li><code>特权指令只能在核心态执行；trap 指令是唯一能在用户态执行并进入核心态的指令</code> —— 把 <code>trap</code> 说成特权指令即为错误。</li>
 <li><code>中断（外中断）来自 CPU 外部，异常（内中断）由当前指令引起</code> —— 时钟、<code>I/O</code> 完成属中断；缺页、除零、系统调用属异常。</li>
@@ -265,7 +73,7 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <li><code>系统调用 = 传参 + 陷入指令 + 内核服务例程 + 返回用户态</code> —— 库函数不一定发生系统调用，系统调用一定进内核。</li>
 <li><code>原语的原子性靠关中断保证</code> —— 关中断/开中断是特权指令，故原语只能在核心态运行。</li>
 </ul>
-<p class="lab">示意图</p>
+</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
 <p><strong>用户态与内核态的地址空间与切换路径</strong>：用户程序只能通过中断/异常这道"门"进入内核，内核通过修改 <code>PSW</code> 回到用户态。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>process address space and the user/kernel boundary
 
@@ -336,106 +144,32 @@ mode switch paths
     C9 --&gt; C10[&quot;执行返回指令 恢复 PSW 回到用户态&quot;]
     C10 --&gt; C11[&quot;库函数返回 用户程序继续执行&quot;]
 </code></pre></details></div>
-<p class="lab">易错点</p><ul class="errs">
+</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
 <li>把 <code>trap</code>（陷入）指令当成特权指令：<code>trap</code> 必须<strong>在用户态执行</strong>才能完成"请求进入内核"的功能，因此它是非特权指令；真正只能在核心态执行的是开关中断、<code>I/O</code>、修改 <code>PSW</code> 等特权指令。</li>
 <li>混淆中断与异常的分类归属：时钟中断、<code>I/O</code> 完成中断来自 CPU 外部，属<strong>中断</strong>；而缺页、除零、系统调用、断点由当前指令引起，属<strong>异常</strong>；把缺页说成"中断"是最常见的概念错误。</li>
 <li>认为系统调用与库函数等价：库函数可能只是用户态的一段代码（如 <code>printf</code> 的格式化部分），只有其中真正需要内核服务的环节才触发系统调用，二者不是一一对应。</li>
 <li>把"用户态到内核态"的途径扩大化：除中断与异常外，用户程序<strong>没有任何其他合法途径</strong>进入内核态；也不能通过跳转指令直接跳进内核代码（硬件会因特权级检查而拒绝）。</li>
 </ul>
-<p class="lab">真题示例</p>
+</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
 <p class="q-stem"><span class="q-src">2011 年 408 第 23 题（单项选择题，2 分）</span></p>
 <p>下列选项中，在用户态执行的是（ ）。</p>
 <p>A. 命令解释程序　B. 缺页处理程序　C. 进程调度程序　D. 时钟中断处理程序</p>
 <blockquote>
 <p>解析：逐项判定所处的运行状态。<strong>缺页处理程序</strong>属于内存管理的内核功能，需访问页表与磁盘，必须在核心态（B 错）。<strong>进程调度程序</strong>要操作就绪队列与 <code>PCB</code>、修改 <code>PSW</code>，属内核功能，必须在核心态（C 错）。<strong>时钟中断处理程序</strong>是中断服务程序，由硬件中断触发、运行在核心态（D 错）。<strong>命令解释程序</strong>（<code>shell</code>）只是接收用户命令并创建子进程去执行，其自身运行在用户态，因此用户态可以执行（A 对）。答案选 <strong>A</strong>。<strong>判分依据是"该程序是否需要访问内核数据结构或执行特权指令"，不需要即可在用户态运行。</strong></p>
 </blockquote>
-<hr /></main></div>
+<hr /></section><nav class="chapter-nav"><a class="cn-next" href="02-进程与线程.html"><span class="cn-dir">下一章 →</span><span class="cn-title">进程与线程</span></a></nav></main>
+</div>
+<footer class="site-footer">
+<span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
+<span class="ft-sep">·</span>
+<a href="../README.html">数据口径与来源</a>
+<span class="ft-sep">·</span>
+<a href="../LICENSE">许可协议</a>
+<a class="ft-top" href="#">回到顶部 ↑</a>
+</footer>
 <button class="totop" type="button" aria-label="回到顶部">↑</button>
 <button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script>
-// 侧栏筛选
-var q = document.getElementById('q');
-if (q) q.addEventListener('input', function () {
-  var v = this.value.trim().toLowerCase();
-  document.querySelectorAll('nav details.grp').forEach(function (d) {
-    var any = false;
-    d.querySelectorAll('a.item').forEach(function (a) {
-      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
-      a.style.display = hit ? '' : 'none';
-      if (hit) any = true;
-    });
-    d.style.display = (any || !v) ? '' : 'none';
-    if (v && any) d.open = true;
-  });
-});
-// 进度条 + 回到顶部
-var bar = document.getElementById('bar'), top = document.querySelector('.totop');
-function onScroll() {
-  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
-  var max = h.scrollHeight - h.clientHeight;
-  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-  if (top) top.classList.toggle('on', y > 500);
-}
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
-if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
-// 复制
-document.querySelectorAll('.codebox').forEach(function (box) {
-  var btn = box.querySelector('button'), pre = box.querySelector('pre');
-  if (!btn || !pre) return;
-  btn.addEventListener('click', function () {
-    var t = pre.innerText;
-    var done = function () {
-      btn.textContent = '已复制';
-      setTimeout(function () { btn.textContent = '复制'; }, 1200);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
-    else {
-      var ta = document.createElement('textarea'); ta.value = t;
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
-    }
-  });
-});
-// 主题（记住选择 + 跟随系统）
-var tb = document.getElementById('theme'), saved = null;
-try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
-if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
-if (saved) document.documentElement.setAttribute('data-theme', saved);
-function syncThemeBtn() {
-  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
-}
-syncThemeBtn();
-if (tb) tb.addEventListener('click', function () {
-  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  syncThemeBtn();
-  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
-});
-// 窄屏抽屉
-var mb = document.getElementById('menu');
-if (mb) {
-  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
-  document.querySelector('nav').addEventListener('click', function (e) {
-    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
-  });
-}
-// 目录高亮当前章节
-(function () {
-  var links = [].slice.call(document.querySelectorAll('nav a.item'));
-  var targets = links.map(function (a) {
-    var h = a.getAttribute('href') || '';
-    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
-    return id ? document.getElementById(id) : null;
-  });
-  if (!targets.some(Boolean)) return;
-  function mark() {
-    var y = scrollY + 130, idx = -1;
-    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
-    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
-  }
-  addEventListener('scroll', mark, { passive: true }); mark();
-})();
-</script>
+<script src="../assets/site.js"></script>
 <script>
 (function () {
   var nodes = document.querySelectorAll('.mermaid');

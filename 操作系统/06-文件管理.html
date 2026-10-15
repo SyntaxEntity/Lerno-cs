@@ -1,220 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light"><head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>操作系统 · 文件管理</title><style>
-*,*::before,*::after{box-sizing:border-box}
-:root{
-  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
-  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
-  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
-  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
-  --radius:10px; --mw:780px;
-}
-html[data-theme="dark"]{
-  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
-  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
-  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
-  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
-}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
-       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  text-rendering:optimizeLegibility;
-}
-/* ---------- 布局 ---------- */
-#wrap{display:flex;align-items:flex-start;min-height:100vh}
-nav{
-  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
-  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
-}
-nav::-webkit-scrollbar{width:9px}
-nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
-nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
-#q{
-  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
-  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
-}
-#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
-nav .home{
-  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
-  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
-}
-nav .home:hover{filter:brightness(.97)}
-details.grp{margin:2px 0}
-details.grp>summary{
-  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
-  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-details.grp>summary::-webkit-details-marker{display:none}
-details.grp>summary:hover{background:var(--line2)}
-details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
-details.grp[open]>summary{color:var(--acc)}
-nav a.item{
-  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
-  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-nav a.item:hover{background:var(--line2);color:var(--fg)}
-nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
-/* ---------- 进度条 ---------- */
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
-/* ---------- 标题 ---------- */
-h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
-h2{
-  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
-  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
-}
-h3{font-size:18px;margin:28px 0 12px}
-p{margin:0 0 14px}
-/* ---------- 知识点卡片 ---------- */
-.kp{
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
-}
-.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
-/* ---------- 字段 ---------- */
-.fld{margin:24px 0 0}
-.lab{
-  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
-  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
-}
-.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
-.freq{
-  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
-  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
-}
-.freq b{color:var(--fg)}
-html[data-theme="dark"] .freq{color:#f2e8cc}
-/* 结论速记 → 公式卡 */
-ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.facts li{
-  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
-  padding:11px 15px;font-size:15px;margin:0;
-}
-ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
-/* 易错点 → 卡片 */
-ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.errs li{
-  position:relative;background:var(--panel);border:1px solid var(--line);
-  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
-}
-ul.errs li::before{
-  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
-  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
-}
-html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
-/* 解析 */
-blockquote{
-  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
-  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
-}
-blockquote p:last-child{margin-bottom:0}
-blockquote strong{color:var(--fg)}
-/* 真题题干 */
-.q-stem{
-  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
-}
-.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
-/* ---------- 代码 ---------- */
-code{
-  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
-  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
-  word-break:break-word;
-}
-.codebox{margin:14px 0}
-.codebox .bar{
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
-}
-.codebox button{
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  border-radius:6px;padding:2px 9px;font-size:11.5px;
-}
-.codebox button:hover{border-color:var(--acc);color:var(--acc)}
-pre{
-  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
-  padding:14px 16px;overflow:auto;margin:0;
-}
-pre code{background:none;padding:0;font-size:13px;line-height:1.5}
-/* ASCII 示意图：深色面板，保证等宽对齐可读 */
-.codebox.ascii .bar{color:var(--fg2);font-weight:600}
-.codebox.ascii pre{
-  background:var(--dark);border-color:#000;color:var(--dark-fg);
-  font-size:12.5px;line-height:1.45;padding:18px;
-}
-.codebox.ascii pre code{color:var(--dark-fg)}
-/* Mermaid */
-.fig{margin:16px 0}
-.mermaid{
-  background:var(--panel);border:1px solid var(--line);border-radius:8px;
-  padding:16px;overflow:auto;text-align:center;min-height:44px;
-}
-.mermaid svg{max-width:100%;height:auto}
-.fig details{margin-top:8px}
-.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
-.fig summary:hover{color:var(--acc)}
-/* ---------- 表格 ---------- */
-.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
-th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
-th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--line2)}
-/* ---------- 杂项 ---------- */
-.warn{
-  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
-  padding:11px 15px;font-size:14px;margin:14px 0;
-}
-.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
-.totop{
-  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
-  transition:opacity .2s;z-index:40;
-}
-.totop.on{opacity:1;pointer-events:auto}
-.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
-#theme{
-  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
-}
-#menu{
-  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
-  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
-  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
-}
-hr{border:none;border-top:1px solid var(--line);margin:32px 0}
-/* ---------- 窄屏 ---------- */
-@media (max-width:1000px){
-  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
-      box-shadow:4px 0 22px rgba(0,0,0,.12)}
-  nav.open{transform:none}
-  main{padding:22px 18px 130px;max-width:none}
-  #menu{display:flex}
-  .kp{padding:20px 18px 24px}
-}
-/* ---------- 打印 ---------- */
-@media print{
-  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
-  body{background:#fff;font-size:11pt}
-  main{max-width:none;padding:0}
-  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
-  h2{break-after:avoid}
-  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
-  .mermaid{border-color:#ccc}
-  a{color:#000;text-decoration:none}
-}
-</style>
+<title>操作系统 · 文件管理</title>
+<link rel="stylesheet" href="../assets/site.css">
 <script src="../mermaid.min.js"></script></head>
 <body>
 <div id="bar"></div>
+<header class="site-topbar">
+<a class="tb-brand" href="../index.html">408 速成复习资料</a>
+<nav class="tb-crumbs" aria-label="面包屑"><a href="../index.html">首页</a><span class="tb-sep">›</span><a href="index.html">操作系统</a><span class="tb-sep">›</span><span aria-current="page">文件管理</span></nav>
+<button class="tb-search" type="button" aria-label="搜索">搜索</button>
+</header>
 <button id="menu" type="button" aria-label="目录">☰</button>
-<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<div class="site-body">
+<nav class="site-sidebar"><div class="sb-brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
 <input id="q" placeholder="筛选知识点…" autocomplete="off">
 <a class="home" href="../index.html">⌂ 全科单页合集</a>
 <details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
@@ -241,6 +40,14 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <a class="item" href="04-同步与互斥.html">同步与互斥</a>
 <a class="item" href="05-内存管理.html">内存管理</a>
 <a class="item cur" href="06-文件管理.html">文件管理</a>
+<div class="sb-secs">
+<a class="sec-link" href="#sec-freq">考频统计</a>
+<a class="sec-link" href="#sec-core">核心讲解</a>
+<a class="sec-link" href="#sec-key">关键结论速记</a>
+<a class="sec-link" href="#sec-fig">示意图</a>
+<a class="sec-link" href="#sec-err">易错点</a>
+<a class="sec-link" href="#sec-real">真题示例</a>
+</div>
 <a class="item" href="07-输入输出管理.html">输入输出管理</a>
 </details>
 <details class="grp"><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
@@ -250,13 +57,14 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <a class="item" href="../计算机网络/04-网络层.html">网络层</a>
 <a class="item" href="../计算机网络/05-传输层.html">传输层</a>
 <a class="item" href="../计算机网络/06-应用层.html">应用层</a>
-</details></nav><main><h1>操作系统 ｜ 文件管理</h1><h1 id="_1">操作系统 · 文件管理</h1>
+</details></nav>
+<main><h1>文件管理</h1><h1 id="_1">操作系统 · 文件管理</h1>
 <h2 id="_2" id="kp">文件管理 [高频]</h2>
-<p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2024；分数占比约 16%；主要题型：选择题 + 综合应用题（文件物理结构、目录、磁盘空间）。</p>
-<p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2024；分数占比约 16%；主要题型：选择题 + 综合应用题（文件物理结构、目录、磁盘空间）。</p>
+</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
 <p>文件管理把磁盘上的物理块抽象为按名访问的逻辑文件：文件逻辑结构分无结构流式（顺序文件）与有结构记录式（顺序、索引、索引顺序、散列），物理结构分连续、链接（隐式/显式 FAT）、索引（单级/多级/混合），其中 UNIX 混合索引的最大文件长度 = <code>D*a + I*a + I^2*a + I^3*a</code>，<code>D</code>、<code>I</code> 为直接与一级间接地址项个数，<code>a</code> 为盘块大小，逐项相加不得漏掉直接项。目录本质是文件名到 FCB 的映射表，采用索引结点（inode）后把文件名与除名字外的属性分离，目录项只留<code>文件名 + inode 号</code>，使检索时一个盘块能容纳更多目录项、显著减少 I/O 次数。文件共享靠硬链接（多个目录项指向同一 inode，<code>count</code> 计数，删除只减计数，为 0 才真正回收）与软链接（新建一个存放路径名的文件，删除原文件后软链接失效成为悬空链接）。</p>
 <p>磁盘空间管理常用位示图、空闲链表、成组链接法；位示图的字号 <code>i</code>、位号 <code>j</code> 与块号换算按从 1 开始编号时为 <code>块号 = (i-1)*n + j</code>（<code>n</code> 为每字位数），从 0 开始编号时 <code>块号 = i*n + j</code>，两者必须与题设口径统一。进程访问文件先查进程打开文件表（含文件描述符、读写偏移、访问权限），表项指向系统打开文件表的全局表项（含 inode 指针、引用计数），再由 inode 逐级查目录与磁盘，最终由页/块缓存完成 <code>read</code>。</p>
-<p class="lab">关键结论速记</p><ul class="facts">
+</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
 <li><code>最大文件长度 = D*a + I*a + I^2*a + I^3*a</code> —— 直接、一级、二级、三级间接地址项逐项求和，<code>a</code> 为盘块大小，物理块号还需占用地址项宽度（如 4B）。</li>
 <li><code>一级间接可指块数 = a / 地址项字节数</code> —— 索引块本身占一个盘块，能放的指针个数由此决定，再逐级平方或立方。</li>
 <li><code>inode 把文件名与属性分离</code> —— 目录项只存<code>文件名 + inode 号</code>，检索路径名时目录占块少、命中率高，一个文件可被多个目录项共享。</li>
@@ -264,7 +72,7 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <li><code>位示图 n 位/字</code> —— 从 1 开始编号 <code>块号 = (i-1)*n + j</code>；从 0 开始编号 <code>块号 = i*n + j</code>，<code>j</code> 为字内位号。</li>
 <li><code>打开文件表两级</code> —— 进程表项（fd、读写位置、权限）唯一指向系统打开文件表项（inode 指针、引用计数），<code>read</code> 只改进程表项的偏移。</li>
 </ul>
-<p class="lab">示意图</p>
+</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>hybrid-index inode layout  (a = block size, w = address width, k = a / w)
 
  inode
@@ -335,105 +143,31 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
     A11 --&gt; A12[数据拷入用户缓冲区 偏移增加]
     A12 --&gt; A13[返回实际读到的字节数]
 </code></pre></details></div>
-<p class="lab">易错点</p><ul class="errs">
+</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
 <li>算最大文件长度时漏掉直接地址项或漏乘盘块大小：正确做法是<code>直接项数*a + 一级间接项数*a + k*a + k^2*a + k^3*a</code>，<code>k</code> 由盘块大小除以地址项字节数得到，每一项都要乘 <code>a</code>。</li>
 <li>把软链接说成共享索引结点：软链接是新建的独立文件，自身有 inode，内容只是原文件路径名；只有硬链接才共享同一 inode 并靠引用计数决定回收时机。</li>
 <li>位示图块号与字号位号换算搞错起始编号：题设从 1 开始时<code>块号 = (i-1)*n + j</code>，从 0 开始时<code>块号 = i*n + j</code>，且同一题内字号、位号、块号必须同口径。</li>
 <li>混淆两级打开文件表：进程打开文件表存 fd、读写偏移与权限，系统打开文件表存 inode 指针与引用计数；<code>read</code> 改变的是进程表项的偏移，<code>fork</code> 后父子可共享该偏移。</li>
 </ul>
-<p class="lab">真题示例</p>
+</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
 <p class="q-stem"><span class="q-src">2010 年 408 第 46 题（综合应用题，8 分）</span></p>
 <p>某文件系统采用混合索引分配方式，inode 中有 10 个直接地址项、1 个一级间接地址项、1 个二级间接地址项、1 个三级间接地址项，每个地址项占 4B，磁盘块大小 4KB，则单个文件的最大长度是多少字节，约合多少 GB？</p>
 <blockquote>
 <p>解析：每块可放指针数 <code>k = 4096 / 4 = 1024</code>。直接项可寻址 <code>10 * 4KB</code>；一级间接 <code>1024 * 4KB</code>；二级间接 <code>1024^2 * 4KB</code>；三级间接 <code>1024^3 * 4KB</code>。总和 = <code>(10 + 1024 + 1024^2 + 1024^3) * 4KB = (10 + 1024 + 1048576 + 1073741824) * 4096B ≈ 4.0001 * 10^12 B</code>，即约 <code>4TB</code>（若按 <code>1GB = 2^30 B</code> 计，约 <code>3725GB</code>；按 <code>10^9 B</code> 计约 <code>4000GB</code>）。结论：最大文件长度约 <code>4 * 10^12</code> 字节，数量级远大于按块号宽度直接相乘的粗算值，关键是三级间接项的高次幂且每项都乘盘块大小。</p>
 </blockquote>
-<hr /></main></div>
+<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="05-内存管理.html"><span class="cn-dir">← 上一章</span><span class="cn-title">内存管理</span></a><a class="cn-next" href="07-输入输出管理.html"><span class="cn-dir">下一章 →</span><span class="cn-title">输入输出管理</span></a></nav></main>
+</div>
+<footer class="site-footer">
+<span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
+<span class="ft-sep">·</span>
+<a href="../README.html">数据口径与来源</a>
+<span class="ft-sep">·</span>
+<a href="../LICENSE">许可协议</a>
+<a class="ft-top" href="#">回到顶部 ↑</a>
+</footer>
 <button class="totop" type="button" aria-label="回到顶部">↑</button>
 <button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script>
-// 侧栏筛选
-var q = document.getElementById('q');
-if (q) q.addEventListener('input', function () {
-  var v = this.value.trim().toLowerCase();
-  document.querySelectorAll('nav details.grp').forEach(function (d) {
-    var any = false;
-    d.querySelectorAll('a.item').forEach(function (a) {
-      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
-      a.style.display = hit ? '' : 'none';
-      if (hit) any = true;
-    });
-    d.style.display = (any || !v) ? '' : 'none';
-    if (v && any) d.open = true;
-  });
-});
-// 进度条 + 回到顶部
-var bar = document.getElementById('bar'), top = document.querySelector('.totop');
-function onScroll() {
-  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
-  var max = h.scrollHeight - h.clientHeight;
-  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-  if (top) top.classList.toggle('on', y > 500);
-}
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
-if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
-// 复制
-document.querySelectorAll('.codebox').forEach(function (box) {
-  var btn = box.querySelector('button'), pre = box.querySelector('pre');
-  if (!btn || !pre) return;
-  btn.addEventListener('click', function () {
-    var t = pre.innerText;
-    var done = function () {
-      btn.textContent = '已复制';
-      setTimeout(function () { btn.textContent = '复制'; }, 1200);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
-    else {
-      var ta = document.createElement('textarea'); ta.value = t;
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
-    }
-  });
-});
-// 主题（记住选择 + 跟随系统）
-var tb = document.getElementById('theme'), saved = null;
-try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
-if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
-if (saved) document.documentElement.setAttribute('data-theme', saved);
-function syncThemeBtn() {
-  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
-}
-syncThemeBtn();
-if (tb) tb.addEventListener('click', function () {
-  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  syncThemeBtn();
-  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
-});
-// 窄屏抽屉
-var mb = document.getElementById('menu');
-if (mb) {
-  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
-  document.querySelector('nav').addEventListener('click', function (e) {
-    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
-  });
-}
-// 目录高亮当前章节
-(function () {
-  var links = [].slice.call(document.querySelectorAll('nav a.item'));
-  var targets = links.map(function (a) {
-    var h = a.getAttribute('href') || '';
-    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
-    return id ? document.getElementById(id) : null;
-  });
-  if (!targets.some(Boolean)) return;
-  function mark() {
-    var y = scrollY + 130, idx = -1;
-    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
-    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
-  }
-  addEventListener('scroll', mark, { passive: true }); mark();
-})();
-</script>
+<script src="../assets/site.js"></script>
 <script>
 (function () {
   var nodes = document.querySelectorAll('.mermaid');

@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""把 408/ 下的 Markdown 渲染成「为阅读而设计」的 HTML。
+"""把 .docs/ 下的 Markdown 渲染成「为阅读而设计」的 HTML 站点。
 
 与普通 Markdown→HTML 的区别（这就是本文件存在的理由）：
   1. 不做「Markdown 原样搬进网页」，而是把模板结构**重组成语义化组件**：
      考频统计 → 信息条；结论速记 → 公式卡；易错点 → 卡片；真题解析 → 引用块。
-  2. 公式与代码分开排版（行内 chip / 行间块），不再一律塞进 <code>。
+  2. 六段字段包成 `<section class="sec sec-*" id="sec-*">`，可直接锚点跳转。
   3. ASCII 示意图用深色面板 + 复制按钮；Mermaid 用本地运行时渲染（离线可用）。
-  4. 侧栏是可折叠三级目录树 + 筛选；正文有阅读进度条、主题切换、回到顶部。
+  4. 统一外壳：顶栏面包屑 + 侧栏目录（分组 + 当前章六段锚点 + 筛选）+ 章节
+     prev/next + 页脚；样式与行为外置为 assets/site.css 与 assets/site.js。
+     外壳的 DOM 与 class 名与 math2-kaoyan 共用同一份契约
+     （见 ../PLAN-对齐与改版.md 2.3/2.4），改类名前先改契约。
 
 产出：
-  408/<科目>/<章节>.html      每章一页
-  408/<科目>/index.html       科目首页
-  408/index.html              全科单页合集（四科全部内容）
-  408/README.html             总览
-  408/mermaid.min.js          本地 mermaid 运行时
+  <科目>/<章节>.html      每章一页
+  <科目>/index.html       科目首页
+  index.html              全科单页合集（四科全部内容）
+  README.html             总览
+  assets/site.css|site.js 外壳样式与行为
+  mermaid.min.js          本地 mermaid 运行时
 
 用法： python3 scripts/build_html.py
 """
@@ -36,302 +40,24 @@ except ImportError:
     sys.exit("需要 python-markdown：pip install markdown")
 
 # ---------------------------------------------------------------------------
-# 样式系统
+# 外壳资源：assets/ 下的源文件是**手写源**（不是生成物），必须入库
 # ---------------------------------------------------------------------------
-CSS = """
-*,*::before,*::after{box-sizing:border-box}
-:root{
-  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
-  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
-  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
-  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
-  --radius:10px; --mw:780px;
-}
-html[data-theme="dark"]{
-  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
-  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
-  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
-  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
-}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
-       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  text-rendering:optimizeLegibility;
-}
-/* ---------- 布局 ---------- */
-#wrap{display:flex;align-items:flex-start;min-height:100vh}
-nav{
-  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
-  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
-}
-nav::-webkit-scrollbar{width:9px}
-nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
-nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
-#q{
-  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
-  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
-}
-#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
-nav .home{
-  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
-  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
-}
-nav .home:hover{filter:brightness(.97)}
-details.grp{margin:2px 0}
-details.grp>summary{
-  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
-  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-details.grp>summary::-webkit-details-marker{display:none}
-details.grp>summary:hover{background:var(--line2)}
-details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
-details.grp[open]>summary{color:var(--acc)}
-nav a.item{
-  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
-  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-nav a.item:hover{background:var(--line2);color:var(--fg)}
-nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
-/* ---------- 进度条 ---------- */
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
-/* ---------- 标题 ---------- */
-h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
-h2{
-  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
-  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
-}
-h3{font-size:18px;margin:28px 0 12px}
-p{margin:0 0 14px}
-/* ---------- 知识点卡片 ---------- */
-.kp{
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
-}
-.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
-/* ---------- 字段 ---------- */
-.fld{margin:24px 0 0}
-.lab{
-  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
-  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
-}
-.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
-.freq{
-  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
-  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
-}
-.freq b{color:var(--fg)}
-html[data-theme="dark"] .freq{color:#f2e8cc}
-/* 结论速记 → 公式卡 */
-ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.facts li{
-  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
-  padding:11px 15px;font-size:15px;margin:0;
-}
-ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
-/* 易错点 → 卡片 */
-ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.errs li{
-  position:relative;background:var(--panel);border:1px solid var(--line);
-  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
-}
-ul.errs li::before{
-  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
-  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
-}
-html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
-/* 解析 */
-blockquote{
-  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
-  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
-}
-blockquote p:last-child{margin-bottom:0}
-blockquote strong{color:var(--fg)}
-/* 真题题干 */
-.q-stem{
-  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
-}
-.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
-/* ---------- 代码 ---------- */
-code{
-  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
-  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
-  word-break:break-word;
-}
-.codebox{margin:14px 0}
-.codebox .bar{
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
-}
-.codebox button{
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  border-radius:6px;padding:2px 9px;font-size:11.5px;
-}
-.codebox button:hover{border-color:var(--acc);color:var(--acc)}
-pre{
-  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
-  padding:14px 16px;overflow:auto;margin:0;
-}
-pre code{background:none;padding:0;font-size:13px;line-height:1.5}
-/* ASCII 示意图：深色面板，保证等宽对齐可读 */
-.codebox.ascii .bar{color:var(--fg2);font-weight:600}
-.codebox.ascii pre{
-  background:var(--dark);border-color:#000;color:var(--dark-fg);
-  font-size:12.5px;line-height:1.45;padding:18px;
-}
-.codebox.ascii pre code{color:var(--dark-fg)}
-/* Mermaid */
-.fig{margin:16px 0}
-.mermaid{
-  background:var(--panel);border:1px solid var(--line);border-radius:8px;
-  padding:16px;overflow:auto;text-align:center;min-height:44px;
-}
-.mermaid svg{max-width:100%;height:auto}
-.fig details{margin-top:8px}
-.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
-.fig summary:hover{color:var(--acc)}
-/* ---------- 表格 ---------- */
-.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
-th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
-th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--line2)}
-/* ---------- 杂项 ---------- */
-.warn{
-  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
-  padding:11px 15px;font-size:14px;margin:14px 0;
-}
-.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
-.totop{
-  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
-  transition:opacity .2s;z-index:40;
-}
-.totop.on{opacity:1;pointer-events:auto}
-.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
-#theme{
-  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
-}
-#menu{
-  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
-  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
-  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
-}
-hr{border:none;border-top:1px solid var(--line);margin:32px 0}
-/* ---------- 窄屏 ---------- */
-@media (max-width:1000px){
-  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
-      box-shadow:4px 0 22px rgba(0,0,0,.12)}
-  nav.open{transform:none}
-  main{padding:22px 18px 130px;max-width:none}
-  #menu{display:flex}
-  .kp{padding:20px 18px 24px}
-}
-/* ---------- 打印 ---------- */
-@media print{
-  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
-  body{background:#fff;font-size:11pt}
-  main{max-width:none;padding:0}
-  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
-  h2{break-after:avoid}
-  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
-  .mermaid{border-color:#ccc}
-  a{color:#000;text-decoration:none}
-}
-"""
+ASSETS = os.path.join(SITE, "assets")
 
-JS = """
-// 侧栏筛选
-var q = document.getElementById('q');
-if (q) q.addEventListener('input', function () {
-  var v = this.value.trim().toLowerCase();
-  document.querySelectorAll('nav details.grp').forEach(function (d) {
-    var any = false;
-    d.querySelectorAll('a.item').forEach(function (a) {
-      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
-      a.style.display = hit ? '' : 'none';
-      if (hit) any = true;
-    });
-    d.style.display = (any || !v) ? '' : 'none';
-    if (v && any) d.open = true;
-  });
-});
-// 进度条 + 回到顶部
-var bar = document.getElementById('bar'), top = document.querySelector('.totop');
-function onScroll() {
-  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
-  var max = h.scrollHeight - h.clientHeight;
-  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-  if (top) top.classList.toggle('on', y > 500);
-}
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
-if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
-// 复制
-document.querySelectorAll('.codebox').forEach(function (box) {
-  var btn = box.querySelector('button'), pre = box.querySelector('pre');
-  if (!btn || !pre) return;
-  btn.addEventListener('click', function () {
-    var t = pre.innerText;
-    var done = function () {
-      btn.textContent = '已复制';
-      setTimeout(function () { btn.textContent = '复制'; }, 1200);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
-    else {
-      var ta = document.createElement('textarea'); ta.value = t;
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
-    }
-  });
-});
-// 主题（记住选择 + 跟随系统）
-var tb = document.getElementById('theme'), saved = null;
-try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
-if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
-if (saved) document.documentElement.setAttribute('data-theme', saved);
-function syncThemeBtn() {
-  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
-}
-syncThemeBtn();
-if (tb) tb.addEventListener('click', function () {
-  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  syncThemeBtn();
-  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
-});
-// 窄屏抽屉
-var mb = document.getElementById('menu');
-if (mb) {
-  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
-  document.querySelector('nav').addEventListener('click', function (e) {
-    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
-  });
-}
-// 目录高亮当前章节
-(function () {
-  var links = [].slice.call(document.querySelectorAll('nav a.item'));
-  var targets = links.map(function (a) {
-    var h = a.getAttribute('href') || '';
-    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
-    return id ? document.getElementById(id) : null;
-  });
-  if (!targets.some(Boolean)) return;
-  function mark() {
-    var y = scrollY + 130, idx = -1;
-    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
-    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
-  }
-  addEventListener('scroll', mark, { passive: true }); mark();
-})();
-"""
+# 六段字段的锚点 id / class（契约钦定，与 math2-kaoyan 逐字一致）
+SECS = [
+    ("考频统计", "sec-freq"),
+    ("核心讲解", "sec-core"),
+    ("关键结论速记", "sec-key"),
+    ("示意图", "sec-fig"),
+    ("易错点", "sec-err"),
+    ("真题示例", "sec-real"),
+]
+
+# ---------------------------------------------------------------------------
+# 外壳运行时
+# ---------------------------------------------------------------------------
+
 
 MERMAID_INIT = """
 (function () {
@@ -413,7 +139,51 @@ def _style_fields(body):
     # 真题示例：题干段落标出来源行
     body = re.sub(r"<p>(\s*<strong>((?:19|20)\d{2}\s*年[^<]*)</strong>)",
                   r'<p class="q-stem"><span class="q-src">\2</span>', body)
-    return body
+    return _wrap_sections(body)
+
+
+# 六段字段 → 锚点 id（契约钦定）
+SEC_IDS = dict(SECS)
+
+
+def _wrap_sections(body):
+    """把六段字段各包成 <section class="sec sec-*" id="sec-*">。
+
+    必须在 _style_fields 的列表归属处理**之后**做：那一步靠 `<p class="lab">`
+    标记的顺序来给 ul 挂 .facts/.errs，先包 section 会把标记隔开。
+
+    切分点有两类：
+      - 考频统计：_style_fields 已把它变成 `<p class="freq">`（信息条），
+        它的标签不再是 .lab，所以要单独认；
+      - 其余五段：`<p class="lab">标签</p>`，精确匹配以免「真题示例」被
+        别的标签前缀误伤。
+    """
+    labs = "|".join(re.escape(lab) for lab, _ in SECS if lab != "考频统计")
+    parts = re.split(r'(<p class="freq">|<p class="lab">(?:%s)</p>)' % labs, body)
+    out, open_sec = [], False
+    # parts[0] 是第一个字段之前的内容（知识点标题等），留在 section 之外
+    if parts and parts[0].strip():
+        out.append(parts[0])
+    i = 1
+    while i < len(parts):
+        tag = parts[i]
+        chunk = parts[i + 1] if i + 1 < len(parts) else ""
+        if tag.startswith('<p class="freq">'):
+            lab = "考频统计"
+        else:
+            lab = re.fullmatch(r'<p class="lab">(.*?)</p>', tag).group(1)
+        sid = SEC_IDS.get(lab)
+        if sid:
+            if open_sec:
+                out.append("</section>")
+            out.append('<section class="sec %s" id="%s">' % (sid, sid))
+            open_sec = True
+        out.append(tag)
+        out.append(chunk)
+        i += 2
+    if open_sec:
+        out.append("</section>")
+    return "".join(out)
 
 
 def md_to_html(text):
@@ -450,31 +220,66 @@ def md_to_html(text):
 
 
 # ---------------------------------------------------------------------------
-# 页面骨架
+# 页面骨架（统一外壳：顶栏 / 侧栏 / main / 章节导航 / 页脚）
+#
+# class 名与 DOM 层级由 ../PLAN-对齐与改版.md 2.3/2.4 钦定，与 math2-kaoyan 共用，
+# 改任何类名前先改契约——两边分叉的代价远大于等待。
 # ---------------------------------------------------------------------------
-def page(title, sidebar, body, mermaid_src, subtitle=""):
-    head = "<h1>%s</h1>" % html.escape(subtitle) if subtitle else ""
-    return """<!DOCTYPE html>
-<html lang="zh-CN" data-theme="light"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>%s</title><style>%s</style>
-<script src="%s"></script></head>
-<body>
-<div id="bar"></div>
-<button id="menu" type="button" aria-label="目录">☰</button>
-<div id="wrap"><nav>%s</nav><main>%s%s</main></div>
-<button class="totop" type="button" aria-label="回到顶部">↑</button>
-<button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script>%s</script>
-<script>%s</script>
-</body></html>""" % (html.escape(title), CSS, html.escape(mermaid_src), sidebar, head, body,
-                     JS, MERMAID_INIT)
+def asset_prefix(page):
+    """外壳资源（assets/、mermaid.min.js）相对当前页面的前缀。
+
+    章节页与科目首页都在 <科目>/ 下一层，根页面（合集/总览）在仓库根。
+    """
+    return "../" if page in ("chapter", "overview") else ""
+
+
+def crumbs_for(page, subject_key=None, chapter=None):
+    """面包屑：首页 › 科目 › 章节。"""
+    prefix = asset_prefix(page)
+    out = ['<a href="%sindex.html">首页</a>' % prefix]
+    if subject_key:
+        s = T.SUBJECTS[subject_key]
+        out.append('<span class="tb-sep">›</span>')
+        if chapter:
+            out.append('<a href="index.html">%s</a>' % html.escape(s["name"]))
+            out.append('<span class="tb-sep">›</span>')
+            out.append('<span aria-current="page">%s</span>' % html.escape(chapter))
+        else:
+            out.append('<span aria-current="page">%s</span>' % html.escape(s["name"]))
+    else:
+        out.append('<span class="tb-sep">›</span>')
+        out.append('<span aria-current="page">全科单页合集</span>')
+    return '<nav class="tb-crumbs" aria-label="面包屑">%s</nav>' % "".join(out)
+
+
+def topbar_for(page, subject_key=None, chapter=None, brand="408 速成复习资料"):
+    return """<header class="site-topbar">
+<a class="tb-brand" href="%sindex.html">%s</a>
+%s
+<button class="tb-search" type="button" aria-label="搜索">搜索</button>
+</header>""" % (asset_prefix(page), html.escape(brand),
+               crumbs_for(page, subject_key, chapter))
+
+
+def footer_for(page):
+    prefix = asset_prefix(page)
+    return """<footer class="site-footer">
+<span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
+<span class="ft-sep">·</span>
+<a href="%sREADME.html">数据口径与来源</a>
+<span class="ft-sep">·</span>
+<a href="%sLICENSE">许可协议</a>
+<a class="ft-top" href="#">回到顶部 ↑</a>
+</footer>""" % (prefix, prefix)
 
 
 def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter"):
-    """page: "chapter" 章节页（在 <科目>/ 内）| "overview" 科目总览 | "root" 仓库根页面。"""
-    prefix = "../" if page in ("chapter", "overview") else ""
-    out = ['<div class="brand">408 速成复习资料'
+    """侧栏目录：四科分组 + 当前章的六段锚点 + 关键词筛选。
+
+    page: "chapter" 章节页 | "overview" 科目首页 | "root" 仓库根页面。
+    """
+    prefix = asset_prefix(page)
+    out = ['<div class="sb-brand">408 速成复习资料'
            '<small>四科 · 26 个知识点 · 离线可读</small></div>',
            '<input id="q" placeholder="筛选知识点…" autocomplete="off">']
     if single_page:
@@ -491,7 +296,7 @@ def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter
             if single_page:
                 href, attr = "#%s-%s" % (k, t[6]), ' data-anchor="%s-%s"' % (k, t[6])
             else:
-                # 规则：本科目页面（章节页与总览页都在该科目目录内）→ 同目录直链；
+                # 规则：本科目页面（章节页与科目首页都在该科目目录内）→ 同目录直链；
                 #       其他科目 → 上一层再进该科目目录；根目录页面 → 直接进科目目录
                 if page in ("chapter", "overview") and k == subject_key:
                     href = "%s.html" % t[6]
@@ -502,8 +307,70 @@ def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter
                 attr = ""
             cls = "item cur" if (current == t[6] and subject_key == k) else "item"
             out.append('<a class="%s" href="%s"%s>%s</a>' % (cls, href, attr, t[0]))
+            # 当前章的六段锚点：直接跳到「只看易错点」那一段
+            if current == t[6] and subject_key == k:
+                out.append('<div class="sb-secs">')
+                for lab, sid in SECS:
+                    out.append('<a class="sec-link" href="#%s">%s</a>' % (sid, lab))
+                out.append("</div>")
         out.append("</details>")
-    return "\n".join(out)
+    return '<nav class="site-sidebar">%s</nav>' % "\n".join(out)
+
+
+def chapter_nav(subject_key, slug):
+    """章节 prev/next：按 topics.py 的 TOPICS 顺序（也就是阅读顺序）。"""
+    topics = T.TOPICS[subject_key]
+    idx = next((i for i, t in enumerate(topics) if t[6] == slug), None)
+    if idx is None:
+        return ""
+    out = ['<nav class="chapter-nav">']
+    if idx > 0:
+        p = topics[idx - 1]
+        out.append('<a class="cn-prev" href="%s.html"><span class="cn-dir">← 上一章</span>'
+                   '<span class="cn-title">%s</span></a>' % (p[6], p[0]))
+    if idx + 1 < len(topics):
+        n = topics[idx + 1]
+        out.append('<a class="cn-next" href="%s.html"><span class="cn-dir">下一章 →</span>'
+                   '<span class="cn-title">%s</span></a>' % (n[6], n[0]))
+    out.append("</nav>")
+    return "".join(out)
+
+
+def page(title, sidebar, body, page_kind="chapter", subject_key=None, chapter=None,
+         extra=""):
+    """渲染一个完整页面。
+
+    page_kind 决定外壳资源的相对前缀（见 asset_prefix），不能再靠传入
+    mermaid_src 字符串来隐式表达深度——那样很容易在新增页面时传错。
+    """
+    p = asset_prefix(page_kind)
+    head = "<h1>%s</h1>" % html.escape(chapter) if chapter else ""
+    return """<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>%s</title>
+<link rel="stylesheet" href="%sassets/site.css">
+<script src="%smermaid.min.js"></script></head>
+<body>
+<div id="bar"></div>
+%s
+<button id="menu" type="button" aria-label="目录">☰</button>
+<div class="site-body">
+%s
+<main>%s%s%s</main>
+</div>
+%s
+<button class="totop" type="button" aria-label="回到顶部">↑</button>
+<button id="theme" type="button" aria-label="切换深浅色">☾</button>
+<script src="%sassets/site.js"></script>
+<script>%s</script>
+</body></html>""" % (html.escape(title), p,
+                     p,
+                     topbar_for(page_kind, subject_key, chapter),
+                     sidebar,
+                     head, body, extra,
+                     footer_for(page_kind),
+                     p, MERMAID_INIT)
 
 
 
@@ -544,19 +411,21 @@ def build():
             with open(os.path.join(out, t[6] + ".html"), "w", encoding="utf-8") as f:
                 f.write(page("%s · %s" % (s["name"], t[0]),
                              sidebar_for(k, t[6], page="chapter"), body,
-                             "../mermaid.min.js",
-                             subtitle="%s ｜ %s" % (s["name"], t[0])))
+                             page_kind="chapter", subject_key=k, chapter=t[0],
+                             extra=chapter_nav(k, t[6])))
+        # 科目首页：既是该科入口，也是章节页面包屑的中间一层
         with open(os.path.join(out, "index.html"), "w", encoding="utf-8") as f:
-            f.write(page("%s · 科目总览" % s["name"],
+            f.write(page("%s · 科目首页" % s["name"],
                          sidebar_for(k, None, page="overview"), overviews[k],
-                         "../mermaid.min.js", subtitle=s["name"]))
+                         page_kind="overview", subject_key=k, chapter=s["name"]))
 
-    # 全科单页合集
+    # 全科单页合集（落地页）
     parts = ['<a id="top"></a>',
              '<h1 style="font-size:32px;margin-bottom:10px">408 计算机学科专业基础综合'
              '<span class="tag" style="margin-left:12px;font-size:12px">速成复习资料</span></h1>',
-             '<p style="color:var(--fg2);font-size:15px;margin-bottom:8px">'
+             '<p style="color:var(--fg2);font-size:15px;margin-bottom:18px">'
              '数据结构 · 计算机组成原理 · 操作系统 · 计算机网络</p>',
+             home_subject_cards(),
              '<div class="tw" style="margin:18px 0 26px"><table><thead><tr>'
              '<th>4 个科目</th><th>26 个知识点</th><th>60 张 ASCII 图</th>'
              '<th>52 张 Mermaid 图</th><th>完全离线可用</th>'
@@ -578,15 +447,28 @@ def build():
     with open(os.path.join(SITE, "index.html"), "w", encoding="utf-8") as f:
         f.write(page("408 全科速成复习资料",
                      sidebar_for(None, None, single_page=True, page="root"),
-                     "\n".join(parts), "mermaid.min.js"))
+                     "\n".join(parts), page_kind="root"))
     rp = os.path.join(DOCS, "00-总览.md")
     if os.path.exists(rp):
         with open(rp, encoding="utf-8") as f:
             body = md_to_html(f.read())
         with open(os.path.join(SITE, "README.html"), "w", encoding="utf-8") as f:
             f.write(page("408 总览", sidebar_for(None, None, page="root"), body,
-                         "mermaid.min.js"))
+                         page_kind="root"))
     return len(chapters)
+
+
+def home_subject_cards():
+    """首页科目卡片入口（契约 2.5.1）：类名与 math2-kaoyan 逐字一致。"""
+    out = ['<nav class="home-subjects">']
+    for k in T.ORDER:
+        s = T.SUBJECTS[k]
+        out.append('<a class="hs-card" href="%s/index.html">'
+                   '<span class="hs-name">%s</span>'
+                   '<span class="hs-meta">%d 个知识点 · %d 分</span></a>'
+                   % (s["dir"], html.escape(s["name"]), len(T.TOPICS[k]), s["score"]))
+    out.append("</nav>")
+    return "".join(out)
 
 
 def build_redirect_stubs():

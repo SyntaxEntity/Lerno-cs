@@ -1,220 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light"><head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>计算机组成原理 · 指令系统</title><style>
-*,*::before,*::after{box-sizing:border-box}
-:root{
-  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
-  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
-  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
-  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
-  --radius:10px; --mw:780px;
-}
-html[data-theme="dark"]{
-  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
-  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
-  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
-  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
-}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
-       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  text-rendering:optimizeLegibility;
-}
-/* ---------- 布局 ---------- */
-#wrap{display:flex;align-items:flex-start;min-height:100vh}
-nav{
-  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
-  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
-}
-nav::-webkit-scrollbar{width:9px}
-nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
-nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
-#q{
-  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
-  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
-}
-#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
-nav .home{
-  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
-  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
-}
-nav .home:hover{filter:brightness(.97)}
-details.grp{margin:2px 0}
-details.grp>summary{
-  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
-  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-details.grp>summary::-webkit-details-marker{display:none}
-details.grp>summary:hover{background:var(--line2)}
-details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
-details.grp[open]>summary{color:var(--acc)}
-nav a.item{
-  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
-  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-nav a.item:hover{background:var(--line2);color:var(--fg)}
-nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
-/* ---------- 进度条 ---------- */
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
-/* ---------- 标题 ---------- */
-h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
-h2{
-  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
-  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
-}
-h3{font-size:18px;margin:28px 0 12px}
-p{margin:0 0 14px}
-/* ---------- 知识点卡片 ---------- */
-.kp{
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
-}
-.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
-/* ---------- 字段 ---------- */
-.fld{margin:24px 0 0}
-.lab{
-  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
-  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
-}
-.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
-.freq{
-  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
-  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
-}
-.freq b{color:var(--fg)}
-html[data-theme="dark"] .freq{color:#f2e8cc}
-/* 结论速记 → 公式卡 */
-ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.facts li{
-  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
-  padding:11px 15px;font-size:15px;margin:0;
-}
-ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
-/* 易错点 → 卡片 */
-ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.errs li{
-  position:relative;background:var(--panel);border:1px solid var(--line);
-  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
-}
-ul.errs li::before{
-  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
-  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
-}
-html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
-/* 解析 */
-blockquote{
-  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
-  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
-}
-blockquote p:last-child{margin-bottom:0}
-blockquote strong{color:var(--fg)}
-/* 真题题干 */
-.q-stem{
-  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
-}
-.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
-/* ---------- 代码 ---------- */
-code{
-  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
-  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
-  word-break:break-word;
-}
-.codebox{margin:14px 0}
-.codebox .bar{
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
-}
-.codebox button{
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  border-radius:6px;padding:2px 9px;font-size:11.5px;
-}
-.codebox button:hover{border-color:var(--acc);color:var(--acc)}
-pre{
-  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
-  padding:14px 16px;overflow:auto;margin:0;
-}
-pre code{background:none;padding:0;font-size:13px;line-height:1.5}
-/* ASCII 示意图：深色面板，保证等宽对齐可读 */
-.codebox.ascii .bar{color:var(--fg2);font-weight:600}
-.codebox.ascii pre{
-  background:var(--dark);border-color:#000;color:var(--dark-fg);
-  font-size:12.5px;line-height:1.45;padding:18px;
-}
-.codebox.ascii pre code{color:var(--dark-fg)}
-/* Mermaid */
-.fig{margin:16px 0}
-.mermaid{
-  background:var(--panel);border:1px solid var(--line);border-radius:8px;
-  padding:16px;overflow:auto;text-align:center;min-height:44px;
-}
-.mermaid svg{max-width:100%;height:auto}
-.fig details{margin-top:8px}
-.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
-.fig summary:hover{color:var(--acc)}
-/* ---------- 表格 ---------- */
-.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
-th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
-th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--line2)}
-/* ---------- 杂项 ---------- */
-.warn{
-  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
-  padding:11px 15px;font-size:14px;margin:14px 0;
-}
-.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
-.totop{
-  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
-  transition:opacity .2s;z-index:40;
-}
-.totop.on{opacity:1;pointer-events:auto}
-.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
-#theme{
-  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
-}
-#menu{
-  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
-  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
-  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
-}
-hr{border:none;border-top:1px solid var(--line);margin:32px 0}
-/* ---------- 窄屏 ---------- */
-@media (max-width:1000px){
-  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
-      box-shadow:4px 0 22px rgba(0,0,0,.12)}
-  nav.open{transform:none}
-  main{padding:22px 18px 130px;max-width:none}
-  #menu{display:flex}
-  .kp{padding:20px 18px 24px}
-}
-/* ---------- 打印 ---------- */
-@media print{
-  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
-  body{background:#fff;font-size:11pt}
-  main{max-width:none;padding:0}
-  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
-  h2{break-after:avoid}
-  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
-  .mermaid{border-color:#ccc}
-  a{color:#000;text-decoration:none}
-}
-</style>
+<title>计算机组成原理 · 指令系统</title>
+<link rel="stylesheet" href="../assets/site.css">
 <script src="../mermaid.min.js"></script></head>
 <body>
 <div id="bar"></div>
+<header class="site-topbar">
+<a class="tb-brand" href="../index.html">408 速成复习资料</a>
+<nav class="tb-crumbs" aria-label="面包屑"><a href="../index.html">首页</a><span class="tb-sep">›</span><a href="index.html">计算机组成原理</a><span class="tb-sep">›</span><span aria-current="page">指令系统</span></nav>
+<button class="tb-search" type="button" aria-label="搜索">搜索</button>
+</header>
 <button id="menu" type="button" aria-label="目录">☰</button>
-<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<div class="site-body">
+<nav class="site-sidebar"><div class="sb-brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
 <input id="q" placeholder="筛选知识点…" autocomplete="off">
 <a class="home" href="../index.html">⌂ 全科单页合集</a>
 <details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
@@ -230,6 +29,14 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <a class="item" href="01-数据表示与运算.html">数据表示与运算</a>
 <a class="item" href="02-存储系统.html">存储系统</a>
 <a class="item cur" href="03-指令系统.html">指令系统</a>
+<div class="sb-secs">
+<a class="sec-link" href="#sec-freq">考频统计</a>
+<a class="sec-link" href="#sec-core">核心讲解</a>
+<a class="sec-link" href="#sec-key">关键结论速记</a>
+<a class="sec-link" href="#sec-fig">示意图</a>
+<a class="sec-link" href="#sec-err">易错点</a>
+<a class="sec-link" href="#sec-real">真题示例</a>
+</div>
 <a class="item" href="04-中央处理器.html">中央处理器 CPU</a>
 <a class="item" href="05-总线.html">总线</a>
 <a class="item" href="06-输入输出系统.html">输入输出系统</a>
@@ -250,14 +57,15 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <a class="item" href="../计算机网络/04-网络层.html">网络层</a>
 <a class="item" href="../计算机网络/05-传输层.html">传输层</a>
 <a class="item" href="../计算机网络/06-应用层.html">应用层</a>
-</details></nav><main><h1>计算机组成原理 ｜ 指令系统</h1><h1 id="_1">计算机组成原理 · 指令系统</h1>
+</details></nav>
+<main><h1>指令系统</h1><h1 id="_1">计算机组成原理 · 指令系统</h1>
 <h2 id="_2" id="kp">指令系统 [高频]</h2>
-<p class="freq"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2023、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（指令格式、寻址方式、汇编阅读）。</p>
-<p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 24 次；涉及年份：2010、2012、2014、2016、2018、2019、2021、2023、2025；分数占比约 12%；主要题型：选择题 + 综合应用题（指令格式、寻址方式、汇编阅读）。</p>
+</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
 <p>一条指令由<strong>操作码字段</strong>与<strong>地址码字段</strong>构成。定长指令字中操作码位数固定，可表示 <code>2^k</code> 条指令；<strong>变长指令字</strong>中常用<strong>扩展操作码</strong>技术：把操作码按长度分层，短操作码不能再作为长操作码的前缀，因此设计时必须保证"<strong>短码不是任何长码的前缀</strong>"。以 4 位为基础操作码、需要扩展到 8 位为例，若 4 位编码 0000—1110 分配给 15 条三地址指令，则剩下 1111 作为扩展标志可产生 16 个 8 位编码，用于二地址指令，依此类推。<strong>寻址方式</strong>决定操作数的来源与有效地址 <code>EA</code> 的计算：立即寻址的地址字段就是操作数本身；直接寻址 <code>EA = A</code>；间接寻址 <code>EA = (A)</code>（需访存两次取数，三次含取指）；</p>
 <p>寄存器寻址的操作数在寄存器中，不访存；寄存器间接寻址 <code>EA = (R)</code>；<strong>相对寻址 <code>EA = (PC) + A</code></strong>，其中 <code>PC</code> 已是<strong>取下一条指令后的值</strong>（即已自增）；基址寻址 <code>EA = (BR) + A</code>，基址寄存器由操作系统设定、面向整个程序，用于<strong>程序重定位</strong>；</p>
 <p>变址寻址 <code>EA = (IX) + A</code>，变址寄存器由用户改变、面向数组，用于<strong>数组元素的顺序访问</strong>；堆栈寻址的操作数隐含在栈顶。<code>CISC</code> 与 <code>RISC</code> 的分野在于：<code>RISC</code> 采用<strong>定长指令字、指令条数少且格式规整、只有 Load/Store 访存、通用寄存器多、采用硬布线控制与流水线</strong>，而 <code>CISC</code> 指令变长、寻址方式多、以微程序控制为主。汇编层面必须能读懂"取数—运算—存数"的三段式，重点掌握 <code>mov</code>、<code>add/sub</code>、<code>cmp</code> 与条件转移 <code>jmp/jcc</code>、以及 <code>push/pop</code> 对栈指针的改变。</p>
-<p class="lab">关键结论速记</p><ul class="facts">
+</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
 <li><code>扩展操作码约束：短码不得是长码的前缀</code> —— 否则译码时无法判断指令长度。</li>
 <li><code>相对寻址 EA = (PC) + A，PC 已自增到下一条指令</code> —— 这是 408 反复考查的细节，忘记自增会整体偏移。</li>
 <li><code>基址寻址面向程序重定位（基址寄存器由 OS 设定），变址寻址面向数组（变址寄存器由用户改变）</code> —— 两者形式相同、用途不同。</li>
@@ -265,7 +73,7 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <li><code>RISC：定长指令 + 只有 Load/Store 访存 + 多通用寄存器 + 硬布线 + 流水线</code> —— 与 CISC 的对比是固定选择题考点。</li>
 <li><code>指令字长可以小于机器字长，也可以大于机器字长</code> —— 半字长、双字长指令都允许，按字节编址时需注意取指访存次数。</li>
 </ul>
-<p class="lab">示意图</p>
+</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
 <p><strong>扩展操作码的编码树</strong>：短操作码保留一个（或若干个）编码作为"扩展出口"，不把编码空间用尽；下图用 4 位基础码扩展一次到 8 位为例。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>opcode tree (4-bit base, extended once to 8-bit)
 
@@ -315,105 +123,31 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
     R4 --&gt;|否| R6[&quot;将 EA 送入 PC 完成转移&quot;]
     R6 --&gt; R7[&quot;下一条取指从 EA 开始 实现位置无关代码&quot;]
 </code></pre></details></div>
-<p class="lab">易错点</p><ul class="errs">
+</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
 <li>相对寻址忘记 <code>PC</code> 已自增：<code>EA = (PC) + A</code> 中的 <code>PC</code> 是"取下本条指令后已加一个指令长度"的值；若直接用本条指令地址去加偏移量，结果会整体偏差一条指令的长度。</li>
 <li>基址与变址寻址的用途互换：基址寻址的基址寄存器内容由操作系统给出、程序执行中不变，用于<strong>程序浮动/重定位</strong>；变址寻址的变址值由用户改变，用于<strong>数组或字符串的顺序访问</strong>。</li>
 <li>扩展操作码设计违反前缀约束：把 1111 同时用作一条 4 位指令又用作 8 位扩展标志，译码器无法判定指令长度；正确做法是把该编码<strong>只留给扩展</strong>。</li>
 <li>认为指令字长必须等于机器字长：指令字长可以等于、小于或大于机器字长（半字长、双字长指令都常见），只要求是字节的整数倍（按字节编址时），取指所需访存次数由指令字长与存储字长共同决定。</li>
 </ul>
-<p class="lab">真题示例</p>
+</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
 <p class="q-stem"><span class="q-src">2019 年 408 第 16 题（单项选择题，2 分）</span></p>
 <p>某计算机采用定长指令字，指令字长 16 位，采用扩展操作码方式。若三地址指令有 12 条、二地址指令有 20 条，则一地址指令最多有（ ）条。</p>
 <blockquote>
 <p>解析：设操作码基础长度为 4 位，三地址指令需要 12 个编码，占 <code>0000—1011</code>；剩余 <code>1100、1101、1110、1111</code> 共 4 个编码可作扩展标志。每个扩展标志可扩展出 4 位（地址字段让出 4 位），即每个标志下可得到 <code>2^4 = 16</code> 个 8 位编码，故二地址指令编码空间为 <code>4 × 16 = 64</code> 个。二地址指令实际用了 20 条，剩余 <code>64 - 20 = 44</code> 个 8 位编码可继续作扩展标志，每个再扩展 4 位得到 <code>2^4 = 16</code> 个 12 位编码，故一地址指令最多 <code>44 × 16 = 704</code> 条。<strong>关键是逐层计算"剩余编码数 × 每级扩展倍数"，且绝不能把已用的编码再当扩展标志。</strong></p>
 </blockquote>
-<hr /></main></div>
+<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="02-存储系统.html"><span class="cn-dir">← 上一章</span><span class="cn-title">存储系统</span></a><a class="cn-next" href="04-中央处理器.html"><span class="cn-dir">下一章 →</span><span class="cn-title">中央处理器 CPU</span></a></nav></main>
+</div>
+<footer class="site-footer">
+<span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
+<span class="ft-sep">·</span>
+<a href="../README.html">数据口径与来源</a>
+<span class="ft-sep">·</span>
+<a href="../LICENSE">许可协议</a>
+<a class="ft-top" href="#">回到顶部 ↑</a>
+</footer>
 <button class="totop" type="button" aria-label="回到顶部">↑</button>
 <button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script>
-// 侧栏筛选
-var q = document.getElementById('q');
-if (q) q.addEventListener('input', function () {
-  var v = this.value.trim().toLowerCase();
-  document.querySelectorAll('nav details.grp').forEach(function (d) {
-    var any = false;
-    d.querySelectorAll('a.item').forEach(function (a) {
-      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
-      a.style.display = hit ? '' : 'none';
-      if (hit) any = true;
-    });
-    d.style.display = (any || !v) ? '' : 'none';
-    if (v && any) d.open = true;
-  });
-});
-// 进度条 + 回到顶部
-var bar = document.getElementById('bar'), top = document.querySelector('.totop');
-function onScroll() {
-  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
-  var max = h.scrollHeight - h.clientHeight;
-  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-  if (top) top.classList.toggle('on', y > 500);
-}
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
-if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
-// 复制
-document.querySelectorAll('.codebox').forEach(function (box) {
-  var btn = box.querySelector('button'), pre = box.querySelector('pre');
-  if (!btn || !pre) return;
-  btn.addEventListener('click', function () {
-    var t = pre.innerText;
-    var done = function () {
-      btn.textContent = '已复制';
-      setTimeout(function () { btn.textContent = '复制'; }, 1200);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
-    else {
-      var ta = document.createElement('textarea'); ta.value = t;
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
-    }
-  });
-});
-// 主题（记住选择 + 跟随系统）
-var tb = document.getElementById('theme'), saved = null;
-try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
-if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
-if (saved) document.documentElement.setAttribute('data-theme', saved);
-function syncThemeBtn() {
-  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
-}
-syncThemeBtn();
-if (tb) tb.addEventListener('click', function () {
-  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  syncThemeBtn();
-  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
-});
-// 窄屏抽屉
-var mb = document.getElementById('menu');
-if (mb) {
-  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
-  document.querySelector('nav').addEventListener('click', function (e) {
-    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
-  });
-}
-// 目录高亮当前章节
-(function () {
-  var links = [].slice.call(document.querySelectorAll('nav a.item'));
-  var targets = links.map(function (a) {
-    var h = a.getAttribute('href') || '';
-    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
-    return id ? document.getElementById(id) : null;
-  });
-  if (!targets.some(Boolean)) return;
-  function mark() {
-    var y = scrollY + 130, idx = -1;
-    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
-    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
-  }
-  addEventListener('scroll', mark, { passive: true }); mark();
-})();
-</script>
+<script src="../assets/site.js"></script>
 <script>
 (function () {
   var nodes = document.querySelectorAll('.mermaid');

@@ -1,220 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light"><head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>数据结构 · 图</title><style>
-*,*::before,*::after{box-sizing:border-box}
-:root{
-  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
-  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
-  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
-  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
-  --radius:10px; --mw:780px;
-}
-html[data-theme="dark"]{
-  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
-  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
-  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
-  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
-}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
-       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  text-rendering:optimizeLegibility;
-}
-/* ---------- 布局 ---------- */
-#wrap{display:flex;align-items:flex-start;min-height:100vh}
-nav{
-  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
-  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
-}
-nav::-webkit-scrollbar{width:9px}
-nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
-nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
-#q{
-  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
-  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
-}
-#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
-nav .home{
-  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
-  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
-}
-nav .home:hover{filter:brightness(.97)}
-details.grp{margin:2px 0}
-details.grp>summary{
-  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
-  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-details.grp>summary::-webkit-details-marker{display:none}
-details.grp>summary:hover{background:var(--line2)}
-details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
-details.grp[open]>summary{color:var(--acc)}
-nav a.item{
-  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
-  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-nav a.item:hover{background:var(--line2);color:var(--fg)}
-nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
-/* ---------- 进度条 ---------- */
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
-/* ---------- 标题 ---------- */
-h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
-h2{
-  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
-  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
-}
-h3{font-size:18px;margin:28px 0 12px}
-p{margin:0 0 14px}
-/* ---------- 知识点卡片 ---------- */
-.kp{
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
-}
-.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
-/* ---------- 字段 ---------- */
-.fld{margin:24px 0 0}
-.lab{
-  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
-  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
-}
-.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
-.freq{
-  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
-  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
-}
-.freq b{color:var(--fg)}
-html[data-theme="dark"] .freq{color:#f2e8cc}
-/* 结论速记 → 公式卡 */
-ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.facts li{
-  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
-  padding:11px 15px;font-size:15px;margin:0;
-}
-ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
-/* 易错点 → 卡片 */
-ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.errs li{
-  position:relative;background:var(--panel);border:1px solid var(--line);
-  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
-}
-ul.errs li::before{
-  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
-  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
-}
-html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
-/* 解析 */
-blockquote{
-  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
-  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
-}
-blockquote p:last-child{margin-bottom:0}
-blockquote strong{color:var(--fg)}
-/* 真题题干 */
-.q-stem{
-  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
-}
-.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
-/* ---------- 代码 ---------- */
-code{
-  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
-  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
-  word-break:break-word;
-}
-.codebox{margin:14px 0}
-.codebox .bar{
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
-}
-.codebox button{
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  border-radius:6px;padding:2px 9px;font-size:11.5px;
-}
-.codebox button:hover{border-color:var(--acc);color:var(--acc)}
-pre{
-  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
-  padding:14px 16px;overflow:auto;margin:0;
-}
-pre code{background:none;padding:0;font-size:13px;line-height:1.5}
-/* ASCII 示意图：深色面板，保证等宽对齐可读 */
-.codebox.ascii .bar{color:var(--fg2);font-weight:600}
-.codebox.ascii pre{
-  background:var(--dark);border-color:#000;color:var(--dark-fg);
-  font-size:12.5px;line-height:1.45;padding:18px;
-}
-.codebox.ascii pre code{color:var(--dark-fg)}
-/* Mermaid */
-.fig{margin:16px 0}
-.mermaid{
-  background:var(--panel);border:1px solid var(--line);border-radius:8px;
-  padding:16px;overflow:auto;text-align:center;min-height:44px;
-}
-.mermaid svg{max-width:100%;height:auto}
-.fig details{margin-top:8px}
-.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
-.fig summary:hover{color:var(--acc)}
-/* ---------- 表格 ---------- */
-.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
-th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
-th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--line2)}
-/* ---------- 杂项 ---------- */
-.warn{
-  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
-  padding:11px 15px;font-size:14px;margin:14px 0;
-}
-.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
-.totop{
-  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
-  transition:opacity .2s;z-index:40;
-}
-.totop.on{opacity:1;pointer-events:auto}
-.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
-#theme{
-  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
-}
-#menu{
-  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
-  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
-  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
-}
-hr{border:none;border-top:1px solid var(--line);margin:32px 0}
-/* ---------- 窄屏 ---------- */
-@media (max-width:1000px){
-  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
-      box-shadow:4px 0 22px rgba(0,0,0,.12)}
-  nav.open{transform:none}
-  main{padding:22px 18px 130px;max-width:none}
-  #menu{display:flex}
-  .kp{padding:20px 18px 24px}
-}
-/* ---------- 打印 ---------- */
-@media print{
-  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
-  body{background:#fff;font-size:11pt}
-  main{max-width:none;padding:0}
-  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
-  h2{break-after:avoid}
-  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
-  .mermaid{border-color:#ccc}
-  a{color:#000;text-decoration:none}
-}
-</style>
+<title>数据结构 · 图</title>
+<link rel="stylesheet" href="../assets/site.css">
 <script src="../mermaid.min.js"></script></head>
 <body>
 <div id="bar"></div>
+<header class="site-topbar">
+<a class="tb-brand" href="../index.html">408 速成复习资料</a>
+<nav class="tb-crumbs" aria-label="面包屑"><a href="../index.html">首页</a><span class="tb-sep">›</span><a href="index.html">数据结构</a><span class="tb-sep">›</span><span aria-current="page">图</span></nav>
+<button class="tb-search" type="button" aria-label="搜索">搜索</button>
+</header>
 <button id="menu" type="button" aria-label="目录">☰</button>
-<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<div class="site-body">
+<nav class="site-sidebar"><div class="sb-brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
 <input id="q" placeholder="筛选知识点…" autocomplete="off">
 <a class="home" href="../index.html">⌂ 全科单页合集</a>
 <details class="grp" open><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
@@ -223,6 +22,14 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <a class="item" href="03-栈与队列.html">栈与队列</a>
 <a class="item" href="04-树与二叉树.html">树与二叉树</a>
 <a class="item cur" href="05-图.html">图</a>
+<div class="sb-secs">
+<a class="sec-link" href="#sec-freq">考频统计</a>
+<a class="sec-link" href="#sec-core">核心讲解</a>
+<a class="sec-link" href="#sec-key">关键结论速记</a>
+<a class="sec-link" href="#sec-fig">示意图</a>
+<a class="sec-link" href="#sec-err">易错点</a>
+<a class="sec-link" href="#sec-real">真题示例</a>
+</div>
 <a class="item" href="06-查找.html">查找</a>
 <a class="item" href="07-排序.html">排序</a>
 </details>
@@ -250,15 +57,16 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <a class="item" href="../计算机网络/04-网络层.html">网络层</a>
 <a class="item" href="../计算机网络/05-传输层.html">传输层</a>
 <a class="item" href="../计算机网络/06-应用层.html">应用层</a>
-</details></nav><main><h1>数据结构 ｜ 图</h1><h1 id="_1">数据结构 · 图</h1>
+</details></nav>
+<main><h1>图</h1><h1 id="_1">数据结构 · 图</h1>
 <h2 id="_2" id="kp">图 [高频]</h2>
-<p class="freq"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 14%；主要题型：选择题 + 综合应用题（42 题常考图的最短路径/拓扑/关键路径）。</p>
-<p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 14%；主要题型：选择题 + 综合应用题（42 题常考图的最短路径/拓扑/关键路径）。</p>
+</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
 <p>图 <code>G = (V, E)</code> 由顶点集 <code>V</code> 与边集 <code>E</code> 组成，无向图边数满足 <code>0 &lt;= e &lt;= n(n-1)/2</code>（完全图），有向图满足 <code>0 &lt;= e &lt;= n(n-1)</code>；含 <code>n</code> 个顶点的连通图至少 <code>n-1</code> 条边，生成树恰有 <code>n-1</code> 条边。存储上，邻接矩阵用 <code>n x n</code> 数组存边，空间 <code>O(n^2)</code>，判断任意两点是否相邻为 <code>O(1)</code>，适合稠密图；</p>
 <p>邻接表存 <code>n</code> 个顶点表结点与 <code>2e</code>（无向）或 <code>e</code>（有向）个边表结点，空间 <code>O(n+e)</code>，找某顶点全部邻接点为 <code>O(deg)</code>，适合稀疏图，但求有向图入度需遍历全表（可加逆邻接表）。十字链表用于有向图，每个弧结点含 <code>tailvex/headvex/hlink/tlink</code>，同时支持出边与入边链，空间 <code>O(n+e)</code>；邻接多重表用于无向图，每个边结点含 <code>ivex/jvex/ilink/jlink</code>，一条边只存一个结点，便于删除边。</p>
 <p>BFS 借助队列按层扩展，时间复杂度为邻接表 <code>O(n+e)</code>、邻接矩阵 <code>O(n^2)</code>，在无权图中按层序首次到达的层数即为单源最短路径长度，BFS 生成树（或森林）的树高最小。DFS 借助栈（递归）深入回溯，复杂度同上，可求连通分量、判定回路、生成 DFS 生成树；对有向无环图做 DFS，按顶点「退栈即输出」得到逆拓扑序，即顶点完成时间的降序就是拓扑序列。</p>
 <p>最小生成树用 Prim（从顶点出发，每次选连接树内外的最小边，<code>O(n^2)</code>，适合稠密图）或 Kruskal（按边权递增选边，用并查集判环，<code>O(e log e)</code>，适合稀疏图）。单源最短路径用 Dijkstra（<code>O(n^2)</code>，仅适用非负权边）或 BFS（无权图）；每对顶点最短路径用 Floyd，<code>O(n^3)</code>，本质是动态规划 <code>A^k[i][j] = min(A^{k-1}[i][j], A^{k-1}[i][k] + A^{k-1}[k][j])</code>。AOE 网的关键路径是 <code>ve</code> 与 <code>vl</code> 相等（活动 <code>e = l</code>）的顶点、<code>e</code> 与 <code>l</code> 相等的活动（松弛时间为 <code>0</code>）构成的源点到汇点的最长路径。</p>
-<p class="lab">关键结论速记</p><ul class="facts">
+</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
 <li><code>O(n^2)</code> 与 <code>O(n+e)</code> —— 邻接矩阵空间固定为 <code>n^2</code>（适合稠密图），邻接表空间与边数线性相关（适合稀疏图），遍历复杂度分别为 <code>O(n^2)</code> 与 <code>O(n+e)</code>。</li>
 <li><code>BFS 求无权图单源最短路径</code> —— 从源点出发按层扩展，顶点首次出队时其层数就是最短路径长度 <code>d[]</code>，每个顶点只入队一次，故复杂度 <code>O(n+e)</code>。</li>
 <li><code>DFS 完成时间降序 = 逆拓扑序</code> —— 有向图无环时 DFS 退栈序反向即拓扑序列；若 DFS 中出现指向栈中顶点的回边，则图中存在回路，拓扑排序不存在。</li>
@@ -266,7 +74,7 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <li><code>Dijkstra 不能处理负权边</code> —— 其贪心前提是「已确定顶点的 <code>dist</code> 不会因后续松弛变小」，负权会破坏该前提；含负权边应用 Floyd 或 Bellman-Ford 类算法。</li>
 <li><code>Floyd 循环顺序 k 必须在最外层</code> —— 依次以 <code>v_k</code> 为中间点更新 <code>A[i][j] = min(A[i][j], A[i][k] + A[k][j])</code>，最外层放 <code>i</code> 或 <code>j</code> 会使中间点被提前使用而结果错误。</li>
 </ul>
-<p class="lab">示意图</p>
+</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
 <p>同一无向图（顶点 0 到 3，边 <code>0-1</code>、<code>0-2</code>、<code>1-3</code>、<code>2-3</code>）的邻接矩阵与邻接表如下，两种存储看到的是同一张图，区别只在空间与查询代价。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>adjacency matrix (n=4, row/col index 0..3)
 
@@ -325,13 +133,13 @@ adjacency list (vertex node -&gt; edge nodes)
     A8 --&gt;|是| A9[&quot;拓扑序列存在 图无回路&quot;]
     A8 --&gt;|否| A10[&quot;拓扑排序失败 图中存在回路&quot;]
 </code></pre></details></div>
-<p class="lab">易错点</p><ul class="errs">
+</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
 <li>认为 Dijkstra 可用于含负权边的图。错在贪心前提被破坏：负权边可能让已出堆顶点的 <code>dist</code> 再变小，而该顶点已不再被更新；含负权时应改用 Floyd 或逐次松弛类算法。</li>
 <li>认为 BFS/DFS 遍历序列唯一。错在邻接表存储时边表次序由建表顺序决定，从同一源点出发可能得到不同序列；只有邻接矩阵且下标升序扫描时序列才唯一，而邻接矩阵扫描次序固定，序列唯一。</li>
 <li>把「拓扑序列唯一」与「图中无环」混谈。错在二者不等价：无环只保证拓扑序列存在，序列往往有多个；序列唯一要求每一时刻入度为 <code>0</code> 的顶点恰有一个，即图存在一条贯穿全部顶点的有向哈密顿路径。</li>
 <li>认为 Kruskal 必须判环或 Prim 必须排序全部边。错在判环职责不同：Kruskal 用并查集判断两端点是否已同集合，Prim 则维护 <code>lowcost[]</code> 每轮只取最小跨边，二者都选 <code>n-1</code> 条边，但权值相等的边可能导致生成树不唯一。</li>
 </ul>
-<p class="lab">真题示例</p>
+</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
 <p class="q-stem"><span class="q-src">2016 年 408 第 8 题（单项选择题，2 分）</span></p>
 <p>使用 Dijkstra 算法求下图中从顶点 1 到其余各顶点的最短路径，将当前找到的从顶点 1 到各顶点的最短路径长度填入表中。若图中存在权值为负的边，则下列叙述中正确的是（ ）。</p>
 <p>A. Dijkstra 算法仍能得到正确的最短路径
@@ -341,93 +149,19 @@ D. 只要负权边不与源点直接相连，Dijkstra 算法就正确</p>
 <blockquote>
 <p>解析：第一步，明确 Dijkstra 的贪心不变式——每次从 <code>S</code> 外取 <code>dist</code> 最小的顶点 <code>u</code> 并入 <code>S</code>，并断言 <code>dist[u]</code> 已是最终最短路径长度。第二步，该断言依赖所有边权非负：若存在负权边，后加入的顶点可能通过负权边使 <code>u</code> 的路径变短，而 <code>u</code> 已出 <code>S</code> 不再更新，故结果可能错误。第三步，Dijkstra 全程不做「回路检测」判断，即使存在负权回路也无法报告。因此 B、D 错，A 错。答案为 <strong>C</strong>。</p>
 </blockquote>
-<hr /></main></div>
+<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="04-树与二叉树.html"><span class="cn-dir">← 上一章</span><span class="cn-title">树与二叉树</span></a><a class="cn-next" href="06-查找.html"><span class="cn-dir">下一章 →</span><span class="cn-title">查找</span></a></nav></main>
+</div>
+<footer class="site-footer">
+<span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
+<span class="ft-sep">·</span>
+<a href="../README.html">数据口径与来源</a>
+<span class="ft-sep">·</span>
+<a href="../LICENSE">许可协议</a>
+<a class="ft-top" href="#">回到顶部 ↑</a>
+</footer>
 <button class="totop" type="button" aria-label="回到顶部">↑</button>
 <button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script>
-// 侧栏筛选
-var q = document.getElementById('q');
-if (q) q.addEventListener('input', function () {
-  var v = this.value.trim().toLowerCase();
-  document.querySelectorAll('nav details.grp').forEach(function (d) {
-    var any = false;
-    d.querySelectorAll('a.item').forEach(function (a) {
-      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
-      a.style.display = hit ? '' : 'none';
-      if (hit) any = true;
-    });
-    d.style.display = (any || !v) ? '' : 'none';
-    if (v && any) d.open = true;
-  });
-});
-// 进度条 + 回到顶部
-var bar = document.getElementById('bar'), top = document.querySelector('.totop');
-function onScroll() {
-  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
-  var max = h.scrollHeight - h.clientHeight;
-  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-  if (top) top.classList.toggle('on', y > 500);
-}
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
-if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
-// 复制
-document.querySelectorAll('.codebox').forEach(function (box) {
-  var btn = box.querySelector('button'), pre = box.querySelector('pre');
-  if (!btn || !pre) return;
-  btn.addEventListener('click', function () {
-    var t = pre.innerText;
-    var done = function () {
-      btn.textContent = '已复制';
-      setTimeout(function () { btn.textContent = '复制'; }, 1200);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
-    else {
-      var ta = document.createElement('textarea'); ta.value = t;
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
-    }
-  });
-});
-// 主题（记住选择 + 跟随系统）
-var tb = document.getElementById('theme'), saved = null;
-try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
-if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
-if (saved) document.documentElement.setAttribute('data-theme', saved);
-function syncThemeBtn() {
-  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
-}
-syncThemeBtn();
-if (tb) tb.addEventListener('click', function () {
-  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  syncThemeBtn();
-  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
-});
-// 窄屏抽屉
-var mb = document.getElementById('menu');
-if (mb) {
-  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
-  document.querySelector('nav').addEventListener('click', function (e) {
-    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
-  });
-}
-// 目录高亮当前章节
-(function () {
-  var links = [].slice.call(document.querySelectorAll('nav a.item'));
-  var targets = links.map(function (a) {
-    var h = a.getAttribute('href') || '';
-    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
-    return id ? document.getElementById(id) : null;
-  });
-  if (!targets.some(Boolean)) return;
-  function mark() {
-    var y = scrollY + 130, idx = -1;
-    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
-    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
-  }
-  addEventListener('scroll', mark, { passive: true }); mark();
-})();
-</script>
+<script src="../assets/site.js"></script>
 <script>
 (function () {
   var nodes = document.querySelectorAll('.mermaid');

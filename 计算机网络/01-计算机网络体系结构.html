@@ -1,220 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light"><head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>计算机网络 · 计算机网络体系结构</title><style>
-*,*::before,*::after{box-sizing:border-box}
-:root{
-  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
-  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
-  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
-  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
-  --radius:10px; --mw:780px;
-}
-html[data-theme="dark"]{
-  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
-  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
-  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
-  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
-}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
-       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  text-rendering:optimizeLegibility;
-}
-/* ---------- 布局 ---------- */
-#wrap{display:flex;align-items:flex-start;min-height:100vh}
-nav{
-  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
-  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
-}
-nav::-webkit-scrollbar{width:9px}
-nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
-nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
-#q{
-  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
-  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
-}
-#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
-nav .home{
-  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
-  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
-}
-nav .home:hover{filter:brightness(.97)}
-details.grp{margin:2px 0}
-details.grp>summary{
-  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
-  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-details.grp>summary::-webkit-details-marker{display:none}
-details.grp>summary:hover{background:var(--line2)}
-details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
-details.grp[open]>summary{color:var(--acc)}
-nav a.item{
-  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
-  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-nav a.item:hover{background:var(--line2);color:var(--fg)}
-nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
-/* ---------- 进度条 ---------- */
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
-/* ---------- 标题 ---------- */
-h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
-h2{
-  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
-  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
-}
-h3{font-size:18px;margin:28px 0 12px}
-p{margin:0 0 14px}
-/* ---------- 知识点卡片 ---------- */
-.kp{
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
-}
-.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
-/* ---------- 字段 ---------- */
-.fld{margin:24px 0 0}
-.lab{
-  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
-  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
-}
-.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
-.freq{
-  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
-  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
-}
-.freq b{color:var(--fg)}
-html[data-theme="dark"] .freq{color:#f2e8cc}
-/* 结论速记 → 公式卡 */
-ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.facts li{
-  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
-  padding:11px 15px;font-size:15px;margin:0;
-}
-ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
-/* 易错点 → 卡片 */
-ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.errs li{
-  position:relative;background:var(--panel);border:1px solid var(--line);
-  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
-}
-ul.errs li::before{
-  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
-  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
-}
-html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
-/* 解析 */
-blockquote{
-  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
-  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
-}
-blockquote p:last-child{margin-bottom:0}
-blockquote strong{color:var(--fg)}
-/* 真题题干 */
-.q-stem{
-  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
-}
-.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
-/* ---------- 代码 ---------- */
-code{
-  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
-  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
-  word-break:break-word;
-}
-.codebox{margin:14px 0}
-.codebox .bar{
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
-}
-.codebox button{
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  border-radius:6px;padding:2px 9px;font-size:11.5px;
-}
-.codebox button:hover{border-color:var(--acc);color:var(--acc)}
-pre{
-  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
-  padding:14px 16px;overflow:auto;margin:0;
-}
-pre code{background:none;padding:0;font-size:13px;line-height:1.5}
-/* ASCII 示意图：深色面板，保证等宽对齐可读 */
-.codebox.ascii .bar{color:var(--fg2);font-weight:600}
-.codebox.ascii pre{
-  background:var(--dark);border-color:#000;color:var(--dark-fg);
-  font-size:12.5px;line-height:1.45;padding:18px;
-}
-.codebox.ascii pre code{color:var(--dark-fg)}
-/* Mermaid */
-.fig{margin:16px 0}
-.mermaid{
-  background:var(--panel);border:1px solid var(--line);border-radius:8px;
-  padding:16px;overflow:auto;text-align:center;min-height:44px;
-}
-.mermaid svg{max-width:100%;height:auto}
-.fig details{margin-top:8px}
-.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
-.fig summary:hover{color:var(--acc)}
-/* ---------- 表格 ---------- */
-.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
-th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
-th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--line2)}
-/* ---------- 杂项 ---------- */
-.warn{
-  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
-  padding:11px 15px;font-size:14px;margin:14px 0;
-}
-.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
-.totop{
-  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
-  transition:opacity .2s;z-index:40;
-}
-.totop.on{opacity:1;pointer-events:auto}
-.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
-#theme{
-  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
-}
-#menu{
-  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
-  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
-  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
-}
-hr{border:none;border-top:1px solid var(--line);margin:32px 0}
-/* ---------- 窄屏 ---------- */
-@media (max-width:1000px){
-  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
-      box-shadow:4px 0 22px rgba(0,0,0,.12)}
-  nav.open{transform:none}
-  main{padding:22px 18px 130px;max-width:none}
-  #menu{display:flex}
-  .kp{padding:20px 18px 24px}
-}
-/* ---------- 打印 ---------- */
-@media print{
-  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
-  body{background:#fff;font-size:11pt}
-  main{max-width:none;padding:0}
-  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
-  h2{break-after:avoid}
-  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
-  .mermaid{border-color:#ccc}
-  a{color:#000;text-decoration:none}
-}
-</style>
+<title>计算机网络 · 计算机网络体系结构</title>
+<link rel="stylesheet" href="../assets/site.css">
 <script src="../mermaid.min.js"></script></head>
 <body>
 <div id="bar"></div>
+<header class="site-topbar">
+<a class="tb-brand" href="../index.html">408 速成复习资料</a>
+<nav class="tb-crumbs" aria-label="面包屑"><a href="../index.html">首页</a><span class="tb-sep">›</span><a href="index.html">计算机网络</a><span class="tb-sep">›</span><span aria-current="page">计算机网络体系结构</span></nav>
+<button class="tb-search" type="button" aria-label="搜索">搜索</button>
+</header>
 <button id="menu" type="button" aria-label="目录">☰</button>
-<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<div class="site-body">
+<nav class="site-sidebar"><div class="sb-brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
 <input id="q" placeholder="筛选知识点…" autocomplete="off">
 <a class="home" href="../index.html">⌂ 全科单页合集</a>
 <details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
@@ -245,19 +44,28 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 </details>
 <details class="grp" open><summary><span>计算机网络</span><span class="n">25 分 · 6 点</span></summary>
 <a class="item cur" href="01-计算机网络体系结构.html">计算机网络体系结构</a>
+<div class="sb-secs">
+<a class="sec-link" href="#sec-freq">考频统计</a>
+<a class="sec-link" href="#sec-core">核心讲解</a>
+<a class="sec-link" href="#sec-key">关键结论速记</a>
+<a class="sec-link" href="#sec-fig">示意图</a>
+<a class="sec-link" href="#sec-err">易错点</a>
+<a class="sec-link" href="#sec-real">真题示例</a>
+</div>
 <a class="item" href="02-物理层.html">物理层</a>
 <a class="item" href="03-数据链路层.html">数据链路层</a>
 <a class="item" href="04-网络层.html">网络层</a>
 <a class="item" href="05-传输层.html">传输层</a>
 <a class="item" href="06-应用层.html">应用层</a>
-</details></nav><main><h1>计算机网络 ｜ 计算机网络体系结构</h1><h1 id="_1">计算机网络 · 计算机网络体系结构</h1>
+</details></nav>
+<main><h1>计算机网络体系结构</h1><h1 id="_1">计算机网络 · 计算机网络体系结构</h1>
 <h2 id="_2" id="kp">计算机网络体系结构 [高频]</h2>
-<p class="freq"><b>考频</b>　考察次数 14 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 8%；主要题型：选择题为主（分层模型、协议/服务、设备与层次对应）。</p>
-<p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 14 次；涉及年份：2009、2011、2013、2015、2017、2019、2021、2023、2024；分数占比约 8%；主要题型：选择题为主（分层模型、协议/服务、设备与层次对应）。</p>
+</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
 <p>计算机网络按覆盖范围分为广域网、城域网、局域网与个人区域网；按交换方式分为电路交换、报文交换与<strong>分组交换</strong>（<code>408</code> 的默认语境）。性能指标中必须分清两种时延：<strong>发送时延（传输时延）<code>= 数据长度 / 发送速率</code></strong> 取决于数据量与链路速率，<strong>传播时延 <code>= 距离 / 电磁波传播速率</code></strong> 只取决于物理距离与介质（约 <code>2 × 10^8 m/s</code> 在铜缆/光纤中）。因此"提高带宽"能减少发送时延，但<strong>不能减少传播时延</strong>；<strong>时延带宽积 <code>= 传播时延 × 带宽</code></strong> 表示"链路上能容纳的比特数"，又称"以比特为单位的链路长度"；<strong>往返时间 <code>RTT</code></strong> 是往返一次的时间。</p>
 <p>总时延 <code>= 发送时延 + 传播时延 + 处理时延 + 排队时延</code>，其中处理与排队时延在题目给出时才能计入。<code>OSI</code> 参考模型自下而上为<strong>物理层、数据链路层、网络层、传输层、会话层、表示层、应用层</strong>，<code>TCP/IP</code> 模型为<strong>网络接口层、网际层、传输层、应用层</strong>，二者对应关系是"<code>TCP/IP</code> 的应用层 = <code>OSI</code> 的会话层 + 表示层 + 应用层"，"<code>TCP/IP</code> 的网络接口层 = <code>OSI</code> 的物理层 + 数据链路层"。<strong>协议</strong>是通信双方必须遵守的规则集合，三要素是<strong>语法、语义、同步</strong>；</p>
 <p><strong>服务</strong>是下层向上层提供的功能，是"垂直"的，而协议是"水平"的（同层对等实体之间）。<strong>各层的数据单元</strong>名称不同：物理层为比特、数据链路层为帧、网络层为分组（数据报）、传输层为报文段（<code>TCP</code>）或用户数据报（<code>UDP</code>）；<strong>各层的典型设备</strong>为：中继器与集线器在物理层、网桥与交换机在数据链路层、路由器在网络层、网关在应用层。</p>
-<p class="lab">关键结论速记</p><ul class="facts">
+</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
 <li><code>发送时延 = 数据长度 / 速率</code>，<code>传播时延 = 距离 / 传播速率</code> —— 提高带宽只减少发送时延，不影响传播时延。</li>
 <li><code>时延带宽积 = 传播时延 × 带宽</code> —— 物理意义是"链路中能容纳的比特数"，又称链路长度（比特）。</li>
 <li><code>OSI 七层 = 物理、数据链路、网络、传输、会话、表示、应用</code>；<code>TCP/IP 四层 = 网络接口、网际、传输、应用</code>。</li>
@@ -265,7 +73,7 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <li><code>协议三要素：语法、语义、同步</code>；协议是水平的、服务是垂直的。</li>
 <li><code>设备与层次：集线器/中继器在物理层，交换机/网桥在数据链路层，路由器在网络层</code> —— 判断题的高频依据。</li>
 </ul>
-<p class="lab">示意图</p>
+</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
 <p><strong><code>OSI</code> 七层与 <code>TCP/IP</code> 四层的对应关系及数据单元封装</strong>：每下一层都在上层数据前加上本层首部（必要时加尾部），形成该层的数据单元。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>OSI 7 layers                     TCP/IP 4 layers        PDU name
 +---------------------+          +----------------+     ------------
@@ -349,13 +157,13 @@ devices and the layer they operate at
     S8 --&gt; S9
     S9 --&gt; S10[&quot;逐层解封 校验 FCS 与首部 最终交给应用进程&quot;]
 </code></pre></details></div>
-<p class="lab">易错点</p><ul class="errs">
+</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
 <li>把发送时延与传播时延混为一谈：<code>发送时延 = 数据长度 / 速率</code>（与数据量和带宽有关），<code>传播时延 = 距离 / 传播速率</code>（只与距离和介质有关）；因此"增大带宽可以减小传播时延"是错误说法。</li>
 <li><code>OSI</code> 与 <code>TCP/IP</code> 的层间对应关系写错：<code>TCP/IP</code> 的<strong>网络接口层</strong>对应 <code>OSI</code> 的物理层与数据链路层，<strong>应用层</strong>对应 <code>OSI</code> 的会话层、表示层与应用层；把"表示层"划到传输层或把"会话层"划到网络层都是错的。</li>
 <li>认为集线器能隔离冲突域：集线器工作在物理层、只是多端口的信号放大转发，<strong>所有端口属于同一个冲突域与同一个广播域</strong>；能隔离冲突域的是交换机/网桥，能隔离广播域的是路由器。</li>
 <li>把协议与服务混同：<strong>协议是水平方向</strong>（同层对等实体之间的规则），<strong>服务是垂直方向</strong>（下层通过服务访问点向上层提供的能力）；上层只能看见服务而看不见下层的协议实现。</li>
 </ul>
-<p class="lab">真题示例</p>
+</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
 <p class="q-stem"><span class="q-src">2014 年真题改编（单项选择题，2 分）</span></p>
 <p>下列关于 <code>OSI</code> 参考模型与 <code>TCP/IP</code> 模型各层功能的叙述中，正确的是（ ）。</p>
 <p>A. 数据链路层负责为分组选择路由并实现拥塞控制
@@ -365,93 +173,19 @@ D. 会话层负责数据格式转换与加密，属于 <code>TCP/IP</code> 模�
 <blockquote>
 <p>解析：逐项对应层次职责。<strong>A 错</strong>——"为分组选择路由"是<strong>网络层</strong>的功能，"拥塞控制"也主要由传输层与网络层承担，不是数据链路层的职责。<strong>B 对</strong>——<strong>传输层</strong>面向进程到进程（端到端）通信，<code>TCP</code> 在此层实现可靠传输、流量控制与拥塞控制，这是传输层的标准描述。<strong>C 错</strong>——"相邻结点之间"的差错控制与流量控制属于<strong>数据链路层</strong>，网络层做的是主机到主机的分组转发（不保证可靠）。<strong>D 错</strong>——数据格式转换与加密属于<strong>表示层</strong>，而在 <code>TCP/IP</code> 模型中它被并入<strong>应用层</strong>，不是传输层。答案选 <strong>B</strong>。<strong>判分依据是"端到端 = 传输层、点到点 = 数据链路层"以及表示层在 <code>TCP/IP</code> 中并入应用层这两条对应关系。</strong></p>
 </blockquote>
-<hr /></main></div>
+<hr /></section><nav class="chapter-nav"><a class="cn-next" href="02-物理层.html"><span class="cn-dir">下一章 →</span><span class="cn-title">物理层</span></a></nav></main>
+</div>
+<footer class="site-footer">
+<span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
+<span class="ft-sep">·</span>
+<a href="../README.html">数据口径与来源</a>
+<span class="ft-sep">·</span>
+<a href="../LICENSE">许可协议</a>
+<a class="ft-top" href="#">回到顶部 ↑</a>
+</footer>
 <button class="totop" type="button" aria-label="回到顶部">↑</button>
 <button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script>
-// 侧栏筛选
-var q = document.getElementById('q');
-if (q) q.addEventListener('input', function () {
-  var v = this.value.trim().toLowerCase();
-  document.querySelectorAll('nav details.grp').forEach(function (d) {
-    var any = false;
-    d.querySelectorAll('a.item').forEach(function (a) {
-      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
-      a.style.display = hit ? '' : 'none';
-      if (hit) any = true;
-    });
-    d.style.display = (any || !v) ? '' : 'none';
-    if (v && any) d.open = true;
-  });
-});
-// 进度条 + 回到顶部
-var bar = document.getElementById('bar'), top = document.querySelector('.totop');
-function onScroll() {
-  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
-  var max = h.scrollHeight - h.clientHeight;
-  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-  if (top) top.classList.toggle('on', y > 500);
-}
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
-if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
-// 复制
-document.querySelectorAll('.codebox').forEach(function (box) {
-  var btn = box.querySelector('button'), pre = box.querySelector('pre');
-  if (!btn || !pre) return;
-  btn.addEventListener('click', function () {
-    var t = pre.innerText;
-    var done = function () {
-      btn.textContent = '已复制';
-      setTimeout(function () { btn.textContent = '复制'; }, 1200);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
-    else {
-      var ta = document.createElement('textarea'); ta.value = t;
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
-    }
-  });
-});
-// 主题（记住选择 + 跟随系统）
-var tb = document.getElementById('theme'), saved = null;
-try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
-if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
-if (saved) document.documentElement.setAttribute('data-theme', saved);
-function syncThemeBtn() {
-  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
-}
-syncThemeBtn();
-if (tb) tb.addEventListener('click', function () {
-  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  syncThemeBtn();
-  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
-});
-// 窄屏抽屉
-var mb = document.getElementById('menu');
-if (mb) {
-  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
-  document.querySelector('nav').addEventListener('click', function (e) {
-    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
-  });
-}
-// 目录高亮当前章节
-(function () {
-  var links = [].slice.call(document.querySelectorAll('nav a.item'));
-  var targets = links.map(function (a) {
-    var h = a.getAttribute('href') || '';
-    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
-    return id ? document.getElementById(id) : null;
-  });
-  if (!targets.some(Boolean)) return;
-  function mark() {
-    var y = scrollY + 130, idx = -1;
-    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
-    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
-  }
-  addEventListener('scroll', mark, { passive: true }); mark();
-})();
-</script>
+<script src="../assets/site.js"></script>
 <script>
 (function () {
   var nodes = document.querySelectorAll('.mermaid');

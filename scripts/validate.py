@@ -51,6 +51,15 @@ NODE_DEPS_HINT = ("装依赖：npm install --prefix .tools --cache /tmp/npm-cach
 PY_DEPS_HINT = ("装依赖：python3 -m venv .tools/venv && "
                 ".tools/venv/bin/python -m pip install -r scripts/requirements.txt"
                 "（F14 用真实 Markdown 渲染器，缺它这项校验无法进行）")
+# 六段字段 → 锚点 id（契约钦定，必须与 build_html.py 的 SECS 一致，见 F22）
+SEC_IDS_FOR_CHECK = [
+    ("考频统计", "sec-freq"),
+    ("核心讲解", "sec-core"),
+    ("关键结论速记", "sec-key"),
+    ("示意图", "sec-fig"),
+    ("易错点", "sec-err"),
+    ("真题示例", "sec-real"),
+]
 ALLOW_NO_MERMAID = "--no-mermaid" in sys.argv
 # 防止 F14 换解释器重跑时无限递归（见 render_check）
 NO_REEXEC = "--no-reexec" in sys.argv
@@ -665,6 +674,177 @@ def check_html():
                 err(rel, 0, "F16", "引用的脚本不存在：%s" % ref)
 
 
+def check_shell():
+    """F22: 统一外壳完整性（契约 ../PLAN-对齐与改版.md 2.3/2.4）。
+
+    与 math2-kaoyan 共用同一份 DOM 与 class 名，因此这里校验的是**契约**，
+    不是 408 自己的偏好：顶栏（品牌 + 面包屑 + 搜索）、侧栏、main、页脚
+    四件必须齐全，六段锚点 id 必须齐备，首页科目卡片数必须等于科目数。
+
+    只查「章节页 + 科目首页」：仓库根的合集/总览是另一种页面形态
+    （整站合并 + README），不套用章节骨架。
+    """
+    shell_pages = []
+    for k in T.ORDER:
+        s = T.SUBJECTS[k]
+        shell_pages.append(("overview", k, None,
+                            os.path.join(SITE, s["dir"], "index.html")))
+        for t in T.TOPICS[k]:
+            shell_pages.append(("chapter", k, t[6],
+                                os.path.join(SITE, s["dir"], t[6] + ".html")))
+
+    nav_pages = 0
+    for kind, k, slug, fp in shell_pages:
+        s = T.SUBJECTS[k]
+        rel = os.path.relpath(fp, ROOT)
+        if not os.path.exists(fp):
+            err(rel, 0, "F22", "外壳页面缺失（先跑 scripts/build_html.py）")
+            continue
+        with open(fp, encoding="utf-8") as fh:
+            body = fh.read()
+
+        # ---- 四件套 ----
+        for cls, what in (("site-topbar", "顶栏"), ("site-sidebar", "侧栏"),
+                          ("site-footer", "页脚")):
+            if 'class="%s"' % cls not in body:
+                err(rel, 0, "F22", "缺少%s（.%s）" % (what, cls))
+        for cls in ("tb-brand", "tb-crumbs", "tb-sep", "tb-search"):
+            if 'class="%s"' % cls not in body:
+                err(rel, 0, "F22", "顶栏缺少 .%s" % cls)
+        if "<main>" not in body:
+            err(rel, 0, "F22", "缺少 <main>")
+
+        # ---- 面包屑必须是「首页 › 科目 › 章节」三级 ----
+        crumbs = re.search(r'<nav class="tb-crumbs".*?</nav>', body, re.S)
+        if crumbs:
+            seg = crumbs.group(0)
+            n_sep = seg.count('class="tb-sep"')
+            if n_sep != 2:
+                err(rel, 0, "F22", "面包屑分隔符 %d 个，应为 2 个（首页›科目›章节）" % n_sep)
+            if seg.count('aria-current="page"') != 1:
+                err(rel, 0, "F22", "面包屑应恰有 1 个 aria-current=\"page\" 标记当前页")
+            if kind == "chapter" and slug:
+                # 科目那一层要指回科目首页
+                if not re.search(r'<a href="index\.html">', seg):
+                    err(rel, 0, "F22", "面包屑缺少指向科目首页的链接")
+        else:
+            err(rel, 0, "F22", "面包屑结构缺失")
+
+        # ---- 六段锚点齐备（id 与 class 同名，契约钦定） ----
+        for lab, sid in SEC_IDS_FOR_CHECK:
+            if 'id="%s"' % sid not in body:
+                err(rel, 0, "F22", "缺少六段锚点 #%s（%s）" % (sid, lab))
+            if 'class="sec %s"' % sid not in body:
+                err(rel, 0, "F22", "缺少六段容器 .sec.%s（%s）" % (sid, lab))
+
+        # ---- 章节页专属：prev/next 与侧栏六段锚点 ----
+        if kind == "chapter" and slug:
+            topics = [t[6] for t in T.TOPICS[k]]
+            i = topics.index(slug)
+            nav = re.search(r'<nav class="chapter-nav">.*?</nav>', body, re.S)
+            if not nav:
+                err(rel, 0, "F22", "章节页缺少 .chapter-nav")
+            else:
+                seg = nav.group(0)
+                want_prev = i > 0
+                want_next = i + 1 < len(topics)
+                if want_prev and 'class="cn-prev"' not in seg:
+                    err(rel, 0, "F22", "首章之外必须有 .cn-prev")
+                if want_next and 'class="cn-next"' not in seg:
+                    err(rel, 0, "F22", "末章之外必须有 .cn-next")
+                if not want_prev and "cn-prev" in seg:
+                    err(rel, 0, "F22", "第一章不应有 .cn-prev")
+                if not want_next and "cn-next" in seg:
+                    err(rel, 0, "F22", "最后一章不应有 .cn-next")
+                # prev/next 的 href 必须指向真实存在的同科目章节页
+                for cls in ("cn-prev", "cn-next"):
+                    m = re.search(r'class="%s" href="([^"]+)"' % cls, seg)
+                    if m:
+                        tgt = os.path.normpath(os.path.join(os.path.dirname(fp),
+                                                            m.group(1).split("#")[0]))
+                        if not os.path.exists(tgt):
+                            err(rel, 0, "F22", "%s 指向不存在的页面：%s" % (cls, m.group(1)))
+            if '<div class="sb-secs">' not in body:
+                err(rel, 0, "F22", "侧栏缺少当前章六段锚点 .sb-secs")
+            for lab, sid in SEC_IDS_FOR_CHECK:
+                if 'class="sec-link" href="#%s"' % sid not in body:
+                    err(rel, 0, "F22", "侧栏六段锚点缺少 #%s（%s）" % (sid, lab))
+            nav_pages += 1
+
+    # ---- 首页科目卡片：数量必须等于科目数 ----
+    idx = os.path.join(SITE, "index.html")
+    if os.path.exists(idx):
+        with open(idx, encoding="utf-8") as fh:
+            home = fh.read()
+        cards = re.findall(r'class="hs-card" href="([^"]+)"', home)
+        if len(cards) != len(T.ORDER):
+            err("index.html", 0, "F22",
+                "首页科目卡片 %d 张，应为 %d 张（每科一张）" % (len(cards), len(T.ORDER)))
+        for href in cards:
+            tgt = os.path.normpath(os.path.join(SITE, href.split("#")[0]))
+            if not os.path.exists(tgt):
+                err("index.html", 0, "F22", "科目卡片指向不存在的页面：%s" % href)
+        for k in T.ORDER:
+            s = T.SUBJECTS[k]
+            if 'href="%s/index.html"' % s["dir"] not in home:
+                err("index.html", 0, "F22", "首页缺少科目 %s 的卡片入口" % s["name"])
+        if 'class="home-subjects"' not in home:
+            err("index.html", 0, "F22", "首页缺少 .home-subjects 容器")
+        # 卡片必须在单页合集之前
+        if home.find('class="home-subjects"') > home.find('class="kp"'):
+            err("index.html", 0, "F22", "科目卡片应排在单页合集之前")
+    stats["shell_nav_pages"] = nav_pages
+
+
+def check_assets():
+    """F23: 外置资源可达（assets/site.css 与 assets/site.js）。
+
+    契约要求样式与行为外置；这两份是**手写源**（不是生成物），
+    所以漏提交、改名、引用路径写错都必须在这里报出来，而不是等页面变成裸 HTML。
+    """
+    css = os.path.join(SITE, "assets", "site.css")
+    js = os.path.join(SITE, "assets", "site.js")
+    for fp, what in ((css, "样式"), (js, "行为")):
+        if not os.path.exists(fp):
+            err("assets/%s" % os.path.basename(fp), 0, "F23",
+                "缺少外置%s文件（手写源，必须入库）" % what)
+        elif os.path.getsize(fp) < 500:
+            err("assets/%s" % os.path.basename(fp), 0, "F23",
+                "外置%s文件过小（%d 字节），疑似被清空或截断"
+                % (os.path.basename(fp), os.path.getsize(fp)))
+    # 每个站点页面都必须引用它们（相对层级随页面深度变化）
+    pages = []
+    for k in T.ORDER:
+        s = T.SUBJECTS[k]
+        d = os.path.join(SITE, s["dir"])
+        pages.append(os.path.join(d, "index.html"))
+        for t in T.TOPICS[k]:
+            pages.append(os.path.join(d, t[6] + ".html"))
+    pages += [os.path.join(SITE, "index.html"), os.path.join(SITE, "README.html")]
+    for fp in pages:
+        if not os.path.exists(fp):
+            continue
+        rel = os.path.relpath(fp, ROOT)
+        with open(fp, encoding="utf-8") as fh:
+            body = fh.read()
+        if "assets/site.css" not in body:
+            err(rel, 0, "F23", "页面未引用 assets/site.css")
+        if "assets/site.js" not in body:
+            err(rel, 0, "F23", "页面未引用 assets/site.js")
+        # 页面内不得再有内联 <style>（外置的意义就是消除每页 9 KB 冗余）
+        if "<style>" in body:
+            err(rel, 0, "F23", "页面仍有内联 <style>，样式未真正外置")
+        # 引用的资源必须真实存在
+        for m in re.finditer(r'<link rel="stylesheet" href="([^"]+)"', body):
+            tgt = os.path.normpath(os.path.join(os.path.dirname(fp), m.group(1)))
+            if not os.path.exists(tgt):
+                err(rel, 0, "F23", "样式表不可达：%s" % m.group(1))
+        for m in re.finditer(r'<script src="([^"]+)"', body):
+            tgt = os.path.normpath(os.path.join(os.path.dirname(fp), m.group(1)))
+            if not os.path.exists(tgt):
+                err(rel, 0, "F23", "脚本不可达：%s" % m.group(1))
+
+
 def main():
     parts_mode = "--parts" in sys.argv
     if parts_mode:
@@ -699,6 +879,8 @@ def main():
     check_links()
     check_site_links()
     check_html()
+    check_shell()
+    check_assets()
     run_mermaid_parser(DOCS)
     return report("408 复习资料校验报告")
 

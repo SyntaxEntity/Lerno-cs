@@ -1,220 +1,19 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light"><head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>计算机网络 · 应用层</title><style>
-*,*::before,*::after{box-sizing:border-box}
-:root{
-  --bg:#f7f7f5; --panel:#ffffff; --fg:#1a1d21; --fg2:#4a5058; --mut:#767e88;
-  --line:#e3e6ea; --line2:#eef0f3; --acc:#1f6feb; --acc-soft:#e8f0fe;
-  --warn:#fff5d6; --warn-line:#e6c34a; --ok:#1a7f37;
-  --code-bg:#f4f6f8; --dark:#11151a; --dark-fg:#dfe6ee;
-  --radius:10px; --mw:780px;
-}
-html[data-theme="dark"]{
-  --bg:#0e1116; --panel:#151a21; --fg:#e7edf3; --fg2:#b8c2cc; --mut:#8b949e;
-  --line:#252c35; --line2:#1c232b; --acc:#6cb0ff; --acc-soft:#16233a;
-  --warn:#2c2712; --warn-line:#7a6a1f; --ok:#4ac26b;
-  --code-bg:#171d24; --dark:#0b0f14; --dark-fg:#dfe6ee;
-}
-html{-webkit-text-size-adjust:100%}
-body{
-  margin:0;background:var(--bg);color:var(--fg);
-  font:16.5px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
-       "Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  text-rendering:optimizeLegibility;
-}
-/* ---------- 布局 ---------- */
-#wrap{display:flex;align-items:flex-start;min-height:100vh}
-nav{
-  width:306px;flex:0 0 306px;height:100vh;position:sticky;top:0;overflow-y:auto;
-  background:var(--panel);border-right:1px solid var(--line);padding:20px 14px 70px;
-}
-nav::-webkit-scrollbar{width:9px}
-nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
-nav .brand{font-size:15px;font-weight:700;margin:0 6px 4px;letter-spacing:.2px}
-nav .brand small{display:block;font-weight:400;color:var(--mut);font-size:12px;margin-top:3px}
-#q{
-  width:100%;margin:12px 0 8px;padding:8px 11px;border:1px solid var(--line);
-  border-radius:8px;background:var(--bg);color:var(--fg);font-size:13.5px;
-}
-#q:focus{outline:2px solid var(--acc-soft);border-color:var(--acc)}
-nav .home{
-  display:block;margin:4px 0 12px;padding:7px 11px;font-size:13.5px;font-weight:600;
-  color:var(--acc);text-decoration:none;background:var(--acc-soft);border-radius:8px;
-}
-nav .home:hover{filter:brightness(.97)}
-details.grp{margin:2px 0}
-details.grp>summary{
-  cursor:pointer;list-style:none;padding:8px 10px;font-size:13.5px;font-weight:650;
-  border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-details.grp>summary::-webkit-details-marker{display:none}
-details.grp>summary:hover{background:var(--line2)}
-details.grp>summary .n{color:var(--mut);font-weight:400;font-size:11.5px;white-space:nowrap}
-details.grp[open]>summary{color:var(--acc)}
-nav a.item{
-  display:block;padding:6px 10px 6px 20px;font-size:13.5px;color:var(--fg2);
-  text-decoration:none;border-radius:7px;border-left:2px solid transparent;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-nav a.item:hover{background:var(--line2);color:var(--fg)}
-nav a.item.cur{background:var(--acc-soft);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-main{flex:1;min-width:0;max-width:calc(var(--mw) + 120px);margin:0 auto;padding:38px 60px 150px}
-/* ---------- 进度条 ---------- */
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50}
-/* ---------- 标题 ---------- */
-h1{font-size:29px;line-height:1.35;margin:0 0 26px;letter-spacing:-.2px}
-h2{
-  font-size:23px;line-height:1.4;margin:52px 0 20px;padding-bottom:10px;
-  border-bottom:2px solid var(--line);letter-spacing:-.2px;scroll-margin-top:16px;
-}
-h3{font-size:18px;margin:28px 0 12px}
-p{margin:0 0 14px}
-/* ---------- 知识点卡片 ---------- */
-.kp{
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-  padding:26px 30px 30px;margin:0 0 28px;box-shadow:0 1px 2px rgba(16,22,26,.04);
-}
-.kp>h2{margin-top:0;border-bottom:none;padding-bottom:0}
-/* ---------- 字段 ---------- */
-.fld{margin:24px 0 0}
-.lab{
-  display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;
-  letter-spacing:.6px;color:var(--mut);margin:0 0 10px;
-}
-.lab::before{content:"";width:4px;height:14px;border-radius:2px;background:var(--acc)}
-.freq{
-  background:var(--warn);border:1px solid var(--warn-line);border-left:4px solid var(--warn-line);
-  border-radius:8px;padding:12px 16px;font-size:14.5px;margin:0;
-}
-.freq b{color:var(--fg)}
-html[data-theme="dark"] .freq{color:#f2e8cc}
-/* 结论速记 → 公式卡 */
-ul.facts{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.facts li{
-  background:var(--code-bg);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;
-  padding:11px 15px;font-size:15px;margin:0;
-}
-ul.facts li code{background:none;padding:0;color:var(--acc);font-weight:600;font-size:14.5px}
-/* 易错点 → 卡片 */
-ul.errs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-ul.errs li{
-  position:relative;background:var(--panel);border:1px solid var(--line);
-  border-radius:8px;padding:12px 15px 12px 46px;font-size:15px;margin:0;
-}
-ul.errs li::before{
-  content:"易错";position:absolute;left:12px;top:12px;font-size:10.5px;font-weight:800;
-  color:#b42318;background:#fee4e2;border-radius:5px;padding:2px 5px;letter-spacing:.5px;
-}
-html[data-theme="dark"] ul.errs li::before{color:#ffb4ab;background:#3d1a17}
-/* 解析 */
-blockquote{
-  margin:14px 0 0;padding:14px 18px;background:var(--code-bg);
-  border-left:4px solid var(--ok);border-radius:0 8px 8px 0;font-size:15px;color:var(--fg2);
-}
-blockquote p:last-child{margin-bottom:0}
-blockquote strong{color:var(--fg)}
-/* 真题题干 */
-.q-stem{
-  background:var(--acc-soft);border-radius:8px;padding:14px 18px;font-size:15.5px;
-}
-.q-src{display:block;font-weight:700;color:var(--acc);font-size:13.5px;margin-bottom:7px}
-/* ---------- 代码 ---------- */
-code{
-  background:var(--code-bg);padding:.14em .4em;border-radius:5px;
-  font:14px/1.55 ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
-  word-break:break-word;
-}
-.codebox{margin:14px 0}
-.codebox .bar{
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  font-size:11.5px;color:var(--mut);padding:0 2px 5px;letter-spacing:.4px;
-}
-.codebox button{
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  border-radius:6px;padding:2px 9px;font-size:11.5px;
-}
-.codebox button:hover{border-color:var(--acc);color:var(--acc)}
-pre{
-  background:var(--code-bg);border:1px solid var(--line);border-radius:8px;
-  padding:14px 16px;overflow:auto;margin:0;
-}
-pre code{background:none;padding:0;font-size:13px;line-height:1.5}
-/* ASCII 示意图：深色面板，保证等宽对齐可读 */
-.codebox.ascii .bar{color:var(--fg2);font-weight:600}
-.codebox.ascii pre{
-  background:var(--dark);border-color:#000;color:var(--dark-fg);
-  font-size:12.5px;line-height:1.45;padding:18px;
-}
-.codebox.ascii pre code{color:var(--dark-fg)}
-/* Mermaid */
-.fig{margin:16px 0}
-.mermaid{
-  background:var(--panel);border:1px solid var(--line);border-radius:8px;
-  padding:16px;overflow:auto;text-align:center;min-height:44px;
-}
-.mermaid svg{max-width:100%;height:auto}
-.fig details{margin-top:8px}
-.fig summary{cursor:pointer;font-size:12.5px;color:var(--mut);padding:4px 0;user-select:none}
-.fig summary:hover{color:var(--acc)}
-/* ---------- 表格 ---------- */
-.tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
-table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
-th,td{border-bottom:1px solid var(--line2);padding:9px 13px;text-align:left;vertical-align:top}
-th{background:var(--code-bg);font-weight:650;font-size:13.5px;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--line2)}
-/* ---------- 杂项 ---------- */
-.warn{
-  background:var(--warn);border:1px solid var(--warn-line);border-radius:8px;
-  padding:11px 15px;font-size:14px;margin:14px 0;
-}
-.tag{font-size:11.5px;padding:2px 9px;border-radius:20px;background:var(--code-bg);color:var(--mut)}
-.totop{
-  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:17px;box-shadow:0 2px 10px rgba(16,22,26,.1);opacity:0;pointer-events:none;
-  transition:opacity .2s;z-index:40;
-}
-.totop.on{opacity:1;pointer-events:auto}
-.totop:hover,#theme:hover{border-color:var(--acc);color:var(--acc)}
-#theme{
-  position:fixed;right:26px;bottom:78px;width:42px;height:42px;border-radius:50%;
-  border:1px solid var(--line);background:var(--panel);color:var(--fg2);cursor:pointer;
-  font-size:16px;box-shadow:0 2px 10px rgba(16,22,26,.1);z-index:40;
-}
-#menu{
-  display:none;position:fixed;left:14px;top:14px;z-index:70;width:40px;height:40px;
-  border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--fg);
-  cursor:pointer;align-items:center;justify-content:center;font-size:17px;
-}
-hr{border:none;border-top:1px solid var(--line);margin:32px 0}
-/* ---------- 窄屏 ---------- */
-@media (max-width:1000px){
-  nav{position:fixed;z-index:60;transform:translateX(-100%);transition:transform .22s;
-      box-shadow:4px 0 22px rgba(0,0,0,.12)}
-  nav.open{transform:none}
-  main{padding:22px 18px 130px;max-width:none}
-  #menu{display:flex}
-  .kp{padding:20px 18px 24px}
-}
-/* ---------- 打印 ---------- */
-@media print{
-  nav,#bar,.totop,#theme,#menu,.codebox .bar,.fig details{display:none!important}
-  body{background:#fff;font-size:11pt}
-  main{max-width:none;padding:0}
-  .kp{border:none;padding:0;margin:0 0 16pt;box-shadow:none}
-  h2{break-after:avoid}
-  .codebox.ascii pre{background:#f5f5f5;color:#111;border-color:#ccc}
-  .mermaid{border-color:#ccc}
-  a{color:#000;text-decoration:none}
-}
-</style>
+<title>计算机网络 · 应用层</title>
+<link rel="stylesheet" href="../assets/site.css">
 <script src="../mermaid.min.js"></script></head>
 <body>
 <div id="bar"></div>
+<header class="site-topbar">
+<a class="tb-brand" href="../index.html">408 速成复习资料</a>
+<nav class="tb-crumbs" aria-label="面包屑"><a href="../index.html">首页</a><span class="tb-sep">›</span><a href="index.html">计算机网络</a><span class="tb-sep">›</span><span aria-current="page">应用层</span></nav>
+<button class="tb-search" type="button" aria-label="搜索">搜索</button>
+</header>
 <button id="menu" type="button" aria-label="目录">☰</button>
-<div id="wrap"><nav><div class="brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
+<div class="site-body">
+<nav class="site-sidebar"><div class="sb-brand">408 速成复习资料<small>四科 · 26 个知识点 · 离线可读</small></div>
 <input id="q" placeholder="筛选知识点…" autocomplete="off">
 <a class="home" href="../index.html">⌂ 全科单页合集</a>
 <details class="grp"><summary><span>数据结构</span><span class="n">45 分 · 7 点</span></summary>
@@ -250,15 +49,24 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <a class="item" href="04-网络层.html">网络层</a>
 <a class="item" href="05-传输层.html">传输层</a>
 <a class="item cur" href="06-应用层.html">应用层</a>
-</details></nav><main><h1>计算机网络 ｜ 应用层</h1><h1 id="_1">计算机网络 · 应用层</h1>
+<div class="sb-secs">
+<a class="sec-link" href="#sec-freq">考频统计</a>
+<a class="sec-link" href="#sec-core">核心讲解</a>
+<a class="sec-link" href="#sec-key">关键结论速记</a>
+<a class="sec-link" href="#sec-fig">示意图</a>
+<a class="sec-link" href="#sec-err">易错点</a>
+<a class="sec-link" href="#sec-real">真题示例</a>
+</div>
+</details></nav>
+<main><h1>应用层</h1><h1 id="_1">计算机网络 · 应用层</h1>
 <h2 id="_2" id="kp">应用层 [高频]</h2>
-<p class="freq"><b>考频</b>　考察次数 18 次；涉及年份：2009、2011、2013、2015、2017、2018、2020、2022、2024；分数占比约 12%；主要题型：选择题为主（DNS、HTTP、电子邮件、DHCP）。</p>
-<p class="lab">核心讲解</p>
+<section class="sec sec-freq" id="sec-freq"><p class="freq"><b>考频</b>　考察次数 18 次；涉及年份：2009、2011、2013、2015、2017、2018、2020、2022、2024；分数占比约 12%；主要题型：选择题为主（DNS、HTTP、电子邮件、DHCP）。</p>
+</section><section class="sec sec-core" id="sec-core"><p class="lab">核心讲解</p>
 <p>应用层的两种体系结构是<strong>客户/服务器（<code>C/S</code>）</strong>与<strong>对等（<code>P2P</code>）</strong>：<code>C/S</code> 中客户主动请求、服务器被动等待且必须一直运行，可扩展性受服务器性能限制；<code>P2P</code> 中每个结点既是客户又是服务器，可扩展性好但管理困难。<strong>域名系统 <code>DNS</code></strong> 把域名解析为 <code>IP</code> 地址，采用<strong>分布式层次数据库</strong>：根域名服务器、顶级域名服务器、权限域名服务器、本地域名服务器。查询方式分两种：<strong>主机向本地域名服务器的查询通常采用递归查询</strong>（本地域名服务器代替主机继续查询并把最终结果返回），<strong>本地域名服务器向根/顶级/权限域名服务器的查询通常采用迭代查询</strong>（被查询的服务器只返回"下一步该问谁"的地址，由本地域名服务器继续追问）。</p>
 <p><code>DNS</code> 主要使用 <code>UDP</code> 的 <code>53</code> 号端口；域名解析需要<strong>缓存</strong>以减轻根服务器负担。<strong>文件传输协议 <code>FTP</code></strong> 的特点是<strong>使用两条 <code>TCP</code> 连接</strong>：<strong>控制连接</strong>（服务器 <code>21</code> 端口）在整个会话期间保持、用于传送命令与应答，<strong>数据连接</strong>（服务器 <code>20</code> 端口，主动模式下由服务器发起）用于传送文件内容，因此称 <code>FTP</code> 的控制信息是<strong>带外传送</strong>的。<strong>电子邮件</strong>的发送使用 <strong><code>SMTP</code>（<code>TCP</code> <code>25</code> 端口）</strong>，读取使用 <strong><code>POP3</code>（<code>110</code> 端口）</strong>或 <strong><code>IMAP</code>（<code>143</code> 端口）</strong>；</p>
 <p><code>POP3</code> 把邮件下载到本地后通常在服务器上删除（不保留状态），<code>IMAP</code> 则在服务器上管理邮件、支持多设备同步。<strong>万维网 <code>WWW</code></strong> 以<strong>统一资源定位符 <code>URL</code></strong> 标识资源，用<strong>超文本传输协议 <code>HTTP</code></strong> 传送；</p>
 <p><code>HTTP</code> 使用 <code>TCP</code> 的 <code>80</code> 端口，本身是<strong>无状态</strong>的（靠 <code>Cookie</code> 维持状态）。<code>HTTP/1.0</code> 使用<strong>非持久连接</strong>（每个对象需要建立一次 <code>TCP</code> 连接，即每个对象 <code>2</code> 个 <code>RTT</code>：一次建连、一次请求响应），<code>HTTP/1.1</code> 默认使用<strong>持久连接</strong>（<code>keep-alive</code>），又分为<strong>非流水线</strong>（每个对象依次请求，每个对象 <code>1</code> 个 <code>RTT</code>）与<strong>流水线</strong>（连续发出所有请求，所有对象共约 <code>1</code> 个 <code>RTT</code>）。<code>HTTP</code> 常用方法有 <code>GET</code>、<code>POST</code>、<code>HEAD</code>、<code>PUT</code>、<code>DELETE</code>，状态码 <code>200</code> 表示成功、<code>301</code> 表示永久移动、<code>404</code> 表示未找到、<code>500</code> 表示服务器内部错误。</p>
-<p class="lab">关键结论速记</p><ul class="facts">
+</section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
 <li><code>DNS：主机到本地域名服务器用递归查询，本地到根/顶级/权限用迭代查询</code> —— 递归与迭代的主体不能互换。</li>
 <li><code>DNS 用 UDP 53、SMTP 用 TCP 25、POP3 用 TCP 110、IMAP 用 TCP 143、HTTP 用 TCP 80、FTP 控制 21 数据 20</code>。</li>
 <li><code>FTP 用两条连接：控制连接保持、数据连接传文件</code> —— 控制信息带外传送。</li>
@@ -266,7 +74,7 @@ hr{border:none;border-top:1px solid var(--line);margin:32px 0}
 <li><code>状态码：200 成功、301 永久移动、404 未找到、500 服务器内部错误</code>。</li>
 <li><code>POP3 下载后通常删除（无状态），IMAP 在服务器端管理（有状态、多端同步）</code>。</li>
 </ul>
-<p class="lab">示意图</p>
+</section><section class="sec sec-fig" id="sec-fig"><p class="lab">示意图</p>
 <p><strong><code>DNS</code> 递归查询与迭代查询的路径对比</strong>：递归是"你替我查到底"，迭代是"告诉我下一步问谁"。</p>
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>recursive query (host -&gt; local DNS server)
 
@@ -348,106 +156,32 @@ iterative query (local DNS server -&gt; other servers)
     H11 --&gt;|无| H13[&quot;浏览器渲染页面&quot;]
     H13 --&gt; H14[&quot;按需四次挥手释放连接&quot;]
 </code></pre></details></div>
-<p class="lab">易错点</p><ul class="errs">
+</section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
 <li>把 <code>DNS</code> 的递归与迭代主体弄反：<strong>主机到本地域名服务器</strong>通常是<strong>递归</strong>查询（本地服务器代为查完并返回最终结果），<strong>本地域名服务器到根/顶级/权限服务器</strong>通常是<strong>迭代</strong>查询（对方只返回下一个该问的服务器地址）；说成"根服务器替本地服务器递归查询"即为错误。</li>
 <li>非持久连接下 <code>RTT</code> 次数算错：非持久连接中<strong>每个对象都要新建一次 <code>TCP</code> 连接</strong>，故每个对象需 <code>2</code> 个 <code>RTT</code>（<code>1</code> 个用于建连、<code>1</code> 个用于请求并收到响应）；若题目含 <code>N</code> 个内嵌对象，总 <code>RTT</code> 为 <code>2 × (N + 1)</code>。</li>
 <li>认为 <code>FTP</code> 的数据连接由客户端发起：<code>FTP</code> 有<strong>主动模式</strong>（服务器从 <code>20</code> 端口主动连接客户端的指定端口）与<strong>被动模式</strong>（客户端连接服务器提供的临时端口）两种，端口 <code>20</code> 是主动模式下服务器发起数据连接所用的端口，不能一概而论。</li>
 <li>混淆 <code>POP3</code> 与 <code>IMAP</code> 的行为：<code>POP3</code> 把邮件下载到本地、默认不在服务器保留（因此多设备不同步），<code>IMAP</code> 在服务器上维护邮箱与状态、支持多设备一致视图；把二者的特性对调是常见失分点。</li>
 </ul>
-<p class="lab">真题示例</p>
+</section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
 <p class="q-stem"><span class="q-src">2011 年 408 第 40 题（单项选择题，2 分）</span></p>
 <p>某浏览器使用 <code>HTTP/1.1</code> 的<strong>非持久连接</strong>方式访问一个包含 <code>5</code> 个内嵌对象（每个对象均与主页面位于同一服务器）的 <code>Web</code> 页面。若忽略报文传输时间与处理时间，则从用户输入 <code>URL</code> 到页面全部加载完成所需的最少 <code>RTT</code> 数为（ ）。</p>
 <p>A. <code>4</code>　B. <code>8</code>　C. <code>10</code>　D. <code>12</code></p>
 <blockquote>
 <p>解析：非持久连接意味着<strong>每个对象都要单独建立一次 <code>TCP</code> 连接</strong>，而每次建连需要 <code>1</code> 个 <code>RTT</code>（三次握手的前两次完成连接建立）、随后请求并收到响应又需要 <code>1</code> 个 <code>RTT</code>，故每个对象共需 <code>2</code> 个 <code>RTT</code>。需要传输的对象为 <strong><code>1</code> 个主页面 <code>+ 5</code> 个内嵌对象 <code>= 6</code> 个</strong>，故最少 <code>RTT = 6 × 2 = 12</code>，答案为 <strong>D</strong>。注意题目问的是"从输入 <code>URL</code> 到全部加载完成"，域名解析的 <code>RTT</code> 已被忽略；若漏算主页面（只算 5 个内嵌对象）会得到 <code>10</code> 而误选 <code>C</code>——<strong>判分点是"主页面本身也要一次连接"与"每个对象 2 个 <code>RTT</code>"。</strong></p>
 </blockquote>
-<hr /></main></div>
+<hr /></section><nav class="chapter-nav"><a class="cn-prev" href="05-传输层.html"><span class="cn-dir">← 上一章</span><span class="cn-title">传输层</span></a></nav></main>
+</div>
+<footer class="site-footer">
+<span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
+<span class="ft-sep">·</span>
+<a href="../README.html">数据口径与来源</a>
+<span class="ft-sep">·</span>
+<a href="../LICENSE">许可协议</a>
+<a class="ft-top" href="#">回到顶部 ↑</a>
+</footer>
 <button class="totop" type="button" aria-label="回到顶部">↑</button>
 <button id="theme" type="button" aria-label="切换深浅色">☾</button>
-<script>
-// 侧栏筛选
-var q = document.getElementById('q');
-if (q) q.addEventListener('input', function () {
-  var v = this.value.trim().toLowerCase();
-  document.querySelectorAll('nav details.grp').forEach(function (d) {
-    var any = false;
-    d.querySelectorAll('a.item').forEach(function (a) {
-      var hit = !v || a.textContent.toLowerCase().indexOf(v) >= 0;
-      a.style.display = hit ? '' : 'none';
-      if (hit) any = true;
-    });
-    d.style.display = (any || !v) ? '' : 'none';
-    if (v && any) d.open = true;
-  });
-});
-// 进度条 + 回到顶部
-var bar = document.getElementById('bar'), top = document.querySelector('.totop');
-function onScroll() {
-  var h = document.documentElement, y = h.scrollTop || document.body.scrollTop || 0;
-  var max = h.scrollHeight - h.clientHeight;
-  if (bar) bar.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
-  if (top) top.classList.toggle('on', y > 500);
-}
-addEventListener('scroll', onScroll, { passive: true }); onScroll();
-if (top) top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
-// 复制
-document.querySelectorAll('.codebox').forEach(function (box) {
-  var btn = box.querySelector('button'), pre = box.querySelector('pre');
-  if (!btn || !pre) return;
-  btn.addEventListener('click', function () {
-    var t = pre.innerText;
-    var done = function () {
-      btn.textContent = '已复制';
-      setTimeout(function () { btn.textContent = '复制'; }, 1200);
-    };
-    if (navigator.clipboard) navigator.clipboard.writeText(t).then(done, done);
-    else {
-      var ta = document.createElement('textarea'); ta.value = t;
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); } catch (e) {} ta.remove(); done();
-    }
-  });
-});
-// 主题（记住选择 + 跟随系统）
-var tb = document.getElementById('theme'), saved = null;
-try { saved = localStorage.getItem('dsh-408-theme'); } catch (e) {}
-if (!saved && matchMedia && matchMedia('(prefers-color-scheme:dark)').matches) saved = 'dark';
-if (saved) document.documentElement.setAttribute('data-theme', saved);
-function syncThemeBtn() {
-  if (tb) tb.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
-}
-syncThemeBtn();
-if (tb) tb.addEventListener('click', function () {
-  var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  syncThemeBtn();
-  try { localStorage.setItem('dsh-408-theme', next); } catch (e) {}
-});
-// 窄屏抽屉
-var mb = document.getElementById('menu');
-if (mb) {
-  mb.addEventListener('click', function () { document.querySelector('nav').classList.toggle('open'); });
-  document.querySelector('nav').addEventListener('click', function (e) {
-    if (e.target.tagName === 'A' && innerWidth <= 1000) this.classList.remove('open');
-  });
-}
-// 目录高亮当前章节
-(function () {
-  var links = [].slice.call(document.querySelectorAll('nav a.item'));
-  var targets = links.map(function (a) {
-    var h = a.getAttribute('href') || '';
-    var id = h.indexOf('#') >= 0 ? h.split('#')[1] : (a.dataset.anchor || '');
-    return id ? document.getElementById(id) : null;
-  });
-  if (!targets.some(Boolean)) return;
-  function mark() {
-    var y = scrollY + 130, idx = -1;
-    targets.forEach(function (el, i) { if (el && el.offsetTop <= y) idx = i; });
-    links.forEach(function (a, i) { a.classList.toggle('cur', i === idx); });
-  }
-  addEventListener('scroll', mark, { passive: true }); mark();
-})();
-</script>
+<script src="../assets/site.js"></script>
 <script>
 (function () {
   var nodes = document.querySelectorAll('.mermaid');
