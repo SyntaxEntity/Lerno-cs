@@ -902,6 +902,23 @@ def check_assets():
                 err(rel, 0, "F23", "脚本不可达：%s" % m.group(1))
 
 
+def _python_with_markdown():
+    """返回一个能 import markdown 的解释器。
+
+    优先仓库内的 .tools/venv——它按 scripts/requirements.txt 装了**锁定版本**，
+    与 CI 门禁同版本；系统 python 的 markdown 版本可能不同（中文全角括号的
+    强调判定在 3.10/3.11 之间变过），用错版本会让校验结论不可复现。
+    """
+    venv = os.path.join(ROOT, ".tools", "venv", "bin", "python")
+    for cand in (venv, sys.executable):
+        if not cand or not os.path.exists(cand):
+            continue
+        r = subprocess.run([cand, "-c", "import markdown"], capture_output=True, text=True)
+        if r.returncode == 0:
+            return cand
+    return None
+
+
 def check_render_leftovers():
     """F24: 渲染后不得残留字面 Markdown 记号（`**`）。
 
@@ -939,22 +956,43 @@ def check_render_leftovers():
                                "页面上会直接显示星号）" % n)
 
     # ---- 内容源：按真实流水线渲染一遍，让写手在 build 前就看到 ----
-    try:
-        import markdown as _md
-    except ImportError:
+    # ⚠️ 必须用**锁定的 markdown 版本**（见 scripts/requirements.txt）：中文全角括号
+    # 在 3.10.x 里被判为标点、在 3.11.x 里被判为字母，于是 `**加粗（括号）**` 这种
+    # 写法只在 3.11.x 下暴露成字面 `**`。用错版本 = 本地全绿而 CI 红，本文件就吃过
+    # 这一次（F24 首版用系统 python 的 3.10.3，漏报了 6 个文件）。
+    py = _python_with_markdown()
+    if py is None:
+        err("scripts", 0, "F24",
+            "找不到带 markdown 的解释器，无法检查内容源渲染残留。%s" % PY_DEPS_HINT)
         return
-    for f in sorted(glob.glob(os.path.join(ROOT, "parts", "*", "*.md"))):
-        rel = os.path.relpath(f, ROOT)
-        with open(f, encoding="utf-8") as fh:
-            raw = fh.read()
-        # 只检查会被渲染成正文的段落：代码围栏里的 `**` 是合法内容
-        raw = re.sub(r"```.*?```", "", raw, flags=re.S)
-        body = _md.markdown(raw, extensions=["tables", "fenced_code", "sane_lists"])
-        body = DISPLAY_MATH.sub("", body)
-        body = INLINE_MATH.sub("", body)
-        n = body.count("**")
-        if n:
-            err(rel, 0, "F24", "内容源渲染后残留字面 `**` %d 处" % n)
+    try:
+        raw_all = []
+        for f in sorted(glob.glob(os.path.join(ROOT, "parts", "*", "*.md"))):
+            with open(f, encoding="utf-8") as fh:
+                raw = fh.read()
+            # 只检查会被渲染成正文的部分：代码围栏里的 `**` 是合法内容
+            raw_all.append((os.path.relpath(f, ROOT), re.sub(r"```.*?```", "", raw, flags=re.S)))
+        payload = json.dumps(raw_all)
+        code = (
+            "import sys,json,re,markdown\n"
+            "data=json.loads(sys.stdin.read())\n"
+            "out=[]\n"
+            "for rel,src in data:\n"
+            "    h=markdown.markdown(src,extensions=['tables','fenced_code','sane_lists'])\n"
+            "    out.append([rel,h.count('**')])\n"
+            "print(json.dumps(out))\n"
+        )
+        r = subprocess.run([py, "-c", code], input=payload, capture_output=True,
+                           text=True, timeout=300)
+        if r.returncode != 0:
+            err("scripts", 0, "F24", "内容源渲染检查失败：%s" % (r.stderr or "")[-200:])
+            return
+        for rel, n in json.loads(r.stdout):
+            if n:
+                err(rel, 0, "F24", "内容源渲染后残留字面 `**` %d 处" % n)
+        stats["f24_python"] = py
+    except Exception as e:                                   # noqa: BLE001
+        err("scripts", 0, "F24", "内容源渲染检查异常：%s" % e)
 
 
 def check_site_js_pin():

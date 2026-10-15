@@ -706,7 +706,7 @@ arbitration comparison
 <p><code>I/O</code> 接口（设备控制器）的作用是<strong>数据缓冲、格式转换、状态与命令寄存、地址译码</strong>，它把 CPU 的高速并行总线与设备的低速串行工作方式解耦。<code>I/O</code> 端口的编址有两种：<strong>统一编址</strong>（把端口当作主存单元，用普通访存指令访问，无需专门指令但占用主存地址空间）与<strong>独立编址</strong>（有独立的地址空间与专用 <code>IN/OUT</code> 指令，不占主存空间但指令类型增多）。<code>I/O</code> 控制方式的发展主线是<strong>CPU 干预程度逐步降低</strong>：<strong>程序查询</strong>方式下 CPU 不断读状态寄存器空转等待，CPU 与设备完全串行；</p>
 <p><strong>程序中断</strong>方式下 CPU 发出命令后继续执行原程序，设备就绪时用中断通知 CPU 在<strong>一条指令执行结束后</strong>响应，数据传送仍需 CPU 用指令搬入主存；<strong>DMA</strong> 方式由 DMA 控制器直接在主存与设备之间成块传送，数据<strong>不经过 CPU 的寄存器</strong>，每传送一个字（或一个数据块）占用一次总线（周期挪用/周期窃取），只有在传送前（初始化）与传送后（中断处理）才需要 CPU 参与；<strong>通道</strong>方式由通道处理器执行通道程序，进一步把 CPU 从 <code>I/O</code> 管理中解放出来。</p>
 <p><strong>中断系统</strong>要点：CPU 响应中断的条件是"有中断请求 + 中断允许触发器为 1 + 当前指令执行结束"；响应时由硬件自动执行<strong>中断隐指令</strong>完成三件事——<strong>关中断、保存断点（<code>PC</code>）、取中断向量</strong>；随后由中断服务程序保存现场并执行服务。</p>
-<p><strong>多重中断</strong>（中断嵌套）靠<strong>中断屏蔽字</strong>控制：屏蔽字中某位为 <code>1</code> 表示屏蔽（禁止）对应的中断源，因此优先级越高的中断源，其屏蔽字中"1"的位数越多。<strong>磁盘</strong>的性能指标是存取时间，<code>存取时间 = 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为旋转半圈的时间 <code>60 / (2 × 转速)</code>（转速单位 <code>rpm</code>）；数据传输率与位密度、转速（线速度）相关，<code>数据传输率 = 每条磁道的容量 / 旋转一圈的时间</code>。固态硬盘 <code>SSD</code> 基于闪存，无机械寻道与旋转延迟，随机访问快，但存在<strong>写放大、擦除次数受限（寿命）</strong>的问题。</p>
+<p><strong>多重中断</strong>（中断嵌套）靠<strong>中断屏蔽字</strong>控制：屏蔽字中某位为 <code>1</code> 表示屏蔽（禁止）对应的中断源，因此优先级越高的中断源，其屏蔽字中"1"的位数越多。<strong>磁盘</strong>的性能指标是存取时间，<code>存取时间 = 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为旋转半圈的时间 <code>60 / (2 × 转速)</code>（转速单位 <code>rpm</code>）；数据传输率与位密度、转速（线速度）相关，<code>数据传输率 = 每条磁道的容量 / 旋转一圈的时间</code>。固态硬盘 <code>SSD</code> 基于闪存，无机械寻道与旋转延迟，随机访问快，但存在<strong>写放大</strong>、<strong>擦除次数受限</strong>（寿命）的问题。</p>
 </section><section class="sec sec-key" id="sec-key"><p class="lab">关键结论速记</p><ul class="facts">
 <li><code>四种 I/O 方式 CPU 干预程度：程序查询 &gt; 程序中断 &gt; DMA &gt; 通道</code> —— 判据是"CPU 是否需要在传送过程中持续参与"。</li>
 <li><code>DMA 数据不经过 CPU 寄存器，直接在主存与设备间传送</code> —— 这是 DMA 与程序中断方式的本质区别。</li>
@@ -792,7 +792,7 @@ arbitration comparison
 </section><section class="sec sec-err" id="sec-err"><p class="lab">易错点</p><ul class="errs">
 <li>认为 DMA 传送完全不需要 CPU 参与：DMA 只在<strong>数据传送过程</strong>中不需要 CPU 干预，传送前的初始化（设置主存地址、设备地址、传送长度、方向）与传送结束后的中断处理都必须由 CPU 完成。</li>
 <li>把中断响应时机写成"任意时刻"或"一个时钟周期后"：可屏蔽中断只在<strong>一条指令执行结束后</strong>响应（这样断点才是一条指令的边界）；若在指令中间响应，断点无法正确保存。</li>
-<li>混淆中断隐指令与中断服务程序：中断隐指令是<strong>硬件自动执行</strong>的（关中断、保存断点、取中断向量），而保存现场、执行设备服务、恢复现场是<strong>中断服务程序（软件）</strong>做的，两者不能混为一谈。</li>
+<li>混淆中断隐指令与中断服务程序：中断隐指令是<strong>硬件自动执行</strong>的（关中断、保存断点、取中断向量），而保存现场、执行设备服务、恢复现场是<strong>中断服务程序</strong>（软件）做的，两者不能混为一谈。</li>
 <li>磁盘旋转延迟算成一圈：平均旋转延迟是<strong>旋转半圈</strong>的时间，即 <code>60 / (2 × 转速)</code> 秒；若按一圈计算，存取时间会偏大一倍。</li>
 </ul>
 </section><section class="sec sec-real" id="sec-real"><p class="lab">真题示例</p>
