@@ -93,7 +93,7 @@
 
 | 平台 | 要点 |
 | --- | --- |
-| **GitHub Pages** | 本仓库已带工作流 `.github/workflows/pages.yml`：推 `main` 即自动发布，且**发布前先跑 `scripts/validate.py`**（F1—F17），校验不过不会上线；免费账户需**公开仓库** |
+| **GitHub Pages** | 本仓库已带工作流 `.github/workflows/pages.yml`：推 `main` 即自动发布，且**发布前先跑 `scripts/validate.py`**（形式校验），校验不过不会上线；免费账户需**公开仓库** |
 | **Cloudflare Pages** | 免费、可连**私有**仓库、国内连通性通常较好 |
 | Vercel / Netlify | 直接导入仓库，Framework 选 Other，Output 留空 |
 
@@ -119,7 +119,7 @@ python3 scripts/split_explain.py     # 长段落自动分段
 python3 scripts/build.py             # 由 parts/ + topics.py 组装 .docs/ 的 Markdown
 python3 scripts/gen_summary.py       # 刷新 .docs/00-总览.md 的考频总表
 python3 scripts/build_html.py        # 由 .docs/ 生成仓库根的静态站点
-python3 scripts/validate.py          # 校验 F1—F17，含 mermaid 真实解析
+python3 scripts/validate.py          # 校验形式层，含 mermaid 真实解析
 python3 scripts/validate.py --parts  # 校验 parts/ 半成品（写内容时的内层循环）
 ```
 
@@ -128,7 +128,7 @@ python3 scripts/validate.py --parts  # 校验 parts/ 半成品（写内容时的
 不等于"本地通过"。其中 `mermaid` 的版本必须等于仓库根 `mermaid.min.js` 的版本，
 `validate.py` 会在两者不一致时直接报错。
 
-`validate.py` 覆盖 `F1`—`F26`：模板字段齐全与顺序、考频数字与单一数据源逐字一致、
+`validate.py` 的形式校验项（范围见运行输出）：模板字段齐全与顺序、考频数字与单一数据源逐字一致、
 代码块与图语法（**含 mermaid 真实解析，缺依赖即报错而非跳过**）、ASCII 图全角字符、
 真题年份、图数量、段落与条目数区间、README 声明与正文标注双向一致、块级元素空行、
 **渲染验证字段独立成段**、相对链接可达、交付物与组件完整性（防止渲染器静默退化）、
@@ -139,6 +139,15 @@ python3 scripts/validate.py --parts  # 校验 parts/ 半成品（写内容时的
 **`F24` 渲染残留**（正文不得露出字面 `**`，成品与内容源都查）、
 **`F25` 共用件一致性**（`assets/site.js` 正文必须与上游 `math2-kaoyan` 逐字节相同，
 靠文件头钉的 sha256 强制）、**`F26` 外壳行为测试**（jsdom 跑 12 条断言，复用数学二的测试）。
+
+**规则范围由校验器自己输出**（见运行报告末尾的「规则 N 条：…」）——编号存在历史
+空洞（`F18`—`F21` 从未使用），所以文档与 CI 都**不写死范围**，避免加规则后漂移。
+
+**没有反向测试的校验项进不了主干**：`scripts/reverse_tests.py` 对每条规则注入一个
+反例、断言它真的报错（`python3 scripts/reverse_tests.py`），CI 在形式校验之后跑它，
+失败即中止部署。元校验 `F27` 用**集合比较**强制"规则集合 ≡ 反向测试覆盖集合"，
+并要求扫描型规则上报的**受检对象数 > 0**（防止 glob 写错时"空转通过"）；
+`F28` 禁止文档/CI 硬编码规则范围。
 
 外壳相关的校验项都是**契约**（`../PLAN-对齐与改版.md` 2.4），不是本仓库的偏好；
 要改类名/锚点 id 请先改契约，再同步两个项目。

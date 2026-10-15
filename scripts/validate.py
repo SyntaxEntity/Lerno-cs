@@ -168,6 +168,8 @@ def validate_file(path, subject_key, is_overview=False):
         return
 
     stats["sections"] += len(sections)
+    stats["F0_files"] += 1          # H3：F0/F1 实际扫到了几个文件/小节
+    stats["F1_sections"] += len(sections)
 
     # 校验每个小节的字段。科目总览是元文件；其余文件的每个 ## 小节都必须齐备 6 个模板字段
     for idx, (start, title) in enumerate(sections):
@@ -260,7 +262,13 @@ def validate_file(path, subject_key, is_overview=False):
     # ---- 代码围栏 ----
     ascii_cnt, mermaid_cnt = scan_fences(rel, lines)
 
+    # H3：F3 的受检数在**静态扫描阶段**也累计。真实解析器那层会覆盖成"解析器
+    # 实际扫到的块数"；--no-mermaid 跳过解析器时这里是唯一来源，否则该规则在
+    # 那种模式下受检数为 0，元校验会误报"什么都没检查"。
+    stats["F3_objects"] += mermaid_cnt
+
     # F8 图表数量
+    stats["F8_objects"] += ascii_cnt + mermaid_cnt   # H3：实际扫到的图数
     if ascii_cnt == 0:
         err(rel, 1, "F8", "全文没有任何 ASCII(text) 示意图")
     if mermaid_cnt == 0:
@@ -378,6 +386,8 @@ def validate_partial(subject_key, topic, path):
             err(rel, i, "F2", "parts 文件不得自带考频数字（由 build.py 注入）")
 
     stats["sections"] += 1
+    stats["F0_files"] += 1          # H3：parts 模式实际扫到的半成品数
+    stats["F1_sections"] += 1
     stats["ascii"] += ascii_cnt
     stats["mermaid"] += mermaid_cnt
     stats["chars"] += len(text)
@@ -488,16 +498,23 @@ def render_check(rel, text):
     这条是 F13 的"效果验证"：F13 检查空行是否规范，F14 直接渲染并断言
     六个字段标签落在不同的 <p> 里，防止再次出现"五个字段糊成一坨"。
     """
+    # F14 与 F24 同口径：必须用**锁定版本**的 markdown 渲染。中文全角括号的强调
+    # 判定在 3.10/3.11 之间变过，用系统解释器的版本会得出与 CI 不同的结论
+    # （本地绿、CI 红），所以显式走 .tools/venv。
+    _py = _python_with_markdown()
+    if _py is None:
+        err(rel, 0, "F14", "找不到带 markdown 的解释器，无法做渲染验证。%s" % PY_DEPS_HINT)
+        return
     try:
         import markdown
+        if os.path.abspath(_py) != os.path.abspath(sys.executable):
+            raise ImportError("use pinned interpreter")
     except ImportError:
         # 本进程 import 失败是**确定的事实**（不是"探测不到"），所以这里直接换用
         # 仓库内的 .tools/venv 重跑自己：静默 return 会让 F14 悄悄失效，
         # 出现"校验全绿其实少跑了一项"。venv 见 scripts/requirements.txt。
-        venv = os.path.join(ROOT, ".tools", "venv", "bin", "python")
-        if (not NO_REEXEC and os.path.exists(venv)
-                and os.path.abspath(venv) != os.path.abspath(sys.executable)):
-            r = subprocess.run([venv, os.path.abspath(__file__)] + sys.argv[1:] + ["--no-reexec"],
+        if not NO_REEXEC and os.path.abspath(_py) != os.path.abspath(sys.executable):
+            r = subprocess.run([_py, os.path.abspath(__file__)] + sys.argv[1:] + ["--no-reexec"],
                                capture_output=True, text=True)
             sys.stdout.write(r.stdout)
             sys.stderr.write(r.stderr)
@@ -576,6 +593,7 @@ def check_site_links():
         with open(f, encoding="utf-8") as fh:
             body = visible(fh.read())
         for attr, val in re.findall(r'(href|src)="([^"]+)"', body):
+            stats["F17_objects"] += 1
             if not ok(d, val):
                 err(os.path.relpath(f, ROOT), 0, "F17",
                     "链接不可达（%s）：%s" % (attr, val[:60]))
@@ -591,6 +609,7 @@ def check_site_links():
             for m in re.finditer(r"\]\(([^)\s]+)\)", fh.read()):
                 if "assets/" in m.group(1):
                     continue          # 示例路径（写作规范里的占位）
+                stats["F15_objects"] += 1
                 if not ok(d, m.group(1)) and not ok(SITE, m.group(1)):
                     err(os.path.relpath(f, ROOT), 0, "F17",
                         "Markdown 链接不可达：%s" % m.group(1))
@@ -638,6 +657,7 @@ def check_html():
             err("408/index.html", 0, "F16", "合集缺少科目 %s 的内容" % s["name"])
         for t in T.TOPICS[k]:
             n_topics += 1
+            stats["F16_objects"] += 1
             fp = os.path.join(d, t[6] + ".html")
             if not os.path.exists(fp):
                 err("408/%s" % s["dir"], 0, "F16", "缺少章节 HTML：%s.html" % t[6])
@@ -873,6 +893,7 @@ def check_assets():
         if not os.path.exists(fp):
             continue
         rel = os.path.relpath(fp, ROOT)
+        stats["F23_objects"] += 1
         with open(fp, encoding="utf-8") as fh:
             body = fh.read()
         if "assets/site.css" not in body:
@@ -941,6 +962,7 @@ def check_render_leftovers():
         if not os.path.exists(fp):
             continue
         rel = os.path.relpath(fp, ROOT)
+        stats["F24_objects"] += 1
         with open(fp, encoding="utf-8") as fh:
             text = fh.read()
         body = re.sub(r"<pre.*?</pre>|<code.*?</code>|<script.*?</script>|<style.*?</style>",
@@ -1080,6 +1102,137 @@ def check_site_js_behavior():
         err("site.js", 0, "F26", "行为测试未产出可解析的通过计数，无法确认真的跑了")
 
 
+def rule_codes():
+    """枚举本文件里实际会报出的规则码（H2 的"规则集合"）。
+
+    只认 `err(...)` / `warn(...)` 的**第三参数字面量**——即真正会出现在报告里的
+    错误码。用 **AST 遍历**而不是正则：`err(path, 0, "F17", ...)` 这类调用经常
+    跨行，正则很容易漏（本站 F17 就被漏掉过一次，导致元校验误判"多出 F17"）。
+    """
+    import ast
+    with open(os.path.abspath(__file__), encoding="utf-8") as fh:
+        tree = ast.parse(fh.read(), filename=__file__)
+    out = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        fn = node.func
+        if not (isinstance(fn, ast.Name) and fn.id in ("err", "warn")):
+            continue
+        if len(node.args) >= 3:
+            a = node.args[2]
+            if isinstance(a, ast.Constant) and isinstance(a.value, str):
+                if re.fullmatch(r"F\d+", a.value):
+                    out.add(a.value)
+    return out
+
+
+def coverage_codes():
+    """枚举 reverse_tests.py 里的 case(...)（H2 的"覆盖集合"）。
+
+    ⚠️ 匹配前先**剥掉注释行**：注释/字符串里出现的示例文本会被正则当成"真用例"，
+    凭空往覆盖集合里塞一条不存在的规则（本站踩过：注释里的示例让 F99 长期存在，
+    并且把 F7 一直算作"已覆盖"，使"删掉一条用例要报错"这件事测不出来）。
+    """
+    rp = os.path.join(ROOT, "scripts", "reverse_tests.py")
+    if not os.path.exists(rp):
+        return set()
+    with open(rp, encoding="utf-8") as fh:
+        src = fh.read()
+    code = "\n".join(ln for ln in src.split("\n")
+                      if not ln.lstrip().startswith("#"))
+    return {m.group(1) for m in re.finditer(r'\bcase\(\s*"(F\d+)"', code)}
+
+
+# H3：受检对象数必须 > 0 的规则清单（扫描型：扫文件/扫图/扫链接/扫锚点）。
+# glob 或路径写错时会"一个对象都没扫到却报 0 错、一片绿"，故由 F27 断言其受检数。
+# 不在此列的是**否定型**规则（如 F4「不得出现占位符」、F25「不得与上游不一致」），
+# 它们的受检数天然可以为 0。
+SCAN_RULES_MUST_BE_NONZERO = [
+    "F0", "F1", "F3", "F8", "F12", "F15", "F16", "F17", "F22", "F23", "F24", "F26",
+]
+OBJECT_STAT_KEY = {
+    "F0": "F0_files", "F1": "F1_sections", "F3": "F3_objects", "F8": "F8_objects",
+    "F12": "orig", "F15": "F15_objects", "F16": "F16_objects", "F17": "F17_objects",
+    "F22": "shell_nav_pages", "F23": "F23_objects", "F24": "F24_objects",
+    "F26": "site_js_tests",
+}
+
+
+def check_meta():
+    """F27: 元校验——规则集合 ≡ 反向测试覆盖集合（契约 4.4），并断言受检数 > 0。
+
+    反向测试证明"规则**能**报错"，但只有集合比较才能保证"**每条**规则都被反向
+    测试盯着"。上线后，没被覆盖的校验项再也进不了主干。
+
+    ⚠️ **必须用集合比较，不能假设编号连续**：本站 F18—F21 是历史空洞
+    （F16 之后直接跳到 F22），任何 range() 式的写法都会误判。
+    """
+    rules = rule_codes()
+    covered = coverage_codes()
+    stats["rules_total"] = len(rules)
+    stats["rules_covered"] = len(rules & covered)
+
+    if not covered:
+        err("scripts/reverse_tests.py", 0, "F27",
+            "找不到任何反向测试用例（文件缺失或 case() 写法不符），无法证明规则可被触发")
+        return
+    missing = rules - covered
+    if missing:
+        err("scripts/reverse_tests.py", 0, "F27",
+            "以下规则没有任何反向测试覆盖：%s（共 %d 条）"
+            % ("、".join(sorted(missing, key=lambda x: int(x[1:]))), len(missing)))
+    extra = covered - rules
+    if extra:
+        err("scripts/reverse_tests.py", 0, "F27",
+            "反向测试引用了不存在的规则：%s"
+            % "、".join(sorted(extra, key=lambda x: int(x[1:]))))
+
+    for code in SCAN_RULES_MUST_BE_NONZERO:
+        # --no-mermaid 是显式要求跳过真实解析，此时 F3 受检数为 0 属正常；
+        # 命令行留下了痕迹，不是静默失效。
+        if code == "F3" and ALLOW_NO_MERMAID:
+            continue
+        if code not in rules:
+            err("scripts", 0, "F27",
+                "受检数清单里的 %s 不是已知规则（清单与规则集合脱节）" % code)
+            continue
+        key = OBJECT_STAT_KEY.get(code, code + "_objects")
+        if key not in stats:
+            err("scripts", 0, "F27",
+                "%s 未上报受检对象数（stats[%r] 不存在）——扫描型规则必须上报，"
+                "否则 glob 写错时会空转通过" % (code, key))
+        elif stats[key] <= 0:
+            err("scripts", 0, "F27",
+                "%s 的受检对象数为 0（stats[%r]）——该规则实际什么都没检查"
+                % (code, key))
+
+
+def check_doc_scope():
+    """F28: 文档/CI 不得硬编码规则范围（契约 4.6）。
+
+    数学二的 CI 标签漂移成 `F1—F21`（实际到 F25）就是硬编码的代价。这里扫
+    README/AGENTS/工作流，出现 "F<n>—F<m>" 这类字面量就报错，逼着改用
+    「形式校验」这样的中性措辞；需要范围时以校验器自己的输出为准。
+    """
+    real = sorted(rule_codes(), key=lambda x: int(x[1:]))
+    lo, hi = real[0], real[-1]
+    targets = [os.path.join(ROOT, "README.md"), os.path.join(ROOT, "AGENTS.md"),
+               os.path.join(ROOT, ".github", "workflows", "pages.yml")]
+    pat = re.compile(r"(F\d+)\s*[—–\-~]\s*(F\d+)")
+    for fp in targets:
+        if not os.path.exists(fp):
+            continue
+        rel = os.path.relpath(fp, ROOT)
+        with open(fp, encoding="utf-8") as fh:
+            for i, line in enumerate(fh, 1):
+                for m in pat.finditer(line):
+                    err(rel, i, "F28",
+                        "不得硬编码规则范围 %s—%s；改用「形式校验」这类中性措辞，"
+                        "需要范围时以 validate.py 的输出为准（实际 %s—%s）"
+                        % (m.group(1), m.group(2), lo, hi))
+
+
 def main():
     parts_mode = "--parts" in sys.argv
     if parts_mode:
@@ -1095,6 +1248,8 @@ def main():
         run_mermaid_parser(os.path.join(ROOT, "parts"))
         # F24 同样在内容源阶段就跑：写手改完 parts 立刻能看到没闭合的 `**`
         check_render_leftovers()
+        # 元校验两种模式都跑：规则集合与反向测试覆盖的一致性跟模式无关
+        check_meta()
         return report("parts 半成品校验报告", parts_mode=True)
 
     for key in T.ORDER:
@@ -1121,6 +1276,8 @@ def main():
     check_render_leftovers()
     check_site_js_pin()
     check_site_js_behavior()
+    check_meta()
+    check_doc_scope()
     run_mermaid_parser(DOCS)
     return report("408 复习资料校验报告")
 
@@ -1218,6 +1375,7 @@ def run_mermaid_parser(scan_dir):
         return
     stats["mermaid_parsed"] = data.get("ok", 0)
     stats["mermaid_blocks"] = data.get("total", 0)
+    stats["F3_objects"] = data.get("total", 0)   # 解析器扫到的块数更权威，覆盖静态值
     for f in data.get("failed", []):
         err(os.path.relpath(f["file"], ROOT), f.get("line", 0), "F3",
             "mermaid 真实解析器拒绝：%s" % str(f.get("error", ""))[:200])
@@ -1238,6 +1396,13 @@ def run_mermaid_parser(scan_dir):
                 if m:
                     actual.add((m.group(1), m.group(2)))
     rp = os.path.join(DOCS, "00-总览.md")
+    # 缺文件要降级成 error，不能抛 FileNotFoundError：否则校验器以未捕获异常退出
+    # （stdout 空、没有报告），调用方只看到"退出码 1"，完全不知道哪里坏了。
+    # "校验器自己崩了"比校验失败更难查，必须堵住。
+    if not os.path.exists(rp):
+        err("README.md", 0, "F12", "找不到 %s，无法核对原题声明清单"
+            % os.path.relpath(rp, ROOT))
+        return
     with open(rp, encoding="utf-8") as fh:
         readme = fh.read()
     declared = set(re.findall(r"\| `(\d{4})` 第 `(\d+)` 题", readme))
@@ -1298,6 +1463,10 @@ def report(title, parts_mode=False):
     if stats.get("site_js_tests"):
         print("  外壳行为测试 %d/%d 通过（jsdom，复用数学二）"
               % (stats["site_js_tests"], stats.get("site_js_total", 0)))
+    # H4：规则范围由校验器**自己算**。编号有空洞（F18—F21 是历史空缺），
+    # 所以绝不能硬编码成 "F1—F26"——那样一加规则就漂移。
+    _rules = sorted(rule_codes(), key=lambda x: int(x[1:]))
+    print("  规则 %d 条：%s" % (len(_rules), "、".join(_rules)))
     print("-" * 74)
     if errors:
         print("  ✗ 错误 %d 条：" % len(errors))

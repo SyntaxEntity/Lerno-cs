@@ -73,9 +73,14 @@ python3 scripts/split_explain.py   # 长段落自动分段
 python3 scripts/build.py           # parts/ + topics.py → .docs/ 的 Markdown
 python3 scripts/gen_summary.py     # 刷新 .docs/00-总览.md 的考频总表
 python3 scripts/build_html.py      # .docs/ → 仓库根的静态站点
-python3 scripts/validate.py        # 校验 F1—F26（含 mermaid 真解析与外壳行为测试）
+python3 scripts/validate.py        # 校验形式层（含 mermaid 真解析与外壳行为测试）
 python3 scripts/validate.py --parts   # 校验 parts/ 半成品（写内容时的内层循环）
+python3 scripts/reverse_tests.py       # 反向测试：每条规则注入反例，确认真会报错
 ```
+
+> **新增校验规则必须同时加反向测试**：元校验会比对"规则集合 ≡ 反向测试覆盖集合"
+> （集合比较，编号有空洞不假设连续），漏了直接报错。扫描型规则还须上报受检对象数，
+> 受检数为 0 同样报错（防止"什么都没检查却一片绿"）。
 
 > `mermaid` 的真实解析（`scripts/check_mermaid.mjs`）已并入 `validate.py` 的 F3，
 > **不再是"可选"**：缺 node 或 `.tools` 依赖会报 error 而不是跳过。
@@ -88,8 +93,9 @@ python3 scripts/validate.py --parts   # 校验 parts/ 半成品（写内容时�
 - `assets/site.css` 与 `assets/site.js` 是**手写源**（不是生成物），必须入库；
   但页面外壳的 DOM 与 class 名是**跨项目契约**，改类名/锚点 id 前先改
   `../PLAN-对齐与改版.md`，再同步两个项目。`assets/site.js` 已是上游
-  （math2-kaoyan，冻结于 `9fec899`）的**逐字复制**，由 `F25` 用钉在文件头的
-  sha256 强制；`scripts/test_site_js.mjs` 同样来自上游，由 `F26` 在门禁里跑。
+  （math2-kaoyan，冻结于 `9fec899`）的**逐字复制**，由
+  元校验用钉在文件头的 sha256 强制；`scripts/test_site_js.mjs` 同样来自上游，
+  由外壳行为测试在门禁里跑。
   **这两份都不要就地改。**
 - `scripts/topics.py` 是**考频数字的唯一数据源**，正文里的数字由 `build.py` 注入，
   不要在两处各写一份。
