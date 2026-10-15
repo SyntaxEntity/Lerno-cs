@@ -1017,45 +1017,65 @@ def check_render_leftovers():
         err("scripts", 0, "F24", "内容源渲染检查异常：%s" % e)
 
 
-def check_site_js_pin():
-    """F25: assets/site.js 必须是上游的逐字复制（契约 §2.4.1-D）。
+# 共用件清单（契约 §5.2.2-3）：两边**逐字节相同**的文件。
+# 沿用同一套强制：文件头钉上游正文的 sha256，且（同工作区有上游时）逐字节比对。
+# 这是**同一套**强制，不是给 site.css 另加一条平行规则。
+SHARED_COMPONENTS = [
+    {"path": "assets/site.js", "upstream": ("math2-kaoyan", "数学二", "assets", "site.js")},
+    # ⧗ assets/site.css 的登记在 U1 第 ③ 步（逐字节复制 + 文件头钉 sha256）里加。
+    #   现在登记不了：数学二尚未产出统一版，本地 site.css 也就没有可钉的上游哈希，
+    #   而本条判据要求"文件头必须有 sha256 注记"——提前登记会让门禁在过渡期恒红，
+    #   同时把反向测试的判据打坏（它按"注入后新出现的报错"做差集，前置红噪声会
+    #   淹没注入的错，用例全部假通过）。登记后本条即覆盖 site.css 与 site.js 两者，
+    #   用的仍是这同一套强制，不另加平行规则。
+    # {"path": "assets/site.css",
+    #  "upstream": ("math2-kaoyan", "数学二", "assets", "site.css")},
+]
 
-    该文件是两个项目共用的行为契约实现。文件头注记里钉了上游正文的 sha256，
-    这里核对"注记之后的全部内容"是否等于该哈希——所以任何对正文的本地改动
-    都会失败，逼着改动走契约而不是就地分叉。
 
-    若同工作区存在上游文件，再额外做一次**逐字节**比对（更直接）。
+def check_shared_components():
+    """F25: 共用件必须是上游的逐字复制（契约 §2.4.1-D 与 §5.2.2-3）。
+
+    清单见 SHARED_COMPONENTS。判据两条：
+      1. 文件头注记里钉了上游正文的 sha256，且正文哈希与之相符——任何本地改动
+         都会失败，逼着改动走契约而不是就地分叉；
+      2. 同工作区能读到上游文件时，再做一次**逐字节**比对（更直接）。
+
+    site.css 与 site.js 走的就是这一套，不要再加平行规则。
     """
-    fp = os.path.join(SITE, "assets", "site.js")
-    if not os.path.exists(fp):
-        err("assets/site.js", 0, "F25", "缺少共用行为脚本")
-        return
-    with open(fp, encoding="utf-8") as fh:
-        text = fh.read()
-    m = re.search(r"sha256\s*=\s*([0-9a-f]{64})", text)
-    if not m:
-        err("assets/site.js", 0, "F25",
-            "文件头缺少上游 sha256 注记（无法证明是逐字复制）")
-        return
-    pinned = m.group(1)
-    if "*/\n" not in text:
-        err("assets/site.js", 0, "F25", "文件头注记格式异常（缺少 */ 收尾）")
-        return
-    body = text.split("*/\n", 1)[1]
-    got = hashlib.sha256(body.encode("utf-8")).hexdigest()
-    if got != pinned:
-        err("assets/site.js", 0, "F25",
-            "正文与上游不一致（本地 sha256 %s…，注记 %s…）——"
-            "不要就地改这个共用件，先改契约再同步两个项目" % (got[:12], pinned[:12]))
-    # 同工作区能读到上游时，直接逐字节比对
-    upstream = os.path.join(os.path.dirname(ROOT), "math2-kaoyan", "数学二", "assets", "site.js")
-    if os.path.exists(upstream):
-        with open(upstream, encoding="utf-8") as fh:
-            up = fh.read()
-        if up != body:
-            err("assets/site.js", 0, "F25",
-                "与上游 math2-kaoyan/数学二/assets/site.js 不是逐字节一致")
-        stats["site_js_identical"] = 1
+    parent = os.path.dirname(ROOT)
+    for comp in SHARED_COMPONENTS:
+        rel = comp["path"]
+        fp = os.path.join(SITE, rel)
+        if not os.path.exists(fp):
+            err(rel, 0, "F25", "缺少共用件")
+            continue
+        with open(fp, encoding="utf-8") as fh:
+            text = fh.read()
+        m = re.search(r"sha256\s*=\s*([0-9a-f]{64})", text)
+        if not m:
+            err(rel, 0, "F25", "文件头缺少上游 sha256 注记（无法证明是逐字复制）")
+            continue
+        pinned = m.group(1)
+        if "*/\n" not in text:
+            err(rel, 0, "F25", "文件头注记格式异常（缺少 */ 收尾）")
+            continue
+        body = text.split("*/\n", 1)[1]
+        got = hashlib.sha256(body.encode("utf-8")).hexdigest()
+        if got != pinned:
+            err(rel, 0, "F25",
+                "正文与上游不一致（本地 sha256 %s…，注记 %s…）——"
+                "不要就地改这个共用件，先改契约再同步两个项目" % (got[:12], pinned[:12]))
+        upstream = os.path.join(parent, *comp["upstream"])
+        if os.path.exists(upstream):
+            with open(upstream, encoding="utf-8") as fh:
+                up = fh.read()
+            if up != body:
+                err(rel, 0, "F25",
+                    "与上游 %s 不是逐字节一致" % os.path.join(*comp["upstream"]))
+            else:
+                stats["shared_identical"] = stats.get("shared_identical", 0) + 1
+    stats["shared_total"] = len(SHARED_COMPONENTS)
 
 
 def check_site_js_behavior():
@@ -1274,7 +1294,7 @@ def main():
     check_shell()
     check_assets()
     check_render_leftovers()
-    check_site_js_pin()
+    check_shared_components()
     check_site_js_behavior()
     check_meta()
     check_doc_scope()
