@@ -66,7 +66,7 @@
 │   └── 01-….md.html         同名跳转页（点到 md 时用）
 ├── assets/                 ★ 外壳样式与行为（手写源，必须入库）
 │   ├── site.css             站点外壳样式
-│   └── site.js              外壳行为（**与 math2-kaoyan 逐字共用**，勿就地改）
+│   └── site.js              外壳行为（**与 Lerno-math 逐字共用**，勿就地改）
 ├── README.html             总览页（站点版）
 ├── mermaid.min.js          本地 Mermaid 运行时（离线渲染用）
 ├── .docs/                  ★ Markdown 归档（四科 md + README.md，供翻阅与再生成）
@@ -77,7 +77,7 @@
 └── PROMPT-数学二速成资料.md     同方法的可复用 prompt
 ```
 
-**外壳与 math2-kaoyan 对齐**：两站的页面骨架用同一份 DOM 结构与 class 名
+**外壳与 Lerno-math 对齐**：两站的页面骨架用同一份 DOM 结构与 class 名
 （顶栏 `.site-topbar`、面包屑 `.tb-crumbs`、侧栏 `.site-sidebar`、
 六段锚点 `#sec-freq … #sec-real`、章节导航 `.chapter-nav`、页脚 `.site-footer`、
 首页卡片 `.home-subjects`），规格见 `../PLAN-对齐与改版.md`。
@@ -107,8 +107,9 @@
 # 一次性安装依赖（.tools/ 已 gitignore，可随时删掉重建）
 python3 -m venv .tools/venv
 .tools/venv/bin/python -m pip install -r scripts/requirements.txt
-npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund \
-  mermaid@12.1.0 jsdom@30.1.2        # 版本见 scripts/tools-package.json
+# Node 依赖：版本只写在 scripts/tools-package.json 里，命令里不写版本号
+mkdir -p .tools && cp scripts/tools-package.json .tools/package.json
+npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund
 
 # 一键跑通全流水线（推荐）：规范化 → 分段 → 组装 → 总表 → 站点 → 校验
 python3 scripts/run_all.py           # 加 --quick 可跳过规范化与分段
@@ -138,8 +139,9 @@ python3 scripts/validate.py --parts  # 校验 parts/ 半成品（写内容时的
 **`F23` 外置资源可达**（`assets/site.css|site.js` 存在且被每个页面引用、页面无内联样式）、
 **`F24` 渲染残留**（正文不得露出字面 `**`，成品与内容源都查）、
 **`F25` 共用件一致性**（`assets/site.css` 与 `assets/site.js` 的正文都必须与上游
-`math2-kaoyan` 逐字节相同，靠各自文件头钉的 sha256 强制——**两者共用同一条规则**，
-不是两条平行规则）、**`F29` CSS 语法自检**（花括号/圆括号/方括号配平、选择器不得
+`Lerno-math` 逐字节相同，靠各自文件头钉的 sha256 强制——**两者共用同一条规则**，
+不是两条平行规则；同工作区有兄弟仓库时还会做一次**逐字节比对**，比对了几项在
+报告末尾打印，路径写错不会静默降级）、**`F29` CSS 语法自检**（花括号/圆括号/方括号配平、选择器不得
 以裸 `-` 结尾、`@media`/`@supports` 块配平；**先剥注释与字符串再计数**，否则注释里的
 `{}` 会把一份正确的 CSS 判成错误）、**`F26` 外壳行为测试**（jsdom 跑 12 条断言，复用数学二的测试）。
 

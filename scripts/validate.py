@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """408 复习资料校验器。
 
-校验项（F1—F17）：
+校验项（**真实编号以运行报告末尾的「规则 N 条：…」为准**；F18—F21 是历史空洞）：
+  F0 交付物完整性：文件非空、每个知识点文件含 '## 知识点' 小节、四科半成品齐全
   F1 每个 ## 小节必须含 6 个模板字段，且顺序为
      考频统计→核心讲解→关键结论速记→示意图→易错点→真题示例
   F2 考频统计行必须与 scripts/meta.py 的权威数据逐字一致
@@ -24,6 +25,16 @@
   F15 文档内所有相对链接必须能从仓库根解析
   F16 HTML 产物完整性与组件完整性（防渲染器静默退化）
   F17 站点与归档里的每一个相对链接都必须真实可达（含跳转页目标）
+  F22 统一外壳完整性（顶栏/侧栏/章节导航/页脚、六段锚点 id、首页科目卡片、
+      每页恰好 1 个 h1、同一标签不得重复 id）
+  F23 外置资源可达（assets/site.css|site.js 存在且被每个页面引用；页面无内联样式）
+  F24 渲染后不得残留字面 Markdown 记号（`**`），成品与内容源都查
+  F25 共用件（assets/site.css|site.js）必须是上游 Lerno-math 的逐字复制
+      （文件头钉 sha256；同工作区有兄弟仓库时再做逐字节比对）
+  F26 外壳行为测试：node + jsdom 真跑 assets/site.js 的 12 条断言
+  F27 元校验：规则集合 ≡ 反向测试覆盖集合，且扫描型规则的受检对象数 > 0
+  F28 文档与 CI 不得硬编码规则范围（范围以本脚本输出为准）
+  F29 site.css 语法自检（花括号/圆括号/方括号配平、规则头完整、@media 块配平）
 用法： python3 scripts/validate.py [--stats]
 """
 import glob
@@ -43,10 +54,18 @@ import meta as T  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓库根
 DOCS = os.path.join(ROOT, ".docs")                                   # Markdown 归档
 SITE = ROOT                                                          # HTML 站点就在仓库根
+# 兄弟仓库（数学二）的**当前目录名**：共用件（site.css / site.js）与外壳行为测试的
+# 上游都在里面。⚠️ **两个仓库目录改名时必须同步这里**——路径写错不会报错，只会让
+# F25 的「逐字节比对上游」静默跳过（2026-10-16 的 408-kaoyan→Lerno-cs /
+# math2-kaoyan→Lerno-math 改名就踩过一次，见 check_shared_components 的告警）。
+UPSTREAM_REPO = "Lerno-math"
 
 MERMAID_CHECKER = os.path.join(ROOT, "scripts", "check_mermaid.mjs")
-NODE_DEPS_HINT = ("装依赖：npm install --prefix .tools --cache /tmp/npm-cache "
-                  "--no-audit --no-fund mermaid@12.1.0 jsdom@30.1.2"
+# 提示里**不写版本号**：版本只在 scripts/tools-package.json 里写一次（契约 §1.2.1），
+# 抄到提示里就是第二份数据源，迟早与清单漂移。
+NODE_DEPS_HINT = ("装依赖：mkdir -p .tools && cp scripts/tools-package.json "
+                  ".tools/package.json && npm install --prefix .tools "
+                  "--cache /tmp/npm-cache --no-audit --no-fund"
                   "（版本见 scripts/tools-package.json）；"
                   "实在离线可加 --no-mermaid 显式跳过")
 PY_DEPS_HINT = ("装依赖：python3 -m venv .tools/venv && "
@@ -704,7 +723,7 @@ def check_html():
 def check_shell():
     """F22: 统一外壳完整性（契约 ../PLAN-对齐与改版.md 2.3/2.4）。
 
-    与 math2-kaoyan 共用同一份 DOM 与 class 名，因此这里校验的是**契约**，
+    与 Lerno-math 共用同一份 DOM 与 class 名，因此这里校验的是**契约**，
     不是 408 自己的偏好：顶栏（品牌 + 面包屑 + 搜索）、侧栏、main、页脚
     四件必须齐全，六段锚点 id 必须齐备，首页科目卡片数必须等于科目数。
 
@@ -1034,12 +1053,36 @@ def check_render_leftovers():
 # 共用件清单（契约 §5.2.2-3）：两边**逐字节相同**的文件。
 # 沿用同一套强制：文件头钉上游正文的 sha256，且（同工作区有上游时）逐字节比对。
 # 这是**同一套**强制，不是给 site.css 另加一条平行规则。
+# 上游路径 = 兄弟仓库目录（UPSTREAM_REPO，唯一常量）+ 下面的相对路径。
 SHARED_COMPONENTS = [
-    {"path": "assets/site.js", "upstream": ("math2-kaoyan", "数学二", "assets", "site.js")},
+    {"path": "assets/site.js", "upstream": ("数学二", "assets", "site.js")},
     # U1 第 ③ 步已登记：site.css 与 site.js 走**同一套**强制（不另加平行规则）。
-    {"path": "assets/site.css",
-     "upstream": ("math2-kaoyan", "数学二", "assets", "site.css")},
+    {"path": "assets/site.css", "upstream": ("数学二", "assets", "site.css")},
 ]
+
+
+def _upstream_repo_lookalike():
+    """找出「实际上游仓库」用的是哪个目录名（用于发现改名后没同步 UPSTREAM_REPO）。
+
+    判据**不是目录叫什么名字**，而是「哪个兄弟目录里有上游的 `数学二/assets/site.css`」——
+    所以改名（math2-kaoyan→Lerno-math）也能认出来。找不到就返回 None。
+
+    为什么要有这一条：同工作区没有兄弟仓库时（CI），F25 的逐字节比对按设计跳过；
+    但如果兄弟仓库其实就在旁边、只是常量里的名字过时了，比对会**静默消失**，
+    而所有判据依旧是绿的——正是 P4 要消灭的那类假通过（2026-10-16 改名的实际事故）。
+    """
+    parent = os.path.dirname(ROOT)
+    try:
+        names = sorted(os.listdir(parent))
+    except OSError:                                          # noqa: BLE001
+        return None
+    me = os.path.basename(ROOT)
+    for name in names:
+        if name in (me, UPSTREAM_REPO):
+            continue
+        if os.path.exists(os.path.join(parent, name, "数学二", "assets", "site.css")):
+            return name
+    return None
 
 
 def check_shared_components():
@@ -1050,9 +1093,24 @@ def check_shared_components():
          都会失败，逼着改动走契约而不是就地分叉；
       2. 同工作区能读到上游文件时，再做一次**逐字节**比对（更直接）。
 
+    ⚠️ 判据 2 是**条件执行**的（CI 里没有兄弟仓库），所以它有自己的两条失败路径：
+    兄弟仓库在、上游文件却读不到时告警；兄弟仓库其实在旁边但目录名与常量不符时
+    （改名没同步）也告警。否则这条最强的比对会**静默消失**而判据依旧全绿——
+    正是 P4 要消灭的那类假通过。比对次数上报 `shared_compared`，在报告里打出来，
+    跑没跑一眼可见。
+
     site.css 与 site.js 走的就是这一套，不要再加平行规则。
     """
-    parent = os.path.dirname(ROOT)
+    up_repo = os.path.join(os.path.dirname(ROOT), UPSTREAM_REPO)
+    have_repo = os.path.isdir(up_repo)
+    if not have_repo:
+        other = _upstream_repo_lookalike()
+        if other:
+            warn("scripts", 0, "F25",
+                 "同工作区的上游仓库目录看起来叫 %s，但 UPSTREAM_REPO 写的是 %s ——"
+                 "逐字节比对已跳过。目录改名后请同步 validate.py 的这个常量"
+                 % (other, UPSTREAM_REPO))
+    compared = 0
     for comp in SHARED_COMPONENTS:
         rel = comp["path"]
         fp = os.path.join(SITE, rel)
@@ -1075,16 +1133,23 @@ def check_shared_components():
             err(rel, 0, "F25",
                 "正文与上游不一致（本地 sha256 %s…，注记 %s…）——"
                 "不要就地改这个共用件，先改契约再同步两个项目" % (got[:12], pinned[:12]))
-        upstream = os.path.join(parent, *comp["upstream"])
+        upstream = os.path.join(up_repo, *comp["upstream"])
         if os.path.exists(upstream):
             with open(upstream, encoding="utf-8") as fh:
                 up = fh.read()
+            compared += 1
             if up != body:
                 err(rel, 0, "F25",
-                    "与上游 %s 不是逐字节一致" % os.path.join(*comp["upstream"]))
+                    "与上游 %s 不是逐字节一致" % os.path.join(UPSTREAM_REPO, *comp["upstream"]))
             else:
                 stats["shared_identical"] = stats.get("shared_identical", 0) + 1
+        elif have_repo:
+            warn(rel, 0, "F25",
+                 "兄弟仓库 %s 在，但读不到它的 %s —— **逐字节比对已跳过**。"
+                 "最常见的原因是目录改名后没同步 validate.py 的 UPSTREAM_REPO。"
+                 % (UPSTREAM_REPO, os.path.join(*comp["upstream"])))
     stats["shared_total"] = len(SHARED_COMPONENTS)
+    stats["shared_compared"] = compared
 
 
 def check_site_js_behavior():
@@ -1098,7 +1163,7 @@ def check_site_js_behavior():
     """
     # 优先用本仓库的副本（CI 里只有本仓库）；没有就退回同工作区的上游原件
     local = os.path.join(ROOT, "scripts", "test_site_js.mjs")
-    upstream = os.path.join(os.path.dirname(ROOT), "math2-kaoyan", "数学二",
+    upstream = os.path.join(os.path.dirname(ROOT), UPSTREAM_REPO, "数学二",
                             "scripts", "test_site_js.mjs")
     tester = local if os.path.exists(local) else (upstream if os.path.exists(upstream) else None)
     if tester is None:
@@ -1641,6 +1706,14 @@ def report(title, parts_mode=False):
     if stats.get("site_js_tests"):
         print("  外壳行为测试 %d/%d 通过（jsdom，复用数学二）"
               % (stats["site_js_tests"], stats.get("site_js_total", 0)))
+    # 共用件的**逐字节**比对只在同工作区有兄弟仓库时才能做（CI 里没有），
+    # 所以把「实际比了几项」打出来：跑没跑一眼可见，不靠猜。
+    if stats.get("shared_compared"):
+        print("  共用件逐字节比对 %d/%d 项（上游仓库 %s 就在同工作区）"
+              % (stats["shared_compared"], stats.get("shared_total", 0), UPSTREAM_REPO))
+    else:
+        print("  共用件逐字节比对 0/%d 项（同工作区没有上游 %s，只做了文件头哈希自检）"
+              % (stats.get("shared_total", 0), UPSTREAM_REPO))
     # H4：规则范围由校验器**自己算**。编号有空洞（F18—F21 是历史空缺），
     # 所以绝不能硬编码成 "F1—F26"——那样一加规则就漂移。
     _rules = sorted(rule_codes(), key=lambda x: int(x[1:]))

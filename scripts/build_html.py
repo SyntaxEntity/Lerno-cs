@@ -9,7 +9,7 @@
   3. ASCII 示意图用深色面板 + 复制按钮；Mermaid 用本地运行时渲染（离线可用）。
   4. 统一外壳：顶栏面包屑 + 侧栏目录（分组 + 当前章六段锚点 + 筛选）+ 章节
      prev/next + 页脚；样式与行为外置为 assets/site.css 与 assets/site.js。
-     外壳的 DOM 与 class 名与 math2-kaoyan 共用同一份契约
+     外壳的 DOM 与 class 名与 Lerno-math 共用同一份契约
      （见 ../PLAN-对齐与改版.md 2.3/2.4），改类名前先改契约。
 
 产出：
@@ -44,7 +44,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 ASSETS = os.path.join(SITE, "assets")
 
-# 六段字段的锚点 id / class（契约钦定，与 math2-kaoyan 逐字一致）
+# 六段字段的锚点 id / class（契约钦定，与 Lerno-math 逐字一致）
 SECS = [
     ("考频统计", "sec-freq"),
     ("核心讲解", "sec-core"),
@@ -216,7 +216,7 @@ def md_to_html(text):
 # ---------------------------------------------------------------------------
 # 页面骨架（统一外壳：顶栏 / 侧栏 / main / 章节导航 / 页脚）
 #
-# class 名与 DOM 层级由 ../PLAN-对齐与改版.md 2.3/2.4 钦定，与 math2-kaoyan 共用，
+# class 名与 DOM 层级由 ../PLAN-对齐与改版.md 2.3/2.4 钦定，与 Lerno-math 共用，
 # 改任何类名前先改契约——两边分叉的代价远大于等待。
 # ---------------------------------------------------------------------------
 def asset_prefix(page):
@@ -273,7 +273,7 @@ def footer_for(page):
 def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter"):
     """侧栏目录：四科分组 + 当前章的六段锚点 + 关键词筛选。
 
-    DOM 与钩子类名严格照 math2-kaoyan 的 assets/site.js 契约（PLAN 2.4.1）：
+    DOM 与钩子类名严格照 Lerno-math 的 assets/site.js 契约（PLAN 2.4.1）：
     .sb-head/.sb-title/.sb-home/.sb-filter/.sb-group/.sb-group-t/.sb-chap/
     .tocbox/.toclink —— site.js 只认这一套，改名前先改契约。
 
@@ -494,7 +494,7 @@ def build():
 
 
 def home_subject_cards():
-    """首页科目卡片入口（契约 2.5.1）：类名与 math2-kaoyan 逐字一致。"""
+    """首页科目卡片入口（契约 2.5.1）：类名与 Lerno-math 逐字一致。"""
     out = ['<nav class="home-subjects">']
     for k in T.ORDER:
         s = T.SUBJECTS[k]

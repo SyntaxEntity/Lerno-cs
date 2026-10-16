@@ -1,4 +1,4 @@
-// 来源：math2-kaoyan/数学二/scripts/test_site_js.mjs（**逐字复制**，正文 sha256 a08d6d4df3cf4379）。
+// 来源：Lerno-math/数学二/scripts/test_site_js.mjs（**逐字复制**，正文 sha256 a08d6d4df3cf4379）。
 // 这是两个项目共用的外壳行为测试（PLAN-对齐与改版 §2.4.1-D），不要就地改；
 // 要改先改契约再同步两边。默认被测文件已改为本仓库的 assets/site.js。
 // 外壳脚本 `数学二/assets/site.js` 的**行为测试**（node + jsdom）。

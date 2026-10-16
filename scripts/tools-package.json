@@ -1,7 +1,7 @@
 {
-  "name": "408-kaoyan-scripts-deps",
+  "name": "lerno-cs-scripts-deps",
   "private": true,
-  "description": "408 速成资料 · Node 侧依赖清单（与 .tools/package.json 同内容，用于对齐版本）。安装：npm install --prefix .tools --cache /tmp/npm-cache mermaid@12.1.0 jsdom@30.1.2。版本必须与站点内置运行时一致，否则 F3 校验的语法与线上渲染的不是同一个版本：mermaid 必须等于仓库根 mermaid.min.js 的版本。",
+  "description": "408 速成资料 · Node 侧依赖清单（**版本只写在这里**，PLAN-对齐与改版 §1.2.1）。安装：mkdir -p .tools && cp scripts/tools-package.json .tools/package.json && npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund。mermaid 的版本必须等于仓库根 mermaid.min.js 的版本，否则 F3 校验的语法与线上渲染的不是同一个版本。",
   "dependencies": {
     "jsdom": "30.1.2",
     "mermaid": "12.1.0"

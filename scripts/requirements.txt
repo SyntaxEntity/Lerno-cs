@@ -13,7 +13,9 @@
 # 依赖缺 markdown 时 F14 会静默跳过（见 validate.py 的 render_check），
 # 所以版本漂移本身不会报错，只会让一条校验项悄悄失效。这里锁死来杜绝这种情况。
 #
-# Node 侧依赖（mermaid 真实解析 + 站点内置运行时）另见 tools-package.json：
-#   npm install --prefix .tools --cache /tmp/npm-cache mermaid@12.1.0 jsdom@30.1.2
+# Node 侧依赖（mermaid 真实解析 + 站点内置运行时）另见 tools-package.json ——
+# 版本只在那一份清单里写一次，这里不重复（否则就是第二份数据源，迟早漂移）：
+#   mkdir -p .tools && cp scripts/tools-package.json .tools/package.json
+#   npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund
 
 Markdown==3.11.1

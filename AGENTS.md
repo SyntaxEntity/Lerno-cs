@@ -82,8 +82,9 @@ website/Lerno-cs/
 # 依赖（版本锁定在 scripts/requirements.txt 与 scripts/tools-package.json）
 python3 -m venv .tools/venv
 .tools/venv/bin/python -m pip install -r scripts/requirements.txt
-npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund \
-  mermaid@12.1.0 jsdom@30.1.2
+# Node 侧版本只在 scripts/tools-package.json 里，命令里不写版本号
+mkdir -p .tools && cp scripts/tools-package.json .tools/package.json
+npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund
 
 python3 scripts/run_all.py         # 一键跑通全链（推荐）；--quick 跳过规范化与分段
 python3 scripts/normalize_md.py    # Markdown 空行规范化（幂等）
@@ -117,6 +118,10 @@ python3 scripts/reverse_tests.py       # 反向测试：每条规则注入反例
   元校验（F25 的共用件清单）强制。**不要就地改这两份**——要改先改契约，
   由数学二产出统一版，408 再逐字节复制并重钉哈希。
   数学二的 `scripts/test_site_js.mjs` 同样来自上游，由外壳行为测试在门禁里跑。
+- **目录改名时要同步 `scripts/validate.py` 的 `UPSTREAM_REPO` 常量**：它是兄弟
+  仓库（上游）的目录名，共用件比对与外壳行为测试的备用路径都走它。写错**不会**
+  报错——F25 的逐字节比对会静默跳过（2026-10-16 改名就踩过）。现在它会在报告里
+  打印「逐字节比对 N/2 项」，并在同工作区发现「实际叫别的名字」时告警。
 - 页面外壳的 DOM 与 class 名是**跨项目契约**，改类名/锚点 id 前先改
   `../PLAN-对齐与改版.md`，再同步两个项目。
 - `assets/CSS-NOTES.md` 是 408 侧类选择器清单（U1 第 ① 步的交付物，

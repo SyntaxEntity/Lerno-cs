@@ -27,8 +27,10 @@ function argValue(name, dflt) {
 }
 
 const CONTENT = resolve(argValue('--content', '.docs'));
-const HINT = '装依赖：npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund '
-  + 'mermaid@12.1.0 jsdom@30.1.2（版本见 scripts/tools-package.json）';
+// 提示里**不写版本号**：版本只在 scripts/tools-package.json 里写一次（契约 §1.2.1）。
+const HINT = '装依赖：mkdir -p .tools && cp scripts/tools-package.json .tools/package.json '
+  + '&& npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund'
+  + '（版本见 scripts/tools-package.json）';
 
 /** 致命错误：始终以 JSON 形式报出，让调用方不必解析 stderr 文案。 */
 function fatal(msg) {

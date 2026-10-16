@@ -44,16 +44,22 @@ jobs:
       - name: 安装 Python 校验依赖（读 scripts/requirements.txt）
         run: python3 -m pip install --quiet -r scripts/requirements.txt
 
+      # Node 侧的版本**只写在 scripts/tools-package.json 里**，这里同样不写版本号
+      # （PLAN-对齐与改版 §1.2.1：版本只写在声明文件里，工作流与脚本一律读它）。
+      # .tools/ 已 gitignore，检出时不存在，所以先把清单拷进去，再让 npm 按清单装——
+      # 与数学二的 workflow 逐字同款做法。
       # jsdom 同时供 F26（外壳行为测试）使用：assets/site.js 是两边共用的外壳脚本，
       # scripts/test_site_js.mjs 在真实 DOM 上跑 12 条断言——光"能解析"不算过。
-      - name: 安装 Node 校验依赖（F3 真实 mermaid 解析 + F26 外壳行为测试）
-        run: >-
+      - name: 安装 Node 校验依赖（读 scripts/tools-package.json；F3 真解析 + F26 行为测试）
+        run: |
+          mkdir -p .tools
+          cp scripts/tools-package.json .tools/package.json
           npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund
-          mermaid@12.1.0 jsdom@30.1.2
 
       # 门禁：模板字段、考频数字与 meta.py 逐字一致、图语法（含 mermaid 真解析）、
       # ASCII 对齐、真题年份、链接可达、交付物完整性、统一外壳（F22/F23）、
-      # 渲染残留（F24）、共用件一致性（F25）、外壳行为测试（F26）。
+      # 渲染残留（F24）、共用件一致性（F25）、外壳行为测试（F26）、元校验（F27）、
+      # 文档不得硬编码规则范围（F28）、CSS 语法自检（F29）。
       # 有 error 时退出码为 1，直接中止部署。缺 node/依赖同样是 error，不会静默跳过。
       - name: 发布前校验（形式校验：模板/数字/图/链接/外壳）
         run: python3 scripts/validate.py

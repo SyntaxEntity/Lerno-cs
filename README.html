@@ -109,7 +109,7 @@
    - <strong>逐考点考察次数</strong>：依据王道《408 历年真题》、天勤辅导书等公开的考频统计表，并结合历年真题公开题面核对与自行统计，属<strong>中等置信度，允许 ±1 次误差</strong>。
    - 凡无法核对到可靠统计的条目，一律标注 <strong>"考频待补充"</strong>，不作估算（本版 26 个知识点均有可核对数据，故未出现该标注）。</li>
 <li><strong>真题示例的标注规则</strong>：能确证为原题的写"<strong>20XX 年 408 第 N 题</strong>"；对题面或题号无法完全确证的，写"<strong>20XX 年真题改编</strong>"，<strong>绝不伪装成原题</strong>。</li>
-<li><strong>本文档由脚本生成</strong>：正文数字与考频总表同源于 <code>scripts/topics.py</code>，并经 <code>scripts/validate.py</code> 校验，因此三处数字必然一致。</li>
+<li><strong>本文档由脚本生成</strong>：正文数字与考频总表同源于 <code>scripts/meta.py</code>，并经 <code>scripts/validate.py</code> 校验，因此三处数字必然一致。</li>
 </ol>
 <h3 id="_3">真题标注的两级可信度（请按此理解）</h3>
 <p>全资料共 <code>28</code> 道真题示例（分布在 <code>26</code> 个知识点中，其中计算机组成原理/CPU 与数据结构/栈与队列两节各含 <code>2</code> 道），按<strong>引用可信度</strong>分为两级，标注方式不同：</p>
@@ -583,29 +583,45 @@
 <p><strong>图形约定</strong>：<code>text</code> 代码块为 <strong>ASCII 图</strong>（结构布局、位域划分、地址格式、时序图），<code>mermaid</code> 代码块为 <strong>流程图 / 状态机</strong>（算法流程、协议交互、状态转换）。当前共 <code>60</code> 个 ASCII 图、<code>52</code> 个 Mermaid 图。</p>
 <hr />
 <h2 id="_6">六、如何重新生成与校验</h2>
-<div class="codebox"><div class="bar"><span>bash</span><button type="button">复制</button></div><pre><code>cd website/408-kaoyan
+<div class="codebox"><div class="bar"><span>bash</span><button type="button">复制</button></div><pre><code>cd website/Lerno-cs
+python3 scripts/run_all.py            # 一键跑通全链（推荐）
 python3 scripts/validate.py --parts   # 校验 parts 半成品：模板字段、ASCII 对齐、mermaid 语法、真题年份
-python3 scripts/build.py              # 由 parts + topics.py 生成四科 Markdown
+python3 scripts/build.py              # 由 parts + meta.py 生成四科 Markdown
 python3 scripts/gen_summary.py        # 刷新本文件的考频总表
-python3 scripts/validate.py           # 校验成品：模板完整性、考频数字一致性、图表数量
+python3 scripts/build_html.py         # 由 .docs/ 生成仓库根的静态站点
+python3 scripts/validate.py           # 校验成品：模板、数字、图、链接、外壳、共用件
+python3 scripts/reverse_tests.py      # 反向测试：每条规则注入反例，确认真会报错
 </code></pre></div>
-<p><code>validate.py</code> 的强制校验项包括：</p>
+<p><code>validate.py</code> 的强制校验项包括（<strong>完整编号以它自己输出的「规则 N 条：…」为准</strong>；
+编号存在历史空洞 <code>F18</code>—<code>F21</code>）：</p>
 <ul>
+<li><code>F0</code> 交付物完整性（文件非空、每个知识点含 <code>## 知识点</code> 小节、四科半成品齐全）；</li>
 <li><code>F1</code> 每个知识点的六段式模板字段齐全且<strong>顺序正确</strong>；</li>
-<li><code>F2</code> 正文的<strong>考频统计行与 <code>topics.py</code> 逐字一致</strong>（防止正文、总表、索引三处数字不一致）；</li>
+<li><code>F2</code> 正文的<strong>考频统计行与 <code>scripts/meta.py</code> 逐字一致</strong>（防止正文、总表、索引三处数字不一致）；</li>
 <li><code>F3</code> 代码块必须带 <code>text</code>/<code>mermaid</code> 语言标签、围栏成对闭合、<code>mermaid</code> 无孤立花括号与非法字符（含"圆括号未用引号包裹"这一会导致 mermaid 解析失败的写法）；</li>
+<li><code>F4</code> 禁止占位符（<code>TODO</code> / 待补充讲解 / <code>XXX</code> 等）；</li>
 <li><code>F5</code> <strong>ASCII 图内不得出现全角字符或制表符</strong>（否则等宽对齐会被破坏）；</li>
 <li><code>F6</code> 真题年份必须落在 <code>2009—2025</code>；</li>
+<li><code>F7</code> 高频标记 <code>[高频]</code> 必须出现在小节标题中（<code>warn</code> 级）；</li>
 <li><code>F8</code> 每个知识点必须同时具备 ASCII 图与 Mermaid 图；</li>
 <li><code>F9</code>/<code>F10</code>/<code>F11</code> 核心讲解句数、易错点条数、关键结论速记条数在规范区间内；</li>
 <li><code>F12</code> README 声明的"已核对原题"清单与正文标注<strong>双向逐条一致</strong>；</li>
 <li><code>F13</code>/<code>F14</code> 块级元素之间必须有空行，并用真实渲染器确认模板字段各自独立成段；</li>
 <li><code>F15</code>/<code>F17</code> 文档内相对链接可从仓库根解析，站点与归档的每个相对链接真实可达（含 <code>.md</code> 跳转页目标存在性）；</li>
-<li><code>F16</code> HTML 产物与组件完整性（防止渲染器静默退化）。</li>
+<li><code>F16</code> HTML 产物与组件完整性（防止渲染器静默退化）；</li>
+<li><code>F22</code> 统一外壳完整性（顶栏 / 侧栏 / 章节翻页 / 页脚、六段锚点 <code>id</code>、首页科目卡片、每页恰好 1 个 <code>h1</code>、无重复 <code>id</code> 属性）；</li>
+<li><code>F23</code> 外置资源可达（<code>assets/site.css</code>、<code>assets/site.js</code> 被每个页面引用，页面无内联样式）；</li>
+<li><code>F24</code> 渲染后不得残留字面 <code>**</code>（成品与内容源都查）；</li>
+<li><code>F25</code> 共用件与上游 <code>Lerno-math</code> <strong>逐字节一致</strong>（文件头钉 sha256；同工作区有兄弟仓库时再做一次逐字节比对）；</li>
+<li><code>F26</code> 外壳行为测试（用 jsdom 真跑 <code>assets/site.js</code> 的 12 条断言）；</li>
+<li><code>F27</code> 元校验（规则集合 ≡ 反向测试覆盖集合、扫描型规则的受检对象数大于 0）；</li>
+<li><code>F28</code> 文档与 CI 不得硬编码规则范围；</li>
+<li><code>F29</code> <code>site.css</code> 语法自检（花括号/圆括号/方括号配平、规则头完整、<code>@media</code> 块配平）。</li>
 </ul>
-<p>除静态规则外，还可用官方 <code>mermaid</code> 解析器做<strong>真实语法校验</strong>：脚本会把全部 <code>52</code> 张 Mermaid 图逐张交给 <code>mermaid.parse()</code>，全部解析通过才算合格（这一层能发现静态规则看不出、但渲染时必然报错的写法）。</p>
-<div class="codebox"><div class="bar"><span>bash</span><button type="button">复制</button></div><pre><code>npm install --prefix .tools mermaid jsdom   # 一次性准备，.tools/ 已在 .gitignore 中忽略
-node scripts/check_mermaid.mjs              # 期望输出：mermaid 图总数 52，解析失败 0
+<p>除静态规则外，<code>F3</code> 还会把全部 <code>52</code> 张 Mermaid 图逐张交给官方解析器做<strong>真实语法校验</strong>（<code>mermaid.parse()</code>），全部解析通过才算合格——这一层能发现静态规则看不出、但渲染时必然报错的写法；缺 node 或依赖时<strong>报错而不是跳过</strong>。</p>
+<div class="codebox"><div class="bar"><span>bash</span><button type="button">复制</button></div><pre><code># 一次性准备 Node 依赖（版本只写在 scripts/tools-package.json 里，命令里不写版本号）
+mkdir -p .tools &amp;&amp; cp scripts/tools-package.json .tools/package.json
+npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund
 </code></pre></div>
 <hr />
 <h2 id="_7">七、使用建议（时间紧张时）</h2>

@@ -8,7 +8,8 @@
   3. `build.py`         由 parts/ + meta.py 组装成 .docs/ 的 Markdown；
   4. `gen_summary.py`   把考频总表注入 .docs/00-总览.md（依赖上一步的产物）；
   5. `build_html.py`    由 .docs/ 生成仓库根的静态站点（依赖 3、4 的产物）；
-  6. `validate.py`      校验成品：F1—F17，含链接可达与 mermaid 真实解析。
+  6. `validate.py`      校验成品：模板字段、数字、图、链接、外壳与共用件
+                        （**范围不写死**——真实编号由它自己输出，契约 §4.6）。
 
 用法
 ----
@@ -27,9 +28,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 VENV = os.path.join(ROOT, ".tools", "venv", "bin", "python")
 
-# 与站点内置运行时**逐字节一致**的版本；换版本会让校验的语法与线上渲染的不是同一个。
-NODE_DEPS = {"mermaid": "12.1.0", "jsdom": "30.1.2"}
-# 站点内置的 mermaid 运行时（仓库根），用来核对上面 mermaid 的版本
+# Node 依赖的版本**只写在 tools-package.json 里**（PLAN-对齐与改版 §1.2 单一数据源）。
+# 这里读它、不抄它：CI 与 validate.py 用的是同一份清单，本地与线上不可能装出两个版本。
+TOOLS_MANIFEST = os.path.join(HERE, "tools-package.json")
+INSTALL_HINT = ("mkdir -p .tools && cp scripts/tools-package.json .tools/package.json\n"
+                "    npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund")
+# 站点内置的 mermaid 运行时（仓库根），用来核对清单里 mermaid 的版本
 BUNDLED_MERMAID = os.path.join(ROOT, "mermaid.min.js")
 
 
@@ -39,6 +43,16 @@ def _pkg_version(name):
         with open(p, encoding="utf-8") as f:
             return json.load(f).get("version")
     except Exception:                                        # noqa: BLE001
+        return None
+
+
+def node_deps():
+    """从 tools-package.json 读出 Node 依赖清单；读不到返回 None。"""
+    try:
+        with open(TOOLS_MANIFEST, encoding="utf-8") as f:
+            return json.load(f).get("dependencies") or {}
+    except Exception as e:                                   # noqa: BLE001
+        print("! 读不到依赖清单 %s：%s" % (os.path.relpath(TOOLS_MANIFEST, ROOT), e))
         return None
 
 
@@ -66,21 +80,22 @@ def _bundled_mermaid_version():
 
 
 def check_node_deps():
-    """检查 .tools/node_modules 里的前端依赖是否就位、版本是否与站点运行时一致。
+    """检查 .tools/node_modules 里的前端依赖是否就位、版本是否与清单一致。
 
     版本漂移必须**在开跑前**报出来：F3 用 `mermaid` 解析、站点用仓库根的
     `mermaid.min.js` 渲染——两者版本不同，就会出现「校验通过但页面渲染不出来」
     这种最难查的情况。
     """
-    install = ("npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund "
-               + " ".join("%s@%s" % (n, v) for n, v in NODE_DEPS.items()))
+    want_all = node_deps()
+    if want_all is None:
+        return False
     problems = []
-    for name, want in NODE_DEPS.items():
+    for name, want in want_all.items():
         got = _pkg_version(name)
         if got is None:
             problems.append("缺少 %s" % name)
-        elif want and got != want:
-            problems.append("%s 版本不符：装的是 %s，要求 %s" % (name, got, want))
+        elif got != want:
+            problems.append("%s 版本不符：装的是 %s，清单要求 %s" % (name, got, want))
     bundled = _bundled_mermaid_version()
     have = _pkg_version("mermaid")
     if bundled and have and bundled != have:
@@ -89,8 +104,8 @@ def check_node_deps():
     if not problems:
         return True
     print("! Node 依赖有问题：%s" % "；".join(problems))
-    print("  重装（版本必须与站点内置运行时一致）：")
-    print("    %s" % install)
+    print("  重装（版本以 scripts/tools-package.json 为准）：")
+    print("    %s" % INSTALL_HINT)
     return False
 
 
@@ -135,7 +150,7 @@ def main():
         fails.append("gen_summary")
     if run("生成 HTML 站点", [PY, os.path.join(HERE, "build_html.py")]) != 0:
         fails.append("build_html")
-    if run("校验成品（F1—F17，含 mermaid 真实解析）",
+    if run("校验成品（含 mermaid 真实解析与外壳行为测试）",
            [PY, os.path.join(HERE, "validate.py")]) != 0:
         fails.append("validate")
 
