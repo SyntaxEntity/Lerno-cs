@@ -1,39 +1,55 @@
-# website/408-kaoyan —— 408 速成复习资料
+# website/Lerno-cs —— 408 速成复习资料
 
 本目录是一个**独立 git 仓库**（分支 `main`）。上游工作区说明见
 [`../../AGENTS.md`](../../AGENTS.md)（若你的项目根是本目录，该文件不会被自动加载，
 故要点在此复述）。
 
 📋 **跨项目的对齐与改版规格见 [`../PLAN-对齐与改版.md`](../PLAN-对齐与改版.md)**——
-它同时约束本仓库与 `../math2-kaoyan/`，涉及外壳结构、类名、分期与验收。
+它同时约束本仓库与 `../Lerno-math/`，涉及外壳结构、类名、分期与验收。
 发现规格有问题请回报管理会话改那份文件，**不要在本仓库里自行发明例外**。
 
 ## 一、路径提醒（2026-10-15 工作区重组）
 
 | 旧路径（已失效） | 现在的实际位置 |
 | --- | --- |
-| `UCAS/408-kaoyan/` | **`UCAS/website/408-kaoyan/`**（就是本目录） |
-| `UCAS/408-new/` | `UCAS/website/math2-kaoyan/`（**数学二**项目，不是 408） |
+| `UCAS/408-kaoyan/` | **`UCAS/website/Lerno-cs/`**（就是本目录） |
+| `UCAS/408-new/` | `UCAS/website/Lerno-math/`（**数学二**项目，不是 408） |
 
 ⚠️ `408-new/` 这个目录名**已废弃**：它原本是本 408 项目的仓库，408 内容搬走后
-被数学二项目接管，现已改名为 `website/math2-kaoyan/`。
+被数学二项目接管，现已改名为 `website/Lerno-math/`。
 若历史会话记录或旧文档里出现 `408-new/`，一律按下表换算：
 
-- `408-new/scripts/…` → `website/408-kaoyan/scripts/…`
-- `408-new/PLAYBOOK-速成资料工程化.md` → `website/408-kaoyan/PLAYBOOK-速成资料工程化.md`
+- `408-new/scripts/…` → `website/Lerno-cs/scripts/…`
+- `408-new/PLAYBOOK-速成资料工程化.md` → `website/Lerno-cs/PLAYBOOK-速成资料工程化.md`
 - `408-new/408/…` → 该层中间目录已取消，成品现在直接在仓库根的四科目录下
+
+
+## 一点五、目录改名（2026-10-16）
+
+本仓库目录已改名为**与远端仓库同名**：
+
+| 真实目录（规范路径） | 兼容符号链接（**永久保留，勿删**） |
+| --- | --- |
+| `website/Lerno-cs/` | `website/408-kaoyan` → `Lerno-cs` |
+
+⚠️ **符号链接不能删。** 本项目的 agent 会话 cwd 是**旧路径且不可变**；
+DSH 启动时用 `realpath` 规范化会话 cwd，再与工作区记录的规范路径比对，
+相等才保留成员关系（`dsh-workspace/lib/index.js` L880/L905）。
+删掉符号链接 → cwd 无法解析 → **本 agent 会话永久失组**。
+
+本文档里仍出现的旧目录名（如历史迁移表）**保持原样不动**，它们记录的是当时的事实。
 
 ## 二、目录职责
 
 ```
-website/408-kaoyan/
+website/Lerno-cs/
 ├── .github/workflows/pages.yml  Pages 工作流：validate.py 门禁 → 上传仓库根
 ├── index.html                   落地页 / 部署首屏（四科卡片 + 全科单页合集）
 ├── 数据结构/ 计算机组成原理/ 操作系统/ 计算机网络/
 │                                静态站点：index.html、01-….html、01-….md.html
 ├── assets/                      ★ 外壳样式与行为（手写源，必须入库）
-│   ├── site.css                 外壳样式（与 math2-kaoyan **逐字节相同**，勿就地改）
-│   └── site.js                  外壳行为（与 math2-kaoyan **逐字节相同**，勿就地改）
+│   ├── site.css                 外壳样式（与 Lerno-math **逐字节相同**，勿就地改）
+│   └── site.js                  外壳行为（与 Lerno-math **逐字节相同**，勿就地改）
 ├── README.html                  总览页（站点版 ＝ .docs/00-总览.md 渲染）
 ├── README.md                    仓库说明（部署 / 许可 / 数据可信度口径）
 ├── mermaid.min.js               本地 Mermaid 运行时（离线渲染）
@@ -45,7 +61,7 @@ website/408-kaoyan/
 └── PROMPT-数学二速成资料.md
 ```
 
-> 页面外壳（DOM 与 class 名）与 `../math2-kaoyan/` 共用同一份契约，见
+> 页面外壳（DOM 与 class 名）与 `../Lerno-math/` 共用同一份契约，见
 > [`../PLAN-对齐与改版.md`](../PLAN-对齐与改版.md) 2.3/2.4。
 > 契约钦定：`.site-topbar`/`.tb-*`、`.site-sidebar`、`#sec-freq`…`#sec-real`、
 > `.chapter-nav`/`.cn-prev`/`.cn-next`、`.site-footer`、`.home-subjects`/`.hs-*`、
@@ -95,7 +111,7 @@ python3 scripts/reverse_tests.py       # 反向测试：每条规则注入反例
 - **改内容只改 `parts/`**，然后重跑脚本。`.docs/` 和所有 `.html` 都是生成物，
   手工改会在下次生成时被覆盖。
 - `assets/site.css` 与 `assets/site.js` 是**共用件**（U1 起两者都是）：与
-  `../math2-kaoyan` **逐字节相同**，各自在文件头钉上游 sha256，由**同一条**
+  `../Lerno-math` **逐字节相同**，各自在文件头钉上游 sha256，由**同一条**
   元校验（F25 的共用件清单）强制。**不要就地改这两份**——要改先改契约，
   由数学二产出统一版，408 再逐字节复制并重钉哈希。
   数学二的 `scripts/test_site_js.mjs` 同样来自上游，由外壳行为测试在门禁里跑。
