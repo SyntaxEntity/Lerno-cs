@@ -56,6 +56,9 @@ website/Lerno-cs/
 ├── README.md                    仓库说明（部署 / 许可 / 数据可信度口径）
 ├── mermaid.min.js               本地 Mermaid 运行时（离线渲染）
 ├── .docs/                       Markdown 归档 ← 生成物，勿手改
+│                                ⚠️ 例外：`00-总览.md` 是**手工维护**的总览页
+│                                （只有考频总表由 gen_summary.py 注入），
+│                                它渲染成 README.html，改口径要连 README.md 一起改
 ├── parts/                       内容源，只写这里：ds/ os/ co/ net/
 ├── scripts/                     生成与校验工具链
 ├── LICENSE
@@ -112,7 +115,9 @@ python3 scripts/reverse_tests.py       # 反向测试：每条规则注入反例
   不剥会让读者看到同一标题连出三次，并产生 `id="_2" id="kp"` 这种**重复 id 属性**。
   `F22` 已强制"每页恰好 1 个 `<h1>`、无重复 id 属性"。
 - **改内容只改 `parts/`**，然后重跑脚本。`.docs/` 和所有 `.html` 都是生成物，
-  手工改会在下次生成时被覆盖。
+  手工改会在下次生成时被覆盖（**唯一例外**：`.docs/00-总览.md` 是手工维护的
+  总览页，它渲染成 `README.html`；改口径要连 `README.md` 一起改——两份高度重叠
+  但各自独立维护，线上页面渲染的**不是** `README.md`）。
 - `assets/site.css` 与 `assets/site.js` 是**共用件**（U1 起两者都是）：与
   `../Lerno-math` **逐字节相同**，各自在文件头钉上游 sha256，由**同一条**
   元校验（F25 的共用件清单）强制。**不要就地改这两份**——要改先改契约，
