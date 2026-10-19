@@ -49,7 +49,6 @@ import unicodedata
 from collections import Counter, defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import meta as T  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓库根
 DOCS = os.path.join(ROOT, ".docs")                                   # Markdown 归档
@@ -107,6 +106,22 @@ def err(path, line, code, msg):
 
 def warn(path, line, code, msg):
     warnings.append("%s:%s [%s] %s" % (path, line, code, msg))
+
+
+try:
+    import meta as T  # noqa: E402
+except Exception as _meta_error:                         # noqa: BLE001
+    # 唯一数据源缺了（或语法坏了）就什么都校验不了，但**输出必须仍是结构化的**：
+    # 直接抛 traceback 等于"退出码 1 但没有报告"，调用方不知道哪里坏了（D-06）。
+    err("scripts/meta.py", 0, "F0", "无法导入唯一数据源 scripts/meta.py：%s" % _meta_error)
+    print("=" * 74)
+    print("408 复习资料校验报告")
+    print("=" * 74)
+    print("  ✗ 错误 %d 条：" % len(errors))
+    for _line in errors:
+        print("    " + _line)
+    print("=" * 74)
+    sys.exit(1)
 
 
 def char_width(ch):
@@ -572,6 +587,8 @@ def check_links():
     """F15: 文档内所有相对链接必须能从仓库根解析（统一口径，避免搬家后失效）。"""
     import glob as _g
     files = _g.glob(os.path.join(DOCS, "*", "*.md")) + [os.path.join(DOCS, "00-总览.md")]
+    # 不存在的文件跳过即可：缺总览/F0 会单独报错，这里打开会直接 traceback（D-06 禁止）
+    files = [f for f in files if os.path.exists(f)]
     for f in files:
         rel = os.path.relpath(f, ROOT)
         with open(f, encoding="utf-8") as fh:
@@ -1492,18 +1509,18 @@ def check_quiz_artifact():
 # 它们的受检数天然可以为 0。
 SCAN_RULES_MUST_BE_NONZERO = [
     "F0", "F1", "F3", "F8", "F12", "F15", "F16", "F17", "F22", "F23", "F24", "F26",
-    "F29", "F30", "F31",
+    "F29", "F30", "F31", "F28",
 ]
 # 这些扫描型规则只在**成品模式**运行（查 .docs/、HTML、链接、共用件），
 # --parts 模式下不要求它们上报受检数（否则会报"什么都没检查"的假错）。
-FULL_ONLY_SCAN = {"F8", "F12", "F15", "F16", "F17", "F22", "F23", "F26", "F29"}
+FULL_ONLY_SCAN = {"F8", "F12", "F15", "F16", "F17", "F22", "F23", "F26", "F28", "F29"}
 
 OBJECT_STAT_KEY = {
     "F0": "F0_files", "F1": "F1_sections", "F3": "F3_objects", "F8": "F8_objects",
     "F12": "orig", "F15": "F15_objects", "F16": "F16_objects", "F17": "F17_objects",
     "F22": "shell_nav_pages", "F23": "F23_objects", "F24": "F24_objects",
     "F26": "site_js_tests", "F29": "F29_objects", "F30": "F30_objects",
-    "F31": "F31_objects",
+    "F31": "F31_objects", "F28": "F28_objects",
 }
 
 
@@ -1717,10 +1734,16 @@ def check_doc_scope():
     targets = [os.path.join(ROOT, "README.md"), os.path.join(ROOT, "AGENTS.md"),
                os.path.join(ROOT, ".github", "workflows", "pages.yml")]
     pat = re.compile(r"(F\d+)\s*[—–\-~]\s*(F\d+)")
+    scanned = 0
     for fp in targets:
-        if not os.path.exists(fp):
-            continue
         rel = os.path.relpath(fp, ROOT)
+        if not os.path.exists(fp):
+            # D-06：扫描目标缺失时**不能**当作"没有违规"。这三份文件都是项目必备件，
+            # 缺一份说明仓库结构坏了，必须报出来，否则"没检查"与"检查通过"无法区分。
+            err(rel, 0, "F28",
+                "规则范围扫描目标缺失：无法确认这里没有硬编码规则范围")
+            continue
+        scanned += 1
         with open(fp, encoding="utf-8") as fh:
             for i, line in enumerate(fh, 1):
                 for m in pat.finditer(line):
@@ -1728,6 +1751,7 @@ def check_doc_scope():
                         "不得硬编码规则范围 %s—%s；改用「形式校验」这类中性措辞，"
                         "需要范围时以 validate.py 的输出为准（实际 %s—%s）"
                         % (m.group(1), m.group(2), lo, hi))
+    stats["F28_objects"] = scanned
 
 
 def main():
@@ -1752,11 +1776,16 @@ def main():
         check_meta()
         return report("parts 半成品校验报告", parts_mode=True)
 
+    overview = os.path.join(DOCS, "00-总览.md")
+    if not os.path.exists(overview):
+        err(".docs/00-总览.md", 0, "F0", "缺少根总览（交付物完整性）")
     for key in T.ORDER:
         d = os.path.join(DOCS, T.SUBJECTS[key]["dir"])
         if not os.path.isdir(d):
             err(T.SUBJECTS[key]["dir"], 0, "F0", "科目目录不存在")
             continue
+        if not os.path.exists(os.path.join(d, "00-科目总览.md")):
+            err(T.SUBJECTS[key]["dir"], 0, "F0", "缺少 00-科目总览.md（交付物完整性）")
         files = sorted(f for f in os.listdir(d) if f.endswith(".md"))
         got_slugs = {os.path.splitext(f)[0] for f in files}
         want_slugs = {t[6] for t in T.TOPICS[key]}
@@ -1783,8 +1812,9 @@ def main():
     # 题库：源在 parts/quiz/，产物在 assets/。两条规则都上报受检数，必须在 F27 之前跑。
     check_quiz_bank()
     check_quiz_artifact()
-    check_meta()
+    # F28 也上报受检数，同样必须排在 F27 之前（原先排在后面，H3 只能放过它）
     check_doc_scope()
+    check_meta()
     run_mermaid_parser(DOCS)
     return report("408 复习资料校验报告")
 
@@ -1892,34 +1922,6 @@ def run_mermaid_parser(scan_dir):
             % os.path.relpath(scan_dir, ROOT))
 
 
-
-    """F12: README 声明的"已核对原题"清单必须与正文标注逐条一致。"""
-    import glob
-    actual = set()
-    for f in glob.glob(os.path.join(ROOT, "parts", "*", "*.md")):
-        with open(f, encoding="utf-8") as fh:
-            for line in fh:
-                m = re.match(r"^\*\*((?:19|20)\d{2}) 年 408 第 (\d+) 题", line.strip())
-                if m:
-                    actual.add((m.group(1), m.group(2)))
-    rp = os.path.join(DOCS, "00-总览.md")
-    # 缺文件要降级成 error，不能抛 FileNotFoundError：否则校验器以未捕获异常退出
-    # （stdout 空、没有报告），调用方只看到"退出码 1"，完全不知道哪里坏了。
-    # "校验器自己崩了"比校验失败更难查，必须堵住。
-    if not os.path.exists(rp):
-        err("README.md", 0, "F12", "找不到 %s，无法核对原题声明清单"
-            % os.path.relpath(rp, ROOT))
-        return
-    with open(rp, encoding="utf-8") as fh:
-        readme = fh.read()
-    declared = set(re.findall(r"\| `(\d{4})` 第 `(\d+)` 题", readme))
-    for item in sorted(declared - actual):
-        err("README.md", 0, "F12", "声明为已核对原题但正文未标注：%s 年第 %s 题" % item)
-    for item in sorted(actual - declared):
-        err("README.md", 0, "F12", "正文标注为原题但未在 README 声明清单中：%s 年第 %s 题" % item)
-    stats["orig"] = len(actual)
-
-
 def check_readme_citations():
     """F12: README 声明的"已核对原题"清单必须与正文标注逐条一致。"""
     import glob
@@ -1931,6 +1933,14 @@ def check_readme_citations():
                 if m:
                     actual.add((m.group(1), m.group(2)))
     rp = os.path.join(DOCS, "00-总览.md")
+    # 缺文件必须降级成 error，不能抛 FileNotFoundError：否则校验器以未捕获异常退出
+    # （stdout 是 traceback、没有报告），调用方只看到"退出码 1"，完全不知道哪里坏了。
+    # D-06：这属于"退出码 1 但没有结构化输出"，同样是静默降级。
+    if not os.path.exists(rp):
+        err("README.md", 0, "F12", "找不到 %s，无法核对原题声明清单"
+            % os.path.relpath(rp, ROOT))
+        stats["orig"] = 0          # 如实上报：这次一条声明都没核对
+        return
     with open(rp, encoding="utf-8") as fh:
         readme = fh.read()
     declared = set(re.findall(r"\| `(\d{4})` 第 `(\d+)` 题", readme))
@@ -1967,6 +1977,10 @@ def report(title, parts_mode=False):
     if stats.get("mermaid_blocks"):
         print("  Mermaid 真实解析 %d/%d 通过" % (stats.get("mermaid_parsed", 0),
                                                  stats["mermaid_blocks"]))
+    if ALLOW_NO_MERMAID:
+        # D-06：显式跳过必须**在报告里**说清楚，不能只在失败时才吭声；
+        # 这不是静默降级（命令行留痕 + 这里明示），但必须让"没检查"可见。
+        print("  Mermaid 真实解析：已跳过（--no-mermaid 显式指定）")
     if stats.get("site_js_tests"):
         print("  外壳行为测试 %d/%d 通过（jsdom，复用数学二）"
               % (stats["site_js_tests"], stats.get("site_js_total", 0)))
@@ -1984,6 +1998,9 @@ def report(title, parts_mode=False):
               % (stats.get("quiz_total", 0), stats.get("quiz_topics", 0),
                  stats.get("quiz_topic_total", 0), stats.get("quiz_min", 0),
                  stats.get("quiz_max", 0), stats.get("quiz_pending", 0)))
+    if stats.get("F28_objects"):
+        print("  文档/CI 规则范围扫描 %d/3 个文件（README / AGENTS / 工作流）"
+              % stats["F28_objects"])
     if stats.get("F31_objects"):
         bad = stats.get("quiz_artifact_mismatch", 0)
         print("  题库产物：源哈希 / 条数 / id 集合 / 题目内容 共 %d 项比对，%s"
