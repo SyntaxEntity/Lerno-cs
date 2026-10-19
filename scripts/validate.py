@@ -84,6 +84,7 @@ SEC_IDS_FOR_CHECK = [
 INLINE_MATH = re.compile(r"(?<!\$)\$([^$\n]+?)\$(?!\$)")
 DISPLAY_MATH = re.compile(r"\$\$.+?\$\$", re.S)
 ALLOW_NO_MERMAID = "--no-mermaid" in sys.argv
+PARTS_MODE = "--parts" in sys.argv          # 内层循环：只校验 parts/，不查成品站点
 # 防止 F14 换解释器重跑时无限递归（见 render_check）
 NO_REEXEC = "--no-reexec" in sys.argv
 
@@ -1238,19 +1239,271 @@ def coverage_codes():
     return {m.group(1) for m in re.finditer(r'\bcase\(\s*"(F\d+)"', code)}
 
 
+# ---------------------------------------------------------------------------
+# 练习题库（F30 源完整性 / F31 产物一致性）
+# 契约：PLAN-对齐与改版 §2.3.1.A；方案见 PROPOSAL-练习闭环.md。
+# 判据**基于内容**（附录 Z 的要求）：
+#   · 题目的 subject/topic 必须落在本仓库真实存在的知识点上，不靠文件名；
+#   · 产物用**源哈希**比对，不看文件名、不看修改时间；
+#   · 两条规则都上报受检数（H3），报告里打印实际比对项数。
+# ---------------------------------------------------------------------------
+QUIZ_DIR = os.path.join(ROOT, "parts", "quiz")
+QUIZ_ARTIFACT = os.path.join(ROOT, "assets", "quiz-data.js")
+QUIZ_SOURCE_ORDER = ["ds", "co", "os", "net"]
+QUIZ_SOURCES = ("原题", "改编", "自编")
+QUIZ_ID_RE = re.compile(r"^[a-z]{2,3}-\d{2,3}$")
+QUIZ_ORIGIN_RE = re.compile(r"^(\d{4})·第(\d+)题$")
+
+
+def _quiz_source_sha():
+    """与 scripts/build_quiz.py 完全相同的算法：固定顺序拼接文件字节再取 sha256。"""
+    h = hashlib.sha256()
+    for k in QUIZ_SOURCE_ORDER:
+        fp = os.path.join(QUIZ_DIR, "%s.json" % k)
+        h.update(os.path.basename(fp).encode("utf-8"))
+        h.update(b"\0")
+        with open(fp, "rb") as fh:
+            h.update(fh.read())
+        h.update(b"\0")
+    return h.hexdigest()
+
+
+def _quiz_question_problems(q, subj, topics):
+    """返回一道题的内容问题清单（空 = 通过）。判据只看向量本身，不看它在哪个文件。"""
+    out = []
+    if not isinstance(q, dict):
+        return ["题目不是 JSON 对象"]
+    qid = q.get("id")
+    if not isinstance(qid, str) or not QUIZ_ID_RE.match(qid):
+        out.append("id 非法（应形如 ds-01）：%r" % (qid,))
+    if q.get("subject") != subj:
+        out.append("subject=%r 与所在文件的科目 %r 不一致" % (q.get("subject"), subj))
+    if q.get("topic") not in topics.get(subj, []):
+        out.append("topic=%r 不是本科目的知识点（本项目共 %d 个知识点）"
+                   % (q.get("topic"), len(topics.get(subj, []))))
+    stem = q.get("stem")
+    if not isinstance(stem, str) or len(stem.strip()) < 6:
+        out.append("题干缺失或过短")
+    opts = q.get("options")
+    if not isinstance(opts, list) or not (2 <= len(opts) <= 4):
+        out.append("选项必须是 2—4 个（实际 %r）"
+                   % (len(opts) if isinstance(opts, list) else opts,))
+    elif any(not isinstance(o, str) or not o.strip() for o in opts):
+        out.append("存在空选项")
+    elif len({o.strip() for o in opts}) != len(opts):
+        out.append("选项重复")
+    ans = q.get("answer")
+    if isinstance(ans, bool) or not isinstance(ans, int):
+        out.append("answer 必须是整数下标（实际 %r）" % (ans,))
+    elif isinstance(opts, list) and not (0 <= ans < len(opts)):
+        out.append("答案下标越界：answer=%d，选项 %d 个" % (ans, len(opts)))
+    exp = q.get("explanation")
+    if not isinstance(exp, str) or len(exp.strip()) < 15:
+        out.append("解析缺失或过短（至少 15 字）")
+    src = q.get("source")
+    if src not in QUIZ_SOURCES:
+        out.append("source=%r 不在 %s 之内" % (src, " / ".join(QUIZ_SOURCES)))
+    elif src == "原题":
+        m = QUIZ_ORIGIN_RE.match(str(q.get("origin") or ""))
+        if not m:
+            out.append("标为原题但 origin 格式不对（应形如 2021·第12题）")
+        elif not (2009 <= int(m.group(1)) <= 2025):
+            out.append("标为原题但年份 %s 不在 2009—2025" % m.group(1))
+    diff = q.get("difficulty")
+    if isinstance(diff, bool) or not isinstance(diff, int) or diff not in (1, 2, 3):
+        out.append("difficulty 必须是 1/2/3（实际 %r）" % (diff,))
+    tags = q.get("tags")
+    if not isinstance(tags, list) or any(not isinstance(t, str) or not t.strip() for t in tags):
+        out.append("tags 必须是字符串数组")
+    return out
+
+
+def check_quiz_bank():
+    """F30: 题库源完整性（parts/quiz/*.json + pending.json）。
+
+    覆盖情况逐知识点统计并上报（H3）；有知识点一题都没有时只 warn——
+    题库是「逐步长出来」的，缺题不该阻断构建，但必须看得见。
+    """
+    topics = {k: [t[6] for t in T.TOPICS[k]] for k in T.ORDER}
+    ids, stems = {}, {}
+    per_topic = Counter()
+    total = 0
+    if not os.path.isdir(QUIZ_DIR):
+        err("parts/quiz", 0, "F30", "题库目录不存在（练习功能的数据源）")
+        return
+    for subj in QUIZ_SOURCE_ORDER:
+        fp = os.path.join(QUIZ_DIR, "%s.json" % subj)
+        rel = os.path.relpath(fp, ROOT)
+        if not os.path.exists(fp):
+            err(rel, 0, "F30", "缺少题库源文件")
+            continue
+        try:
+            with open(fp, encoding="utf-8") as fh:
+                data = json.load(fh)
+        except Exception as e:                               # noqa: BLE001
+            err(rel, 0, "F30", "JSON 解析失败：%s" % e)
+            continue
+        if data.get("subject") != subj:
+            err(rel, 0, "F30", "文件内 subject=%r 与文件名 %r 不一致"
+                % (data.get("subject"), subj))
+        qs = data.get("questions")
+        if not isinstance(qs, list) or not qs:
+            err(rel, 0, "F30", "questions 缺失或为空")
+            continue
+        for i, q in enumerate(qs, 1):
+            stats["F30_objects"] += 1
+            total += 1
+            qid = (q or {}).get("id")
+            for msg in _quiz_question_problems(q, subj, topics):
+                err(rel, 0, "F30", "第 %d 题（%s）：%s" % (i, qid, msg))
+            if qid in ids:
+                err(rel, 0, "F30", "id 重复：%s（另见 %s）" % (qid, ids[qid]))
+            else:
+                ids[qid] = rel
+            stem = re.sub(r"\s+", "", str((q or {}).get("stem") or ""))
+            if stem and stem in stems:
+                err(rel, 0, "F30", "题干重复：%s 与 %s" % (qid, stems[stem]))
+            elif stem:
+                stems[stem] = qid
+            topic = (q or {}).get("topic")
+            if topic in topics.get(subj, []):
+                per_topic[topic] += 1
+
+    pending = 0
+    pend_fp = os.path.join(QUIZ_DIR, "pending.json")
+    if os.path.exists(pend_fp):
+        rel = os.path.relpath(pend_fp, ROOT)
+        try:
+            with open(pend_fp, encoding="utf-8") as fh:
+                pdata = json.load(fh)
+            plist = pdata.get("pending") or []
+            pending = len(plist)
+            for i, q in enumerate(plist, 1):
+                if not isinstance(q, dict):
+                    err(rel, 0, "F30", "第 %d 条待补题不是对象" % i)
+                    continue
+                if not q.get("gap"):
+                    err(rel, 0, "F30", "第 %d 条待补题缺少 gap 说明" % i)
+                if q.get("id") in ids:
+                    err(rel, 0, "F30", "待补题 id 与题库重复：%s" % q.get("id"))
+                if q.get("subject") not in topics:
+                    err(rel, 0, "F30", "待补题 subject=%r 非法" % (q.get("subject"),))
+                opts = q.get("options")
+                ans = q.get("answer")
+                if not isinstance(opts, list) or not (2 <= len(opts) <= 4):
+                    err(rel, 0, "F30", "待补题 %s 选项数非法" % q.get("id"))
+                elif isinstance(ans, bool) or not isinstance(ans, int) \
+                        or not (0 <= ans < len(opts)):
+                    err(rel, 0, "F30", "待补题 %s 答案下标越界" % q.get("id"))
+                if not (q.get("explanation") or "").strip():
+                    err(rel, 0, "F30", "待补题 %s 缺解析" % q.get("id"))
+        except Exception as e:                               # noqa: BLE001
+            err(rel, 0, "F30", "JSON 解析失败：%s" % e)
+
+    all_topics = [t[6] for k in T.ORDER for t in T.TOPICS[k]]
+    for t in all_topics:
+        if per_topic.get(t, 0) == 0:
+            warn("parts/quiz", 0, "F30",
+                 "知识点 %s 还没有题目（练习页的「全章覆盖」会缺这一格）" % t)
+    stats["quiz_total"] = total
+    stats["quiz_pending"] = pending
+    stats["quiz_topics"] = sum(1 for t in all_topics if per_topic.get(t, 0) > 0)
+    stats["quiz_topic_total"] = len(all_topics)
+    stats["quiz_min"] = min((per_topic.get(t, 0) for t in all_topics), default=0)
+    stats["quiz_max"] = max((per_topic.get(t, 0) for t in all_topics), default=0)
+
+
+def check_quiz_artifact():
+    """F31: 生成物 assets/quiz-data.js 必须与源一致（源哈希 / 条数 / id 集合）。
+
+    三项都比对并累计到 quiz_artifact_mismatch；报告里打印「N 项比对」，
+    跑没跑、对不对一眼可见（附录 Z：新门禁要打印实际比对计数）。
+    """
+    rel = os.path.relpath(QUIZ_ARTIFACT, ROOT)
+    stats["F31_objects"] = 1
+    stats["quiz_artifact_checks"] = 4
+    if not os.path.exists(QUIZ_ARTIFACT):
+        err(rel, 0, "F31", "缺少题库产物（先跑 scripts/build_quiz.py）")
+        stats["quiz_artifact_mismatch"] = 4
+        return
+    with open(QUIZ_ARTIFACT, encoding="utf-8") as fh:
+        text = fh.read()
+    m = re.search(r"sourceSha256\s*=\s*([0-9a-f]{64})", text)
+    if not m:
+        err(rel, 0, "F31", "产物头部缺少 sourceSha256 注记")
+        stats["quiz_artifact_mismatch"] = 4
+        return
+    try:
+        got = _quiz_source_sha()
+    except Exception as e:                                   # noqa: BLE001
+        err(rel, 0, "F31", "读题库源失败：%s" % e)
+        stats["quiz_artifact_mismatch"] = 4
+        return
+    bad = 0
+    if m.group(1) != got:
+        bad += 1
+        err(rel, 0, "F31",
+            "源哈希不一致：产物 %s…，源 %s…（改了源没重跑 build_quiz.py，或手改了产物）"
+            % (m.group(1)[:12], got[:12]))
+    try:
+        payload = text.split("window.LERNO_QUIZ = ", 1)[1].strip().rstrip(";").strip()
+        data = json.loads(payload)
+        qs = data.get("questions") or []
+    except Exception as e:                                   # noqa: BLE001
+        stats["quiz_artifact_mismatch"] = bad + 1
+        err(rel, 0, "F31", "产物 JSON 解析失败：%s" % e)
+        return
+    m2 = re.search(r"count\s*=\s*(\d+)", text)
+    if not m2 or int(m2.group(1)) != len(qs):
+        bad += 1
+        err(rel, 0, "F31", "条数不一致：头部 %s，产物 %d 题"
+            % (m2.group(1) if m2 else "缺", len(qs)))
+    src_ids = set()
+    for subj in QUIZ_SOURCE_ORDER:
+        fp = os.path.join(QUIZ_DIR, "%s.json" % subj)
+        if not os.path.exists(fp):
+            continue
+        with open(fp, encoding="utf-8") as fh:
+            src_ids |= {q.get("id") for q in (json.load(fh).get("questions") or [])}
+    if {q.get("id") for q in qs} != src_ids:
+        bad += 1
+        err(rel, 0, "F31", "id 集合与源不一致（产物 %d 个，源 %d 个）"
+            % (len(qs), len(src_ids)))
+    # 第 4 项：产物里的**题目内容**必须与源逐字段一致。
+    # 只比源哈希抓不到「改产物正文但不同步源」——哈希钉的是源，不是产物本身。
+    expected = []
+    for subj in QUIZ_SOURCE_ORDER:
+        fp = os.path.join(QUIZ_DIR, "%s.json" % subj)
+        if os.path.exists(fp):
+            with open(fp, encoding="utf-8") as fh:
+                expected.extend(json.load(fh).get("questions") or [])
+    expected.sort(key=lambda q: q.get("id"))
+    got_qs = sorted(qs, key=lambda q: q.get("id"))
+    if json.dumps(expected, ensure_ascii=False, sort_keys=True) != \
+            json.dumps(got_qs, ensure_ascii=False, sort_keys=True):
+        bad += 1
+        err(rel, 0, "F31", "产物题目内容与源不一致（重跑 scripts/build_quiz.py）")
+    stats["quiz_artifact_mismatch"] = bad
+
+
 # H3：受检对象数必须 > 0 的规则清单（扫描型：扫文件/扫图/扫链接/扫锚点）。
 # glob 或路径写错时会"一个对象都没扫到却报 0 错、一片绿"，故由 F27 断言其受检数。
 # 不在此列的是**否定型**规则（如 F4「不得出现占位符」、F25「不得与上游不一致」），
 # 它们的受检数天然可以为 0。
 SCAN_RULES_MUST_BE_NONZERO = [
     "F0", "F1", "F3", "F8", "F12", "F15", "F16", "F17", "F22", "F23", "F24", "F26",
-    "F29",
+    "F29", "F30", "F31",
 ]
+# 这些扫描型规则只在**成品模式**运行（查 .docs/、HTML、链接、共用件），
+# --parts 模式下不要求它们上报受检数（否则会报"什么都没检查"的假错）。
+FULL_ONLY_SCAN = {"F8", "F12", "F15", "F16", "F17", "F22", "F23", "F26", "F29"}
+
 OBJECT_STAT_KEY = {
     "F0": "F0_files", "F1": "F1_sections", "F3": "F3_objects", "F8": "F8_objects",
     "F12": "orig", "F15": "F15_objects", "F16": "F16_objects", "F17": "F17_objects",
     "F22": "shell_nav_pages", "F23": "F23_objects", "F24": "F24_objects",
-    "F26": "site_js_tests", "F29": "F29_objects",
+    "F26": "site_js_tests", "F29": "F29_objects", "F30": "F30_objects",
+    "F31": "F31_objects",
 }
 
 
@@ -1287,6 +1540,11 @@ def check_meta():
         # --no-mermaid 是显式要求跳过真实解析，此时 F3 受检数为 0 属正常；
         # 命令行留下了痕迹，不是静默失效。
         if code == "F3" and ALLOW_NO_MERMAID:
+            continue
+        # `--parts` 只校验 parts/，下面这些规则**根本不会运行**（它们查的是
+        # 成品 HTML/站点链接/共用件），此时要求它们上报受检数就是在报假错；
+        # 这也解释了为什么 --parts 以前一直红着（本次一并修掉）。
+        if PARTS_MODE and code in FULL_ONLY_SCAN:
             continue
         if code not in rules:
             err("scripts", 0, "F27",
@@ -1487,6 +1745,9 @@ def main():
         run_mermaid_parser(os.path.join(ROOT, "parts"))
         # F24 同样在内容源阶段就跑：写手改完 parts 立刻能看到没闭合的 `**`
         check_render_leftovers()
+        # 题库源与内容源同在 parts/，两种模式都校验（产物一致性也一起查）
+        check_quiz_bank()
+        check_quiz_artifact()
         # 元校验两种模式都跑：规则集合与反向测试覆盖的一致性跟模式无关
         check_meta()
         return report("parts 半成品校验报告", parts_mode=True)
@@ -1519,6 +1780,9 @@ def main():
     # 规则必须跑在 check_meta() 之前**。F29 上报 F29_objects，故排在它前面
     # （踩过一次：放在后面时 F27 报"F29 未上报受检对象数"）。
     check_css_syntax()
+    # 题库：源在 parts/quiz/，产物在 assets/。两条规则都上报受检数，必须在 F27 之前跑。
+    check_quiz_bank()
+    check_quiz_artifact()
     check_meta()
     check_doc_scope()
     run_mermaid_parser(DOCS)
@@ -1714,6 +1978,17 @@ def report(title, parts_mode=False):
     else:
         print("  共用件逐字节比对 0/%d 项（同工作区没有上游 %s，只做了文件头哈希自检）"
               % (stats.get("shared_total", 0), UPSTREAM_REPO))
+    # 题库（F30/F31）：打印**实际比对计数**，跑没跑一眼可见（附录 Z 的要求）。
+    if stats.get("quiz_total") or stats.get("quiz_pending"):
+        print("  题库：%d 题 · 覆盖 %d/%d 个知识点（每个知识点 %d—%d 题）· 待补 %d 题"
+              % (stats.get("quiz_total", 0), stats.get("quiz_topics", 0),
+                 stats.get("quiz_topic_total", 0), stats.get("quiz_min", 0),
+                 stats.get("quiz_max", 0), stats.get("quiz_pending", 0)))
+    if stats.get("F31_objects"):
+        bad = stats.get("quiz_artifact_mismatch", 0)
+        print("  题库产物：源哈希 / 条数 / id 集合 / 题目内容 共 %d 项比对，%s"
+              % (stats.get("quiz_artifact_checks", 0),
+                 "全部一致" if not bad else "%d 项不一致" % bad))
     # H4：规则范围由校验器**自己算**。编号有空洞（F18—F21 是历史空缺），
     # 所以绝不能硬编码成 "F1—F26"——那样一加规则就漂移。
     _rules = sorted(rule_codes(), key=lambda x: int(x[1:]))

@@ -51,7 +51,8 @@ website/Lerno-cs/
 │                                静态站点：index.html、01-….html、01-….md.html
 ├── assets/                      ★ 外壳样式与行为（手写源，必须入库）
 │   ├── site.css                 外壳样式（与 Lerno-math **逐字节相同**，勿就地改）
-│   └── site.js                  外壳行为（与 Lerno-math **逐字节相同**，勿就地改）
+│   ├── site.js                  外壳行为（与 Lerno-math **逐字节相同**，勿就地改）
+│   └── quiz-data.js             题库产物（**生成物**：build_quiz.py 从 parts/quiz/ 生成）
 ├── README.html                  总览页（站点版 ＝ .docs/00-总览.md 渲染）
 ├── README.md                    仓库说明（部署 / 许可 / 数据可信度口径）
 ├── mermaid.min.js               本地 Mermaid 运行时（离线渲染）
@@ -59,7 +60,7 @@ website/Lerno-cs/
 │                                ⚠️ 例外：`00-总览.md` 是**手工维护**的总览页
 │                                （只有考频总表由 gen_summary.py 注入），
 │                                它渲染成 README.html，改口径要连 README.md 一起改
-├── parts/                       内容源，只写这里：ds/ os/ co/ net/
+├── parts/                       内容源，只写这里：ds/ os/ co/ net/（+ quiz/ 题库源）
 ├── scripts/                     生成与校验工具链
 ├── LICENSE
 ├── PLAYBOOK-速成资料工程化.md
@@ -94,6 +95,7 @@ python3 scripts/normalize_md.py    # Markdown 空行规范化（幂等）
 python3 scripts/split_explain.py   # 长段落自动分段
 python3 scripts/build.py           # parts/ + meta.py → .docs/ 的 Markdown
 python3 scripts/gen_summary.py     # 刷新 .docs/00-总览.md 的考频总表
+python3 scripts/build_quiz.py      # parts/quiz/*.json → assets/quiz-data.js（练习页数据）
 python3 scripts/build_html.py      # .docs/ → 仓库根的静态站点
 python3 scripts/validate.py        # 校验形式层（含 mermaid 真解析与外壳行为测试）
 python3 scripts/validate.py --parts   # 校验 parts/ 半成品（写内容时的内层循环）
@@ -134,6 +136,9 @@ python3 scripts/reverse_tests.py       # 反向测试：每条规则注入反例
   「哪个类归谁、为什么」的索引。
 - `scripts/meta.py` 是**考频数字的唯一数据源**，正文里的数字由 `build.py` 注入，
   不要在两处各写一份。
+- **题库只改 `parts/quiz/*.json`**，然后跑 `build_quiz.py` + `validate.py`；
+  `assets/quiz-data.js` 是生成物（F31 会核对源哈希与题目内容，手改必报错）。
+  题库字段、来源与授权见 `parts/quiz/README.md`。
 - 考频/真题数据凡不能核实的，标注「考频待补充」或「真题改编」，**不许编造**。
   数据口径与可信度分级见 `README.md` 第三节。
 - 站点是完全离线的纯静态页，改完直接用浏览器打开 `index.html` 验证，无需起服务器。

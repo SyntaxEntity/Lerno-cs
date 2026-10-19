@@ -330,6 +330,22 @@ case("F29", "@media 块未闭合", SITECSS,
 case("F28", "README 写死规则范围", os.path.join(ROOT, "README.md"),
      lambda t: t + "\n\n本仓库校验覆盖 F1—F26。\n", expect_kw="不得硬编码规则范围")
 
+# F30：题库源完整性（parts/quiz/*.json）
+#   反例注入在**真实题目**上，不是 pending——pending 走的是另一条校验路径。
+QUIZ_DS = os.path.join(PARTS, "quiz", "ds.json")
+QUIZ_JS = os.path.join(SITE, "assets", "quiz-data.js")
+case("F30", "答案下标越界", QUIZ_DS,
+     lambda t: t.replace('"answer": 0', '"answer": 9', 1),
+     expect_kw="答案下标越界")
+
+# F31：题库产物一致性（源哈希 / 条数 / id 集合 / 题目内容，共 4 项）
+case("F31", "产物正文被手改（内容与源不一致）", QUIZ_JS,
+     lambda t: t.replace('"answer":0', '"answer":1', 1),
+     expect_kw="产物题目内容与源不一致")
+case("F31", "产物头部源哈希被改", QUIZ_JS,
+     lambda t: t.replace("sourceSha256 = ", "sourceSha256 = 0", 1),
+     expect_kw="源哈希不一致")
+
 
 # ---------------------------------------------------------------------------
 # 执行器

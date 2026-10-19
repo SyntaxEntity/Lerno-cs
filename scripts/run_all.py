@@ -7,8 +7,9 @@
   2. `split_explain.py` 长段落自动分段（同样只该在规范化之后做）；
   3. `build.py`         由 parts/ + meta.py 组装成 .docs/ 的 Markdown；
   4. `gen_summary.py`   把考频总表注入 .docs/00-总览.md（依赖上一步的产物）；
-  5. `build_html.py`    由 .docs/ 生成仓库根的静态站点（依赖 3、4 的产物）；
-  6. `validate.py`      校验成品：模板字段、数字、图、链接、外壳与共用件
+  5. `build_quiz.py`    把 parts/quiz/*.json 打包成 assets/quiz-data.js（练习页数据）；
+  6. `build_html.py`    由 .docs/ 生成仓库根的静态站点（依赖 3、4、5 的产物）；
+  7. `validate.py`      校验成品：模板字段、数字、图、链接、外壳、共用件与题库
                         （**范围不写死**——真实编号由它自己输出，契约 §4.6）。
 
 用法
@@ -148,6 +149,10 @@ def main():
         fails.append("build")
     if run("刷新考频总表", [PY, os.path.join(HERE, "gen_summary.py")]) != 0:
         fails.append("gen_summary")
+    # 题库要在 build_html 之前产出：练习页会引用 assets/quiz-data.js
+    if run("打包题库（parts/quiz → assets/quiz-data.js）",
+           [PY, os.path.join(HERE, "build_quiz.py")]) != 0:
+        fails.append("build_quiz")
     if run("生成 HTML 站点", [PY, os.path.join(HERE, "build_html.py")]) != 0:
         fails.append("build_html")
     if run("校验成品（含 mermaid 真实解析与外壳行为测试）",
