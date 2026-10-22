@@ -246,28 +246,45 @@ def crumbs_for(page, subject_key=None, chapter=None):
     return '<nav class="tb-crumbs" aria-label="面包屑">%s</nav>' % "".join(out)
 
 
-def topbar_for(page, subject_key=None, chapter=None, brand="408 速成复习资料"):
+def topbar_for(page, subject_key=None, chapter=None, brand="408 速成复习资料",
+               crumb_label=None):
+    """顶栏。`crumb_label` 给非章节页用（如练习页：首页 › 今日练习）。"""
+    if crumb_label:
+        crumbs = ('<nav class="tb-crumbs" aria-label="面包屑">'
+                  '<a href="%sindex.html">首页</a><span class="tb-sep">›</span>'
+                  '<span aria-current="page">%s</span></nav>'
+                  % (asset_prefix(page), html.escape(crumb_label)))
+    else:
+        crumbs = crumbs_for(page, subject_key, chapter)
     return """<header class="site-topbar">
 <a class="tb-brand" href="%sindex.html">%s</a>
 %s
 <button class="tb-search" type="button" aria-label="搜索">搜索</button>
-</header>""" % (asset_prefix(page), html.escape(brand),
-               crumbs_for(page, subject_key, chapter))
+</header>""" % (asset_prefix(page), html.escape(brand), crumbs)
+
+
+PRACTICE_FILE = "练习.html"          # 408 特有页面（PLAN §2.3.1.A）
 
 
 def footer_for(page):
-    """页脚：内容包在 .sf-inner 里（统一版把页脚列宽也放在 .sf-inner 上）。"""
+    """页脚：内容包在 .sf-inner 里（统一版把页脚列宽也放在 .sf-inner 上）。
+
+    2026-10-20 裁定（D-03 ①）：页脚加「今日练习」入口，零改共用件；
+    练习页自身不加（避免自链接）。
+    """
     prefix = asset_prefix(page)
+    practice = "" if page == "practice" else (
+        '<span class="ft-sep">·</span>\n<a href="%s%s">今日练习</a>' % (prefix, PRACTICE_FILE))
     return """<footer class="site-footer">
 <div class="sf-inner">
 <span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
 <span class="ft-sep">·</span>
 <a href="%sREADME.html">数据口径与来源</a>
 <span class="ft-sep">·</span>
-<a href="%sLICENSE">许可协议</a>
+<a href="%sLICENSE">许可协议</a>%s
 <a class="ft-top" href="#">回到顶部 ↑</a>
 </div>
-</footer>""" % (prefix, prefix)
+</footer>""" % (prefix, prefix, practice)
 
 
 def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter"):
@@ -349,7 +366,7 @@ def nav_targets(subject_key, slug):
 
 
 def page(title, sidebar, body, page_kind="chapter", subject_key=None, chapter=None,
-         extra=""):
+         extra="", head_extra="", with_mermaid=True, crumb_label=None):
     """渲染一个完整页面。
 
     page_kind 决定外壳资源的相对前缀（见 asset_prefix）与 body 上的翻章数据；
@@ -361,13 +378,14 @@ def page(title, sidebar, body, page_kind="chapter", subject_key=None, chapter=No
     if page_kind == "chapter" and subject_key and chapter:
         prev, nxt = nav_targets(subject_key, _slug_of(subject_key, chapter))
     body_attr = ' data-prev="%s" data-next="%s"' % (prev, nxt) if page_kind == "chapter" else ""
+    mermaid_tag = ('<script src="%smermaid.min.js"></script>\n' % p) if with_mermaid else ""
+    extra_head = ("\n" + head_extra) if head_extra else ""
     return """<!DOCTYPE html>
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>%s</title>
 <link rel="stylesheet" href="%sassets/site.css">
-<script src="%smermaid.min.js"></script>
-<script src="%sassets/site.js"></script></head>
+%s<script src="%sassets/site.js"></script>%s</head>
 <body%s>
 <a id="top"></a>
 <div class="read-progress"></div>
@@ -380,8 +398,8 @@ def page(title, sidebar, body, page_kind="chapter", subject_key=None, chapter=No
 %s
 <button class="to-top" type="button" aria-label="回到顶部">↑</button>
 <button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>
-</body></html>""" % (html.escape(title), p, p, p, body_attr,
-                     topbar_for(page_kind, subject_key, chapter),
+</body></html>""" % (html.escape(title), p, mermaid_tag, p, extra_head, body_attr,
+                     topbar_for(page_kind, subject_key, chapter, crumb_label=crumb_label),
                      sidebar,
                      head, body, extra,
                      footer_for(page_kind))
@@ -461,6 +479,11 @@ def build():
              '<p style="color:var(--fg2);font-size:15px;margin-bottom:18px">'
              '数据结构 · 计算机组成原理 · 操作系统 · 计算机网络</p>',
              home_subject_cards(),
+             # D-03 ①：练习入口放在 .home-subjects **之外**，不改变卡片数（F22）
+             '<p style="margin:16px 0 6px;font-size:15px">'
+             '<a href="%s" style="font-weight:600">今日练习 →</a> '
+             '<span style="color:var(--fg2)">按今日计划刷题、记录错题与掌握度'
+             '（数据只存在本机浏览器）</span></p>' % PRACTICE_FILE,
              '<div class="tw" style="margin:18px 0 26px"><table><thead><tr>'
              '<th>4 个科目</th><th>26 个知识点</th><th>60 张 ASCII 图</th>'
              '<th>52 张 Mermaid 图</th><th>完全离线可用</th>'
@@ -506,6 +529,51 @@ def home_subject_cards():
     return "".join(out)
 
 
+def practice_sidebar():
+    """练习页侧栏：练习视图导航（复用外壳类名；site.js 的筛选器此页不启用）。"""
+    items = [("today", "今日"), ("practice", "刷题"), ("wrong", "错题本"),
+             ("mock", "模拟考"), ("stats", "学习报告"), ("settings", "设置")]
+    out = ['<div class="sb-head"><span class="sb-title">练习闭环</span>'
+           '<a class="sb-home" href="index.html">全科合集</a></div>',
+           '<div class="sb-group"><div class="sb-group-t">练习</div>']
+    for key, label in items:
+        out.append('<a class="sb-chap" href="#/%s" data-view="%s">%s</a>'
+                   % (key, key, label))
+    out.append("</div>")
+    return '<nav class="site-sidebar">%s</nav>' % "\n".join(out)
+
+
+def practice_body():
+    """练习页主体：静态骨架 + 一个容器，路由与视图由 assets/practice.js 负责。"""
+    return """<div class="pv">
+<h1 class="pv-title">今日练习</h1>
+<p class="pv-sub">按每日目标刷题、记录错题与掌握度。数据只保存在本机浏览器，不上传。</p>
+<div id="practice-view" class="pv-view" aria-live="polite">
+<section class="pv-card"><p class="pv-note">正在加载题库…</p></section>
+</div>
+<noscript><section class="pv-card"><p class="pv-note">练习功能需要启用 JavaScript。</p></section></noscript>
+<p class="pv-build">练习功能正在搭建：当前为 M2 骨架，刷题 / 错题本 / 学习报告将在 M3 接入。</p>
+</div>"""
+
+
+def build_practice():
+    """写 练习.html（408 特有页面，契约 §2.3.1.A）。
+
+    - 套完整外壳（顶栏 / 侧栏 / 页脚），但**不含**六段锚点、不进 prev/next；
+    - 样式与行为全在 assets/practice.css / practice.js，site.css 与 site.js 零改动；
+    - 本页不加载 mermaid 运行时（用不到，省 5.5 MB）。
+    """
+    head_extra = ('<link rel="stylesheet" href="assets/practice.css">\n'
+                  '<script src="assets/quiz-data.js"></script>\n'
+                  '<script src="assets/practice.js"></script>')
+    html_text = page("今日练习 · 408 速成复习资料", practice_sidebar(), practice_body(),
+                     page_kind="practice", head_extra=head_extra, with_mermaid=False,
+                     crumb_label="今日练习")
+    with open(os.path.join(SITE, PRACTICE_FILE), "w", encoding="utf-8") as f:
+        f.write(html_text)
+    return PRACTICE_FILE
+
+
 def build_redirect_stubs():
     """在 408/<科目>/ 内写同名 .md.html 跳转页：点到 md 想看渲染版时用得上。"""
     made = 0
@@ -536,8 +604,10 @@ def copy_mermaid_runtime():
 def main():
     copy_mermaid_runtime()
     n = build()
+    practice = build_practice()
     stubs = build_redirect_stubs()
-    print("已生成 %d 个章节 HTML + 4 个科目首页 + 1 个全科单页 + %d 个跳转页" % (n, stubs))
+    print("已生成 %d 个章节 HTML + 4 个科目首页 + 1 个全科单页 + 1 个练习页（%s）"
+          " + %d 个跳转页" % (n, practice, stubs))
 
 
 if __name__ == "__main__":

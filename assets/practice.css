@@ -1,0 +1,94 @@
+/* 练习页样式（408 特有页面，PLAN-对齐与改版 §2.3.1.A）
+ *
+ * 这是**408 本地件**，与 Lerno-math 无关，不进共用件清单（site.css / site.js 才是）。
+ * 只用 site.css 里已有的 token，不新增配色与字体，保证与站内其它页面同一套视觉语言。
+ * 页面里没有内联 <style>（F23 强制），所有练习页样式都在这里。
+ */
+
+.pv {
+  padding: 6px 0 24px;
+}
+
+.pv-title {
+  font-size: 28px;
+  margin: 8px 0 6px;
+}
+
+.pv-sub {
+  color: var(--fg2);
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 0 20px;
+}
+
+.pv-view {
+  min-height: 300px;
+}
+
+.pv-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin: 0 0 14px;
+}
+
+.pv-h2 {
+  font-size: 17px;
+  margin: 0 0 8px;
+}
+
+.pv-text {
+  color: var(--fg);
+  font-size: 14.5px;
+  line-height: 1.8;
+  margin: 0 0 8px;
+}
+
+.pv-note {
+  color: var(--mut);
+  font-size: 13px;
+  line-height: 1.75;
+  margin: 6px 0 0;
+}
+
+.pv-list {
+  margin: 6px 0 0;
+  padding-left: 1.3em;
+  color: var(--fg2);
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.pv-alert {
+  color: #b45309;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.pv-alert code {
+  font-size: 12.5px;
+}
+
+.pv-build {
+  color: var(--mut);
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 18px 0 0;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+
+@media (max-width: 640px) {
+  .pv-title {
+    font-size: 23px;
+  }
+
+  .pv-card {
+    padding: 15px 16px;
+  }
+}

@@ -52,7 +52,10 @@ website/Lerno-cs/
 ├── assets/                      ★ 外壳样式与行为（手写源，必须入库）
 │   ├── site.css                 外壳样式（与 Lerno-math **逐字节相同**，勿就地改）
 │   ├── site.js                  外壳行为（与 Lerno-math **逐字节相同**，勿就地改）
+│   ├── practice.css             练习页样式（408 本地件，不进共用件清单）
+│   ├── practice.js              练习页行为（路由 + 视图，408 本地件）
 │   └── quiz-data.js             题库产物（**生成物**：build_quiz.py 从 parts/quiz/ 生成）
+├── 练习.html                    练习闭环页（**生成物**，408 特有页面，契约 §2.3.1.A）
 ├── README.html                  总览页（站点版 ＝ .docs/00-总览.md 渲染）
 ├── README.md                    仓库说明（部署 / 许可 / 数据可信度口径）
 ├── mermaid.min.js               本地 Mermaid 运行时（离线渲染）

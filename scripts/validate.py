@@ -681,6 +681,9 @@ def check_html():
                 err("408/%s/%s.html" % (s["dir"], t[6]), 0, "F16", "图文组件均缺失")
     # ---- 结构完整性 ----
 
+    practice = os.path.join(SITE, "练习.html")
+    if not os.path.exists(practice):
+        err("练习.html", 0, "F16", "缺少练习页（先跑 scripts/build_html.py）")
     idx = os.path.join(SITE, "index.html")
     if not os.path.exists(idx):
         err("408/index.html", 0, "F16", "缺少全科单页合集（先跑 scripts/build_html.py）")
@@ -939,7 +942,8 @@ def check_assets():
         pages.append(os.path.join(d, "index.html"))
         for t in T.TOPICS[k]:
             pages.append(os.path.join(d, t[6] + ".html"))
-    pages += [os.path.join(SITE, "index.html"), os.path.join(SITE, "README.html")]
+    pages += [os.path.join(SITE, "index.html"), os.path.join(SITE, "README.html"),
+              os.path.join(SITE, "练习.html")]          # 408 特有练习页（§2.3.1.A）
     for fp in pages:
         if not os.path.exists(fp):
             continue

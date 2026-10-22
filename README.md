@@ -64,9 +64,13 @@
 │   ├── index.html           科目首页（章节页面包屑的中间一层）
 │   ├── 01-….html …          各知识点页面
 │   └── 01-….md.html         同名跳转页（点到 md 时用）
+├── 练习.html                练习闭环页（今日 / 刷题 / 错题本 / 模拟考 / 报告）
 ├── assets/                 ★ 外壳样式与行为（手写源，必须入库）
 │   ├── site.css             站点外壳样式
-│   └── site.js              外壳行为（**与 Lerno-math 逐字共用**，勿就地改）
+│   ├── site.js              外壳行为（**与 Lerno-math 逐字共用**，勿就地改）
+│   ├── practice.css         练习页样式（408 本地件）
+│   ├── practice.js          练习页行为（408 本地件）
+│   └── quiz-data.js         题库产物（build_quiz.py 生成）
 ├── README.html             总览页（站点版）
 ├── mermaid.min.js          本地 Mermaid 运行时（离线渲染用）
 ├── .docs/                  ★ Markdown 归档（四科 md + README.md，供翻阅与再生成）
