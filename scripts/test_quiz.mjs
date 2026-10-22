@@ -180,9 +180,10 @@ try {
   fail(3, '启动 jsdom 失败：' + String((e && e.message) || e));
 }
 
-check('题库已加载（134 题 / 4 科）', () => {
+// 不钉死条数：题库会增长（M5 补题），条数一致性由 F31 负责；这里只证明"加载到了"。
+check('题库已加载（非空 / 4 科）', () => {
   const d = w.LERNO_QUIZ;
-  return !!d && Array.isArray(d.questions) && d.questions.length === 134 && d.subjects.length === 4
+  return !!d && Array.isArray(d.questions) && d.questions.length > 0 && d.subjects.length === 4
     ? true : `questions=${d && d.questions && d.questions.length} subjects=${d && d.subjects && d.subjects.length}`;
 });
 check('练习页外壳齐全（顶栏/侧栏/页脚）', () =>
