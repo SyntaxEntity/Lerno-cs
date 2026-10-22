@@ -20,6 +20,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
 SRC_DIR = os.path.join(ROOT, "parts", "quiz")
 OUT = os.path.join(ROOT, "assets", "quiz-data.js")
 SUBJECTS = ["ds", "co", "os", "net"]          # 固定顺序：哈希与产物都依赖它
@@ -54,6 +55,26 @@ def source_sha256(paths=None):
     return h.hexdigest()
 
 
+def subject_meta():
+    """科目与知识点的元数据：名字/目录/分值/章节标题都取自 scripts/meta.py。
+
+    练习页需要「科目 → 目录 → 章节标题」来渲染掌握度与跳转链接；如果让 JS 里再抄
+    一份，就是第二个数据源（改 meta 时必然漂移）。所以随产物一起下发。
+    """
+    import meta as T
+    out = []
+    for k in T.ORDER:
+        s = T.SUBJECTS[k]
+        out.append({
+            "key": k,
+            "name": s["name"],
+            "dir": s["dir"],
+            "score": s["score"],
+            "topics": [{"slug": t[6], "title": t[0]} for t in T.TOPICS[k]],
+        })
+    return out
+
+
 def load_questions(paths=None):
     """读出全部题目（跨科目按 id 排序），并做最小结构检查。"""
     if paths is None:
@@ -72,7 +93,8 @@ def build(out_path=OUT):
     paths = source_files()
     questions = load_questions(paths)
     sha = source_sha256(paths)
-    payload = {"version": 1, "sourceSha256": sha, "questions": questions}
+    payload = {"version": 1, "sourceSha256": sha, "subjects": subject_meta(),
+               "questions": questions}
     body = "window.LERNO_QUIZ = " + json.dumps(payload, ensure_ascii=False,
                                                separators=(",", ":")) + ";\n"
     header = (
