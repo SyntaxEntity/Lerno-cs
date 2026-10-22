@@ -908,7 +908,10 @@
       '<button class="pv-btn pv-btn-quiet" type="button" data-action="clear-data">清空学习数据</button>' +
       '<input type="file" id="pv-import" data-role="import-file" accept="application/json" hidden>' +
       '</div><p class="pv-note">导入会覆盖当前数据；导出的 JSON 里不含任何个人信息。</p></section>' +
-      '<section class="pv-card"><h2 class="pv-h2">关于</h2><p class="pv-note">M3 · 纯前端离线实现；题库 134 题，覆盖 26 个知识点。</p></section>';
+      '<section class="pv-card"><h2 class="pv-h2">关于</h2><p class="pv-note">纯前端离线实现；题库 ' +
+      ((bank() || []).length) + ' 题，覆盖 ' +
+      ((subjectsMeta() || []).reduce(function (n, s) { return n + s.topics.length; }, 0)) +
+      ' 个知识点。</p></section>';
   }
 
   function renderRoute() {

@@ -26,7 +26,7 @@
   {
    "id": "ds-02",
    "subject": "ds",
-   "topic": "01-线性表",
+   "topic": "03-栈与队列",
    "stem": "递归函数 f(n) 在 n > 1 时返回 f(n-1) + 1，否则返回 1。该递归算法的空间复杂度是：",
    "options": [
     "O(1)",
@@ -92,7 +92,7 @@
     "front == rear",
     "(rear + 1) % m == front",
     "rear == m - 1",
-    "front == (rear + 1) % m"
+    "rear == (front + 1) % m"
    ],
    "answer": 1,
    "explanation": "牺牲一个单元后，队空为 front == rear；队满为队尾再走一步就追上队头，即 (rear + 1) % m == front。",
@@ -388,7 +388,7 @@
    "id": "ds-21",
    "subject": "ds",
    "topic": "03-栈与队列",
-   "stem": "循环队列存放在大小为 10 的数组中，front = 5，rear = 2，队列中当前有多少个元素？",
+   "stem": "循环队列存放在大小为 10 的数组中，front 指向队头元素，rear 指向下一个入队位置。若 front = 5，rear = 2，队列中当前有多少个元素？",
    "options": [
     "3",
     "7",
@@ -556,7 +556,7 @@
     "250"
    ],
    "answer": 1,
-   "explanation": "每趟归并路数减少为原来的 1/4。4^4=256 < 1000，4^5=1024 ≥ 1000，因此需要 5 趟。",
+   "explanation": "每趟归并后归并段数减少为原来的 1/4（4 路归并的路数 k 不变）。4^4=256 < 1000，4^5=1024 ≥ 1000，因此需要 5 趟。",
    "source": "改编",
    "credit": "拾阶 408（授权）",
    "difficulty": 3,
@@ -587,7 +587,7 @@
   {
    "id": "ds-32",
    "subject": "ds",
-   "topic": "01-线性表",
+   "topic": "03-栈与队列",
    "stem": "递归计算 Fibonacci 数列（fib(n)=fib(n−1)+fib(n−2)）时，递归调用栈的最大深度约为：",
    "options": [
     "O(1)",
@@ -702,6 +702,44 @@
    "difficulty": 2,
    "tags": [
     "近乎有序"
+   ]
+  },
+  {
+   "id": "ds-41",
+   "subject": "ds",
+   "topic": "02-顺序表与链表",
+   "stem": "在单链表中，已知指针 p 指向某结点，若要在 p 之后插入结点 s，正确的指针操作顺序是：",
+   "options": [
+    "p->next = s; s->next = p->next;",
+    "s->next = p->next; p->next = s;",
+    "s->next = p; p->next = s;",
+    "p->next = s->next; s->next = p;"
+   ],
+   "answer": 1,
+   "explanation": "必须先把 p 原来的后继保存到 s->next，再让 p->next 指向 s。若先执行 p->next = s，p 的原后继地址就丢失了，链表会在 s 之后断开。",
+   "source": "自编",
+   "difficulty": 1,
+   "tags": [
+    "单链表插入"
+   ]
+  },
+  {
+   "id": "ds-42",
+   "subject": "ds",
+   "topic": "02-顺序表与链表",
+   "stem": "静态链表用数组模拟链表，其每个结点的 next 域存放的是：",
+   "options": [
+    "下一个结点在内存中的真实地址",
+    "下一个结点在数组中的下标（游标）",
+    "下一个结点的数据值",
+    "头结点的地址"
+   ],
+   "answer": 1,
+   "explanation": "静态链表用游标代替指针：next 存的是数组下标，用 -1（或约定的 0）表示链尾。它把链式逻辑建立在顺序存储上，插入删除仍不必移动元素，但容量固定、不能动态扩容。",
+   "source": "自编",
+   "difficulty": 2,
+   "tags": [
+    "静态链表"
    ]
   }
  ]
