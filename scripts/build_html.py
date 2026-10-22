@@ -320,8 +320,10 @@ def sidebar_for(subject_key=None, current=None, single_page=False, page="chapter
                     href = "%s/%s.html" % (s["dir"], t[6])
                 attr = ""
             cls = "sb-chap cur" if (current == t[6] and subject_key == k) else "sb-chap"
-            out.append('<a class="%s" href="%s"%s>%s <span class="tag">高频</span></a>'
-                       % (cls, href, attr, t[0]))
+            # D-09：没有考频数据（PENDING）就不标高频，侧栏也不能替它打标签
+            hot_tag = ' <span class="tag">高频</span>' if t[5] else ""
+            out.append('<a class="%s" href="%s"%s>%s%s</a>'
+                       % (cls, href, attr, t[0], hot_tag))
             # 当前章的六段锚点：直接跳到「只看易错点」那一段
             if current == t[6] and subject_key == k:
                 out.append('<div class="tocbox">')
@@ -449,7 +451,7 @@ def build():
             # 去掉章节正文自带的 h1 与 h2：
             #   h1 —— Markdown 归档顶部那一行 "数据结构 · 线性表"，章名已由 page()
             #         的 <h1>{章名}</h1> 给出，重复渲染会让读者看到同一标题连出三次；
-            #   h2 —— "线性表 [高频]"，同上（`[高频]` 26 个知识点全都有、无区分度，
+            #   h2 —— "线性表 [高频]"，同上（`[高频]` 只出现在有考频数据的章节，已无区分度，
             #         而它带来的 `id="_2" id="kp"` 还是**重复 id 属性**，非法 HTML）。
             # 旧写法 `re.sub(r"<h2([^>]*)>", r'<h2\1 id="kp">', …)` 更糟：给一个已经
             # 有 id 的 h2 再插一个 id，等于把非法 HTML 固化下来。
