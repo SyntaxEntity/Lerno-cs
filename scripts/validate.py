@@ -602,6 +602,7 @@ def check_links():
                 # 允许三种落点：与所在 md 同目录、相对归档根、或站点里的跳转页
                 cands = [os.path.join(os.path.dirname(f), target),
                          os.path.join(DOCS, target),
+                         os.path.join(SITE, target),          # 站内根页面（如 练习.html）
                          os.path.join(SITE, target + ".html")]
                 if target.endswith(".md"):
                     cands.append(os.path.join(SITE, target[:-3] + ".md.html"))

@@ -24,6 +24,9 @@
 
 共 `60` 张 ASCII 图 + `52` 张 Mermaid 图。
 
+另有**练习闭环页** [`练习.html`](练习.html)：140 道单选题 + 今日计划 / 刷题 / 错题本 /
+限时模拟 / 学习报告，数据只存本机（见第八节）。
+
 ## 二、试卷结构（客观事实）
 
 | 项目 | 内容 |
@@ -123,9 +126,11 @@ python3 scripts/normalize_md.py      # Markdown 空行规范化（幂等）
 python3 scripts/split_explain.py     # 长段落自动分段
 python3 scripts/build.py             # 由 parts/ + meta.py 组装 .docs/ 的 Markdown
 python3 scripts/gen_summary.py       # 刷新 .docs/00-总览.md 的考频总表
+python3 scripts/build_quiz.py        # parts/quiz/*.json → assets/quiz-data.js（练习页题库）
 python3 scripts/build_html.py        # 由 .docs/ 生成仓库根的静态站点
 python3 scripts/validate.py          # 校验形式层，含 mermaid 真实解析
 python3 scripts/validate.py --parts  # 校验 parts/ 半成品（写内容时的内层循环）
+node scripts/test_quiz.mjs           # 练习页行为测试（jsdom；validate 的 F32 会跑它）
 ```
 
 依赖版本由 `scripts/requirements.txt` 与 `scripts/tools-package.json` 锁定，
@@ -174,6 +179,28 @@ python3 scripts/validate.py --parts  # 校验 parts/ 半成品（写内容时的
 
 `parts/` 是内容源，`scripts/build.py` 会把统计数字与模板骨架注入 `.docs/`。
 **不要直接改 `.docs/` 或站点 HTML**，重新生成会覆盖。
+
+## 八、练习闭环（`练习.html`，408 特有）
+
+**是什么**：140 道单选题驱动的回环——今日计划 → 刷题 → 即时判分 → 错题本 →
+掌握度 → 学习报告 → 次日计划；另有三种限时模拟（全科 20 题 / 单科 15 题 /
+薄弱点 10 题）。题目覆盖 26 个知识点（每个 5–8 题），其中 134 道改编自授权题库、
+6 道自编；来源与审校记录见 [`parts/quiz/README.md`](parts/quiz/README.md)。
+
+**数据只在本机**：作答、错题、掌握度全部存在浏览器 `localStorage`
+（键 `lerno-quiz-v1`），不上传任何服务器；换设备或清理浏览器数据前，请用
+「设置 → 导出备份」。浏览器禁用本地存储时，页面会**明确提示**并降级为内存模式。
+
+**判分与掌握度**：
+- 练习模式：选完立即判分并显示解析，答错自动进错题本；
+- 模拟模式：限时、答题时不显示对错、交卷后统一解析，未作答按错误计分；
+- 考点掌握度按**累计**答对算：≥4 次「已掌握」、≥2 次「复习中」，答错降回「学习中」；
+- 错题按**连续**答对 2 次判「已掌握」。
+
+（两处语义不同，页面上也分别写明——这是刻意与"看起来像"的实现区分的。）
+
+**与内容页的关系**：练习是补充入口，不替代阅读；每道题都标所属知识点，可跳回对应章节。
+章节正文与题库由两层门禁分别守住（`F1`–`F29` 管内容与外壳，`F30`–`F32` 管题库与练习行为）。
 
 ---
 

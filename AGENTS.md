@@ -143,6 +143,11 @@ node scripts/test_quiz.mjs             # 练习页行为测试（jsdom；validat
 - **题库只改 `parts/quiz/*.json`**，然后跑 `build_quiz.py` + `validate.py`；
   `assets/quiz-data.js` 是生成物（F31 会核对源哈希与题目内容，手改必报错）。
   题库字段、来源与授权见 `parts/quiz/README.md`。
+- **练习页是 408 特有页面**（契约 §2.3.1.A）：`练习.html` 由 `build_html.py` 生成，
+  样式与行为在 `assets/practice.css` / `assets/practice.js`（**不进共用件清单**，
+  `site.css` / `site.js` 保持零改动）。`practice.js` 里**不得**出现
+  fetch / XHR / WebSocket（F32 静态断言）；改它必须让 `node scripts/test_quiz.mjs`
+  通过——F32 已进门禁（26 条断言，缺 node/jsdom/脚本都是 error）。
 - 考频/真题数据凡不能核实的，标注「考频待补充」或「真题改编」，**不许编造**。
   数据口径与可信度分级见 `README.md` 第三节。
 - 站点是完全离线的纯静态页，改完直接用浏览器打开 `index.html` 验证，无需起服务器。
