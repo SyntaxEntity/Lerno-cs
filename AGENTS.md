@@ -103,6 +103,7 @@ python3 scripts/build_html.py      # .docs/ → 仓库根的静态站点
 python3 scripts/validate.py        # 校验形式层（含 mermaid 真解析与外壳行为测试）
 python3 scripts/validate.py --parts   # 校验 parts/ 半成品（写内容时的内层循环）
 python3 scripts/reverse_tests.py       # 反向测试：每条规则注入反例，确认真会报错
+node scripts/test_quiz.mjs             # 练习页行为测试（jsdom；validate 的 F32 会跑它）
 ```
 
 > **新增校验规则必须同时加反向测试**：元校验会比对"规则集合 ≡ 反向测试覆盖集合"

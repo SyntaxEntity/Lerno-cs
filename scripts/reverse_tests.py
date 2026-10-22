@@ -346,6 +346,14 @@ case("F31", "产物头部源哈希被改", QUIZ_JS,
      lambda t: t.replace("sourceSha256 = ", "sourceSha256 = 0", 1),
      expect_kw="源哈希不一致")
 
+# F32：练习页行为测试（jsdom）
+#   删掉「练习模式作答后写状态」这一行：页面看起来还能点、还能看解析，但统计/错题/
+#   掌握度全部不再更新——正是"看起来能跑、其实坏了"的典型，必须被行为测试抓住。
+PRACTICEJS = os.path.join(SITE, "assets", "practice.js")
+case("F32", "删掉练习判分记录（闭环失效）", PRACTICEJS,
+     lambda t: t.replace("recordAnswer(q, i, 'practice');", "", 1),
+     expect_kw="练习行为测试未通过")
+
 
 # ---------------------------------------------------------------------------
 # 执行器

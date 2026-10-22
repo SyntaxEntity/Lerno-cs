@@ -35,6 +35,9 @@
   F27 元校验：规则集合 ≡ 反向测试覆盖集合，且扫描型规则的受检对象数 > 0
   F28 文档与 CI 不得硬编码规则范围（范围以本脚本输出为准）
   F29 site.css 语法自检（花括号/圆括号/方括号配平、规则头完整、@media 块配平）
+  F30 题库源完整性（parts/quiz/*.json：字段/答案/解析/来源）
+  F31 题库产物一致性（assets/quiz-data.js 的源哈希/条数/id 集合/题目内容）
+  F32 练习页行为测试（jsdom 真跑「练习→判分→错题→报告→模拟→持久化」）
 用法： python3 scripts/validate.py [--stats]
 """
 import glob
@@ -1218,6 +1221,52 @@ def check_site_js_behavior():
         err("site.js", 0, "F26", "行为测试未产出可解析的通过计数，无法确认真的跑了")
 
 
+def check_practice_behavior():
+    """F32: 练习页行为测试（jsdom 跑 scripts/test_quiz.mjs）。
+
+    练习闭环的状态机全在 assets/practice.js：判分、掌握度（累计 vs 连续）、
+    错题本、模拟交卷、持久化。它不能只是"看起来对"——这里把整条回环点一遍。
+
+    缺 node / jsdom / 测试脚本都是 error，不静默跳过（D-06）。断言数计入
+    `quiz_behavior_tests`（H3），报告里打印 N/N（D-04）。
+    """
+    tester = os.path.join(ROOT, "scripts", "test_quiz.mjs")
+    if not os.path.exists(tester):
+        err("scripts", 0, "F32", "找不到练习行为测试脚本 scripts/test_quiz.mjs（必须入库）")
+        return
+    if shutil.which("node") is None:
+        err("练习.html", 0, "F32", "找不到 node，无法跑练习行为测试")
+        return
+    if _node_version("jsdom") is None:
+        err("练习.html", 0, "F32", "缺少 jsdom（见 scripts/tools-package.json）")
+        return
+    try:
+        r = subprocess.run(["node", tester, "--strict"], cwd=ROOT,
+                           capture_output=True, text=True, timeout=600)
+    except Exception as e:                                   # noqa: BLE001
+        err("练习.html", 0, "F32", "调用练习行为测试失败：%s" % e)
+        return
+    data = None
+    try:
+        data = json.loads((r.stdout or "").strip().splitlines()[-1])
+    except Exception:                                        # noqa: BLE001
+        data = None
+    if r.returncode != 0:
+        failed = [f.get("name", "?") for f in (data or {}).get("failed", [])][:3]
+        tail = ((r.stderr or "").strip().splitlines() or [""])[-1][:160]
+        err("练习.html", 0, "F32",
+            "练习行为测试未通过（退出码 %d）%s：%s"
+            % (r.returncode,
+               ("；失败项 " + "、".join(failed)) if failed else "",
+               tail))
+        return
+    if not data or not data.get("total"):
+        err("练习.html", 0, "F32", "行为测试未产出可解析的断言计数，无法确认真的跑了")
+        return
+    stats["quiz_behavior_tests"] = int(data.get("ok", 0))
+    stats["quiz_behavior_total"] = int(data.get("total", 0))
+
+
 def rule_codes():
     """枚举本文件里实际会报出的规则码（H2 的"规则集合"）。
 
@@ -1513,18 +1562,18 @@ def check_quiz_artifact():
 # 它们的受检数天然可以为 0。
 SCAN_RULES_MUST_BE_NONZERO = [
     "F0", "F1", "F3", "F8", "F12", "F15", "F16", "F17", "F22", "F23", "F24", "F26",
-    "F29", "F30", "F31", "F28",
+    "F29", "F30", "F31", "F32", "F28",
 ]
 # 这些扫描型规则只在**成品模式**运行（查 .docs/、HTML、链接、共用件），
 # --parts 模式下不要求它们上报受检数（否则会报"什么都没检查"的假错）。
-FULL_ONLY_SCAN = {"F8", "F12", "F15", "F16", "F17", "F22", "F23", "F26", "F28", "F29"}
+FULL_ONLY_SCAN = {"F8", "F12", "F15", "F16", "F17", "F22", "F23", "F26", "F28", "F29", "F32"}
 
 OBJECT_STAT_KEY = {
     "F0": "F0_files", "F1": "F1_sections", "F3": "F3_objects", "F8": "F8_objects",
     "F12": "orig", "F15": "F15_objects", "F16": "F16_objects", "F17": "F17_objects",
     "F22": "shell_nav_pages", "F23": "F23_objects", "F24": "F24_objects",
     "F26": "site_js_tests", "F29": "F29_objects", "F30": "F30_objects",
-    "F31": "F31_objects", "F28": "F28_objects",
+    "F31": "F31_objects", "F32": "quiz_behavior_tests", "F28": "F28_objects",
 }
 
 
@@ -1816,6 +1865,7 @@ def main():
     # 题库：源在 parts/quiz/，产物在 assets/。两条规则都上报受检数，必须在 F27 之前跑。
     check_quiz_bank()
     check_quiz_artifact()
+    check_practice_behavior()
     # F28 也上报受检数，同样必须排在 F27 之前（原先排在后面，H3 只能放过它）
     check_doc_scope()
     check_meta()
@@ -1988,6 +2038,9 @@ def report(title, parts_mode=False):
     if stats.get("site_js_tests"):
         print("  外壳行为测试 %d/%d 通过（jsdom，复用数学二）"
               % (stats["site_js_tests"], stats.get("site_js_total", 0)))
+    if stats.get("quiz_behavior_tests"):
+        print("  练习闭环行为测试 %d/%d 通过（jsdom，F32）"
+              % (stats["quiz_behavior_tests"], stats.get("quiz_behavior_total", 0)))
     # 共用件的**逐字节**比对只在同工作区有兄弟仓库时才能做（CI 里没有），
     # 所以把「实际比了几项」打出来：跑没跑一眼可见，不靠猜。
     if stats.get("shared_compared"):
