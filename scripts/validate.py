@@ -4,7 +4,8 @@
 
 校验项（**真实编号以运行报告末尾的「规则 N 条：…」为准**；F18—F21 是历史空洞）：
   F0 交付物完整性：文件非空、每个知识点文件含 '## 知识点' 小节、四科半成品齐全
-  F1 每个 ## 小节必须含 6 个模板字段，且顺序为
+  F1 每个 ## 小节必须含 6 个模板字段；[高频] 标记必须与本节「考频统计」一致——
+     考频待补充不得标 [高频]，有数据必须标（D-09，双向校验）
      考频统计→核心讲解→关键结论速记→示意图→易错点→真题示例
   F2 考频统计行必须与 scripts/meta.py 的权威数据逐字一致
   F3 代码围栏必须成对闭合，示意图必须带语言标签（text/mermaid）；
@@ -14,7 +15,7 @@
   F4 禁止占位符（TODO / 待补充讲解 / XXX / 略 等）
   F5 ASCII 示意图不得混入全角/中文字符（会破坏等宽对齐），不得含制表符
   F6 真题示例必须标注年份，且年份落在 2009—2025 区间
-  F7 高频标记 [高频] 必须出现在小节标题中
+  F7 有考频数据的小节必须标 [高频]（warn；待补充的小节不告警，error 由 F1 报）
   F8 每个知识点必须有 ≥1 个 ASCII 图，且 ≥1 个 Mermaid 图（复杂流程）
   F9 核心讲解 句数（中文句号/分号切分）不少于 3 句
   F10 易错点 条目数 2—4 条
@@ -213,11 +214,23 @@ def validate_file(path, subject_key, is_overview=False):
     for idx, (start, title) in enumerate(sections):
         if is_overview:
             continue
-        if not title.endswith("[高频]"):
-            err(rel, start + 1, "F1", "## 小节《%s》不是知识点小节（标题未以 [高频] 结尾），每个 ## 小节都必须是知识点" % title)
         end = sections[idx + 1][0] if idx + 1 < len(sections) else len(lines)
         body = lines[start:end]
         body_text = "\n".join(body)
+
+        # F1/F7 高频标记（D-09）：判据取自本节正文的「考频统计」行，
+        # 不另外维护"哪些章没有考频"的名单——名单会漂移，正文不会。
+        hot = title.endswith("[高频]")
+        plain_title = title[:-len("[高频]")].strip() if hot else title
+        freq_lines = [ln for ln in body if ln.startswith("**考频统计**")]
+        pending = bool(freq_lines) and "考频待补充" in freq_lines[0]
+        if freq_lines:
+            if pending and hot:
+                err(rel, start + 1, "F1",
+                    "小节《%s》考频为「考频待补充」却标了 [高频]（没有数据支撑的标签）" % plain_title)
+            elif not pending and not hot:
+                err(rel, start + 1, "F1",
+                    "小节《%s》有考频数据却没有标 [高频]" % plain_title)
 
         # F1 顺序与存在性（按字段名定位，避免字段增删导致下标错位）
         pos_by_field = {}
@@ -239,8 +252,7 @@ def validate_file(path, subject_key, is_overview=False):
             ends = [v for v in pos_by_field.values() if v > i]
             return body[i:(min(ends) if ends else len(body))]
 
-        # F2 考频统计一致性
-        freq_lines = [ln for ln in body if ln.startswith("**考频统计**")]
+        # F2 考频统计一致性（freq_lines 已在 F1/F7 处取到）
         if freq_lines:
             expect = None
             for t in T.TOPICS.get(subject_key, []):
@@ -270,11 +282,11 @@ def validate_file(path, subject_key, is_overview=False):
                 if not (2009 <= y <= 2025):
                     err(rel, start + 1 + tr_idx, "F6", "真题年份 %d 超出 2009—2025 区间" % y)
 
-        # F7 高频标记
-        if "[高频]" in title:
+        # F7 高频标记（D-09：待补充的小节不告警；标签与数据是否匹配由 F1 判）
+        if hot:
             stats["hot"] += 1
-        else:
-            warn(rel, start + 1, "F7", "小节《%s》标题未标记 [高频]" % title)
+        elif not pending:
+            warn(rel, start + 1, "F7", "小节《%s》标题未标记 [高频]" % plain_title)
 
         # F9 核心讲解句数
         cp_idx = pos_by_field.get("**核心讲解**")

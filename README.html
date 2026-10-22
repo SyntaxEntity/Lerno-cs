@@ -293,7 +293,7 @@
 <td><a href="数据结构/08-绪论与算法分析.md.html"">绪论与算法分析</a></td>
 <td>考频待补充</td>
 <td>未统计</td>
-<td><strong>是</strong></td>
+<td>否</td>
 </tr>
 <tr>
 <td>数据结构</td>
@@ -357,7 +357,7 @@
 <td><a href="计算机组成原理/07-计算机系统概述.md.html"">计算机系统概述</a></td>
 <td>考频待补充</td>
 <td>未统计</td>
-<td><strong>是</strong></td>
+<td>否</td>
 </tr>
 <tr>
 <td>计算机组成原理</td>
@@ -618,13 +618,13 @@ node scripts/test_quiz.mjs            # 练习页行为测试（jsdom；validate
 编号存在历史空洞 <code>F18</code>—<code>F21</code>）：</p>
 <ul>
 <li><code>F0</code> 交付物完整性（文件非空、每个知识点含 <code>## 知识点</code> 小节、四科半成品齐全）；</li>
-<li><code>F1</code> 每个知识点的六段式模板字段齐全且<strong>顺序正确</strong>；</li>
+<li><code>F1</code> 每个知识点的六段式模板字段齐全且<strong>顺序正确</strong>；<code>[高频]</code> 标记必须与本节的「考频统计」<strong>双向一致</strong>——考频待补充不得标、有数据必须标（D-09）；</li>
 <li><code>F2</code> 正文的<strong>考频统计行与 <code>scripts/meta.py</code> 逐字一致</strong>（防止正文、总表、索引三处数字不一致）；</li>
 <li><code>F3</code> 代码块必须带 <code>text</code>/<code>mermaid</code> 语言标签、围栏成对闭合、<code>mermaid</code> 无孤立花括号与非法字符（含"圆括号未用引号包裹"这一会导致 mermaid 解析失败的写法）；</li>
 <li><code>F4</code> 禁止占位符（<code>TODO</code> / 待补充讲解 / <code>XXX</code> 等）；</li>
 <li><code>F5</code> <strong>ASCII 图内不得出现全角字符或制表符</strong>（否则等宽对齐会被破坏）；</li>
 <li><code>F6</code> 真题年份必须落在 <code>2009—2025</code>；</li>
-<li><code>F7</code> 高频标记 <code>[高频]</code> 必须出现在小节标题中（<code>warn</code> 级）；</li>
+<li><code>F7</code> 有考频数据的小节必须标 <code>[高频]</code>（<code>warn</code> 级；考频待补充的小节不告警）；</li>
 <li><code>F8</code> 每个知识点必须同时具备 ASCII 图与 Mermaid 图；</li>
 <li><code>F9</code>/<code>F10</code>/<code>F11</code> 核心讲解句数、易错点条数、关键结论速记条数在规范区间内；</li>
 <li><code>F12</code> README 声明的"已核对原题"清单与正文标注<strong>双向逐条一致</strong>；</li>
@@ -651,7 +651,7 @@ npm install --prefix .tools --cache /tmp/npm-cache --no-audit --no-fund
 <hr />
 <h2 id="_7">七、使用建议（时间紧张时）</h2>
 <ol>
-<li><strong>只看 <code>[高频]</code> 小节</strong>：本版 28 个章节全部标记为 <code>[高频]</code>（均在统计区间内反复命题），若时间极紧，按第三节的优先级顺序逐个过。</li>
+<li><strong>只看 <code>[高频]</code> 小节</strong>：本版 28 个章节中 26 个有可核对数据、标 <code>[高频]</code>；2 个新增章节考频待补充，<strong>不标</strong>（没有数据就不给标签，见第二节口径）。若时间极紧，按第三节的优先级顺序逐个过。</li>
 <li><strong>每节只读三段</strong>：<code>考频统计</code> 判断要不要细看 → <code>关键结论速记</code> 快速回忆公式 → <code>易错点</code> 排雷；<code>核心讲解</code> 在回忆不起来时再读。</li>
 <li><strong>图形优先</strong>：<code>示意图</code> 中的 ASCII 图与 Mermaid 图是"考场默写"的模板，尤其是 Cache 地址划分、<code>IP</code> 分片、流水线时空图、五状态转换图、<code>TCP</code> 握手挥手这几张。</li>
 <li><strong>真题示例当自测</strong>：先不看解析作答，再对照解析检查推导链是否完整。</li>
