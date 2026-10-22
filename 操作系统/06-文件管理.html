@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -26,7 +27,8 @@
 <a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../计算机组成原理/07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -63,15 +65,21 @@
 
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2012、2014、2016、2018、2020、2022、2023、2024；分数占比约 16%；主要题型：选择题 + 综合应用题（文件物理结构、目录、磁盘空间）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
-<p>文件管理把磁盘上的物理块抽象为按名访问的逻辑文件：文件逻辑结构分无结构流式（顺序文件）与有结构记录式（顺序、索引、索引顺序、散列），物理结构分连续、链接（隐式/显式 FAT）、索引（单级/多级/混合），其中 UNIX 混合索引的最大文件长度 = <code>D*a + I*a + I^2*a + I^3*a</code>，<code>D</code>、<code>I</code> 为直接与一级间接地址项个数，<code>a</code> 为盘块大小，逐项相加不得漏掉直接项。目录本质是文件名到 FCB 的映射表，采用索引结点（inode）后把文件名与除名字外的属性分离，目录项只留<code>文件名 + inode 号</code>，使检索时一个盘块能容纳更多目录项、显著减少 I/O 次数。文件共享靠硬链接（多个目录项指向同一 inode，<code>count</code> 计数，删除只减计数，为 0 才真正回收）与软链接（新建一个存放路径名的文件，删除原文件后软链接失效成为悬空链接）。</p>
+<p>文件管理把磁盘上的物理块抽象为按名访问的逻辑文件：文件逻辑结构分无结构流式（顺序文件）与有结构记录式（顺序、索引、索引顺序、散列），物理结构分连续、链接（隐式/显式 FAT）、索引（单级/多级/混合），其中 UNIX 混合索引的最大文件长度 = <code>D*a + I*a + I^2*a + I^3*a</code>，<code>D</code>、<code>I</code> 为直接与一级间接地址项个数，<code>a</code> 为盘块大小，逐项相加不得漏掉直接项。</p>
+<p><strong>物理结构的对比</strong>按"能否随机访问、有无外部碎片"两个口径看：<strong>连续分配</strong>支持随机访问且最快，但会产生<strong>外部碎片</strong>、文件不易动态增长、必须预先知道长度；<strong>链接分配</strong>用指针把盘块串成链，<strong>隐式链接</strong>把指针存在每个盘块里、只能顺序访问且任一处指针损坏就丢失后续内容，<strong>显式链接</strong>把指针集中到内存中的<strong>文件分配表 FAT</strong>（表项下标是块号、表项内容是下一块号），因而支持随机访问，代价是 FAT 要常驻内存；<strong>索引分配</strong>为每个文件建一个索引块、登记它的全部盘块号，支持随机访问且没有外部碎片，代价是索引块本身占空间，大文件还需多级或混合索引。</p>
+<p><strong>FAT16</strong> 每个表项占 16 位，故簇号上限为 <code>2^16 = 65536</code> 个（簇号 <code>0</code>、<code>1</code> 保留，实际可用约 <code>65534</code> 个），因此<strong>最大分区 ≈ 簇数上限 × 簇大小</strong>、<strong>最大文件 ≈ 单文件可占簇数上限 × 簇大小</strong>，例如簇大小取 <code>32 KB</code> 时两者都约为 <code>2 GB</code>；由此可知要扩大容量只能加大簇，而簇越大内部碎片越严重。</p>
+<p>目录本质是文件名到 FCB 的映射表，采用索引结点（inode）后把文件名与除名字外的属性分离，目录项只留<code>文件名 + inode 号</code>，使检索时一个盘块能容纳更多目录项、显著减少 I/O 次数。文件共享靠硬链接（多个目录项指向同一 inode，<code>count</code> 计数，删除只减计数，为 0 才真正回收）与软链接（新建一个存放路径名的文件，删除原文件后软链接失效成为悬空链接）。</p>
+<p><strong>虚拟文件系统 VFS</strong> 在系统调用接口与各具体文件系统之间提供统一的抽象（<code>inode</code>、<code>dentry</code>、<code>file</code>、<code>super_block</code> 等对象与一组统一的 <code>open</code>/<code>read</code>/<code>write</code> 操作），使 <code>ext4</code>、<code>FAT</code>、<code>NFS</code> 等以同样的方式被访问；<strong>挂载 <code>mount</code></strong> 把某个文件系统实例接到目录树中的一个<strong>挂载点</strong>上，此后访问该目录即进入被挂载文件系统的根目录，<code>umount</code> 则把挂载点摘除。</p>
 <p>磁盘空间管理常用位示图、空闲链表、成组链接法；位示图的字号 <code>i</code>、位号 <code>j</code> 与块号换算按从 1 开始编号时为 <code>块号 = (i-1)*n + j</code>（<code>n</code> 为每字位数），从 0 开始编号时 <code>块号 = i*n + j</code>，两者必须与题设口径统一。进程访问文件先查进程打开文件表（含文件描述符、读写偏移、访问权限），表项指向系统打开文件表的全局表项（含 inode 指针、引用计数），再由 inode 逐级查目录与磁盘，最终由页/块缓存完成 <code>read</code>。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
-<li><code>最大文件长度 = D*a + I*a + I^2*a + I^3*a</code> —— 直接、一级、二级、三级间接地址项逐项求和，<code>a</code> 为盘块大小，物理块号还需占用地址项宽度（如 4B）。</li>
-<li><code>一级间接可指块数 = a / 地址项字节数</code> —— 索引块本身占一个盘块，能放的指针个数由此决定，再逐级平方或立方。</li>
+<li><code>最大文件长度 = D*a + I*a + I^2*a + I^3*a</code> —— 直接项与各级间接项都要乘盘块大小 <code>a</code>、间接项按层数取幂，每级可指块数 <code>= a / 地址项字节数</code>；漏乘 <code>a</code> 或漏掉直接项都会算小。</li>
 <li><code>inode 把文件名与属性分离</code> —— 目录项只存<code>文件名 + inode 号</code>，检索路径名时目录占块少、命中率高，一个文件可被多个目录项共享。</li>
 <li><code>硬链接 = 共享同一 inode + count++</code>；<code>软链接 = 新建文件存原路径</code> —— 删原文件后硬链接仍可访问数据，软链接变为悬空链接。</li>
 <li><code>位示图 n 位/字</code> —— 从 1 开始编号 <code>块号 = (i-1)*n + j</code>；从 0 开始编号 <code>块号 = i*n + j</code>，<code>j</code> 为字内位号。</li>
 <li><code>打开文件表两级</code> —— 进程表项（fd、读写位置、权限）唯一指向系统打开文件表项（inode 指针、引用计数），<code>read</code> 只改进程表项的偏移。</li>
+<li><code>连续随机访问快但有外部碎片；隐式链接只能顺序访问，显式链接靠内存 FAT 支持随机访问；索引分配随机访问、无外部碎片</code> —— 索引块本身占空间是索引分配的代价。</li>
+<li><code>FAT16：16 位表项 -&gt; 簇数上限 2^16</code> —— 最大分区 ≈ 簇数上限 × 簇大小，最大文件也受可占簇数 × 簇大小限制，簇越大上限越高而内部碎片越多。</li>
+<li><code>VFS 用统一的 inode/dentry/file 抽象屏蔽具体文件系统</code> —— <code>mount</code> 把文件系统挂到目录树的挂载点上，挂载不复制数据、也不改其内部结构。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>hybrid-index inode layout  (a = block size, w = address width, k = a / w)
@@ -100,6 +108,22 @@
  1-level      1             256
  2-level      2             256 * 256
  3-level      3             256 * 256 * 256
+</code></pre></div>
+<p><strong>三种物理结构的串联方式与 FAT16 的上限</strong>：连续分配的盘块在盘上相邻，链接分配靠指针串起，索引分配用索引块集中登记；指针放在盘块里只能顺序走，集中到内存 FAT 后才能随机跳。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>file allocation methods
+
+  continuous   [0][1][2][3]         random access, external fragment
+  linked       [0|3]-&gt;[3|7]-&gt;[EOF]  sequential only, ptr inside block
+  explicit FAT FAT[0]=3 FAT[3]=7    table in MEMORY, random access OK
+  index        idx=[0|3|7]          random access, no ext fragment;
+                                    costs one index block per file
+
+FAT16 size limits
+
+  16-bit entry -&gt; at most 2^16 = 65536 clusters (0 and 1 reserved)
+  max partition ~= cluster count * cluster size
+  max file      ~= max clusters per file * cluster size
+  e.g. cluster = 32 KB -&gt; both about 2 GB
 </code></pre></div>
 <div class="fig"><div class="mermaid" data-src="flowchart TD
     A1[进程调用 open 路径] --&gt; A2{查进程打开文件表}
@@ -146,9 +170,9 @@
 </code></pre></details></div>
 </div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>算最大文件长度时漏掉直接地址项或漏乘盘块大小：正确做法是<code>直接项数*a + 一级间接项数*a + k*a + k^2*a + k^3*a</code>，<code>k</code> 由盘块大小除以地址项字节数得到，每一项都要乘 <code>a</code>。</li>
-<li>把软链接说成共享索引结点：软链接是新建的独立文件，自身有 inode，内容只是原文件路径名；只有硬链接才共享同一 inode 并靠引用计数决定回收时机。</li>
+<li>把软链接说成共享 inode、或把挂载当成"把文件系统复制进当前目录"：软链接是独立文件、自身有 inode，内容只是原路径名，删原文件即悬空；<code>mount</code> 只是把另一个文件系统接到目录树的挂载点上，访问路径改由该文件系统解析，并不复制数据。</li>
 <li>位示图块号与字号位号换算搞错起始编号：题设从 1 开始时<code>块号 = (i-1)*n + j</code>，从 0 开始时<code>块号 = i*n + j</code>，且同一题内字号、位号、块号必须同口径。</li>
-<li>混淆两级打开文件表：进程打开文件表存 fd、读写偏移与权限，系统打开文件表存 inode 指针与引用计数；<code>read</code> 改变的是进程表项的偏移，<code>fork</code> 后父子可共享该偏移。</li>
+<li>混淆链接分配的随机访问能力、并把 FAT16 的上限只归因于簇大小：隐式链接只能顺序访问，只有把指针集中到内存 FAT 的显式链接才支持随机访问；FAT16 的簇数上限由 16 位表项固定为 <code>2^16</code>，最大分区 ≈ 簇数上限 × 簇大小。</li>
 </ul>
 </div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2010 年 408 第 46 题（综合应用题，8 分）</span></p>

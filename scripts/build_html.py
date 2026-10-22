@@ -22,6 +22,7 @@
 
 用法： python3 scripts/build_html.py
 """
+import glob
 import html
 import os
 import re
@@ -472,6 +473,17 @@ def build():
                          sidebar_for(k, None, page="overview"), ov_body,
                          page_kind="overview", subject_key=k, chapter=s["name"]))
 
+    # 落地页统计数字：从 .docs 实际内容与 meta 现算，避免补章节后写死的数字过期
+    ascii_n = mer_n = 0
+    for f in glob.glob(os.path.join(DOCS, "*", "*.md")):
+        if os.path.basename(f).startswith("00-"):
+            continue                      # 科目总览页是章节内容的汇总副本，不重复计数
+        with open(f, encoding="utf-8") as fh:
+            txt = fh.read()
+        ascii_n += len(re.findall(r"^```text\s*$", txt, re.M))
+        mer_n += len(re.findall(r"^```mermaid\s*$", txt, re.M))
+    topic_n = sum(len(v) for v in T.TOPICS.values())
+
     # 全科单页合集（落地页）
     parts = ['<a id="top"></a>',
              '<h1 style="font-size:32px;margin-bottom:10px">408 计算机学科专业基础综合'
@@ -484,10 +496,10 @@ def build():
              '<a href="%s" style="font-weight:600">今日练习 →</a> '
              '<span style="color:var(--fg2)">按今日计划刷题、记录错题与掌握度'
              '（数据只存在本机浏览器）</span></p>' % PRACTICE_FILE,
-             '<div class="tw" style="margin:18px 0 26px"><table><thead><tr>'
-             '<th>4 个科目</th><th>26 个知识点</th><th>60 张 ASCII 图</th>'
-             '<th>52 张 Mermaid 图</th><th>完全离线可用</th>'
-             '</tr></thead></table></div>',
+             ('<div class="tw" style="margin:18px 0 26px"><table><thead><tr>'
+              '<th>4 个科目</th><th>%d 个知识点</th><th>%d 张 ASCII 图</th>'
+              '<th>%d 张 Mermaid 图</th><th>完全离线可用</th>'
+              '</tr></thead></table></div>') % (topic_n, ascii_n, mer_n),
              '<p class="warn">本页把四科全部内容合并为单页：左侧目录可折叠与筛选，'
              '右下角可切换深浅色，支持 Ctrl+F 全文检索；每个知识点均按'
              '「考频统计 → 核心讲解 → 关键结论速记 → 示意图 → 易错点 → 真题示例」组织。</p>']

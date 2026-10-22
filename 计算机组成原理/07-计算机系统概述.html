@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>计算机组成原理 · 计算机系统概述</title>
+<link rel="stylesheet" href="../assets/site.css">
+<script src="../mermaid.min.js"></script>
+<script src="../assets/site.js"></script></head>
+<body data-prev="" data-next="01-数据表示与运算.html">
+<a id="top"></a>
+<div class="read-progress"></div>
+<header class="site-topbar">
+<a class="tb-brand" href="../index.html">408 速成复习资料</a>
+<nav class="tb-crumbs" aria-label="面包屑"><a href="../index.html">首页</a><span class="tb-sep">›</span><a href="index.html">计算机组成原理</a><span class="tb-sep">›</span><span aria-current="page">计算机系统概述</span></nav>
+<button class="tb-search" type="button" aria-label="搜索">搜索</button>
+</header>
+<button class="nav-toggle" type="button" aria-label="目录">☰</button>
+<div class="site-body">
+<nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
+<input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/04-树与二叉树.html">树与二叉树 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/05-图.html">图 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
+</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap cur" href="07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
+<div class="tocbox">
+<a class="toclink" href="#sec-freq">考频统计</a>
+<a class="toclink" href="#sec-core">核心讲解</a>
+<a class="toclink" href="#sec-key">关键结论速记</a>
+<a class="toclink" href="#sec-fig">示意图</a>
+<a class="toclink" href="#sec-err">易错点</a>
+<a class="toclink" href="#sec-real">真题示例</a>
+</div>
+<a class="sb-chap" href="01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
+<a class="sb-chap" href="02-存储系统.html">存储系统 <span class="tag">高频</span></a>
+<a class="sb-chap" href="03-指令系统.html">指令系统 <span class="tag">高频</span></a>
+<a class="sb-chap" href="04-中央处理器.html">中央处理器 CPU <span class="tag">高频</span></a>
+<a class="sb-chap" href="05-总线.html">总线 <span class="tag">高频</span></a>
+<a class="sb-chap" href="06-输入输出系统.html">输入输出系统 <span class="tag">高频</span></a>
+</div>
+<div class="sb-group"><div class="sb-group-t">操作系统（35 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../操作系统/01-操作系统概述与运行机制.html">操作系统概述与运行机制 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/02-进程与线程.html">进程与线程 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/03-处理机调度与死锁.html">处理机调度与死锁 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/04-同步与互斥.html">同步与互斥 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/05-内存管理.html">内存管理 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/06-文件管理.html">文件管理 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../操作系统/07-输入输出管理.html">输入输出管理 <span class="tag">高频</span></a>
+</div>
+<div class="sb-group"><div class="sb-group-t">计算机网络（25 分 · 6 个知识点）</div>
+<a class="sb-chap" href="../计算机网络/01-计算机网络体系结构.html">计算机网络体系结构 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/02-物理层.html">物理层 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/03-数据链路层.html">数据链路层 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/04-网络层.html">网络层 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/05-传输层.html">传输层 <span class="tag">高频</span></a>
+<a class="sb-chap" href="../计算机网络/06-应用层.html">应用层 <span class="tag">高频</span></a>
+</div></nav>
+<main><div class="inner"><h1>计算机系统概述</h1>
+
+<section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 考频待补充；涉及年份：2026 大纲「一、计算机系统概述」；常与存储、CPU 性能题合并考查；分数占比约 未统计；主要题型：选择题为主（性能指标计算）。</p>
+</div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
+<p>计算机系统由<strong>硬件</strong>与<strong>软件</strong>组成，硬件五大部件是运算器、控制器、存储器、输入设备和输出设备，它们通过总线连接；冯·诺依曼结构以<strong>存储器为中心</strong>，程序和数据以二进制形式存放在同一存储器中，这就是"<strong>存储程序</strong>"工作方式。程序执行时，CPU 按 PC 给出的地址取指令、译码、执行，再写回结果，一条指令的执行可拆成取指、译码、执行、访存、写回几个阶段。系统呈层次结构：硬件之上是操作系统，再往上依次是语言处理程序与应用程序，上层通过下层提供的接口工作，因此"软件与硬件在逻辑上等价"。</p>
+<p>衡量性能时，主频 <code>f</code> 与时钟周期 <code>T</code> 互为倒数（<code>T = 1/f</code>），<code>CPI</code> 是每条指令平均占用的时钟周期数，<strong>CPU 执行时间 = 指令条数 × CPI × 时钟周期</strong>。<code>MIPS = 主频 / (CPI × 10^6)</code> 表示每秒执行多少百万条指令，浮点性能用 <code>MFLOPS</code>/<code>GFLOPS</code> 等表示；吞吐量与响应时间则从系统整体角度衡量。注意 <code>CPI</code> 是<strong>平均</strong>值：不同指令的 CPI 不同，程序混合执行时要用各类指令的比例加权。</p>
+</div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
+<li><code>五大部件：运算器、控制器、存储器、输入、输出</code> —— 冯·诺依曼结构以存储器为中心，程序与数据统一编址存放。</li>
+<li><code>存储程序 = 程序与数据预先存入存储器 + CPU 按地址自动取指执行</code> —— 这是"通用计算机"的基础。</li>
+<li><code>CPU 执行时间 = 指令条数 IC × CPI × 时钟周期 T</code> —— 三条同时影响，主频高不一定更快。</li>
+<li><code>MIPS = f / (CPI × 10^6)</code>（<code>f</code> 以 Hz 计） —— MIPS 只看指令条数，不区分指令的复杂程度。</li>
+<li><code>T = 1/f</code>，<code>f = 2GHz</code> 时 <code>T = 0.5ns</code> —— 主频与时钟周期互为倒数，单位不要混（<code>GHz</code> 与 <code>ns</code>）。</li>
+<li><code>吞吐量 vs 响应时间</code> —— 吞吐量是单位时间完成的任务数，响应时间是单个任务从提交到完成的延迟，二者优化方向可能相反。</li>
+</ul>
+</div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
+<p>冯·诺依曼结构用一条系统总线把五大部件连起来，指令与数据都从存储器取出，经控制器译码后由运算器执行。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>von Neumann architecture (single bus)
+
+   +-----------+        +----------------+        +-----------+
+   |  input    |        |   memory       |        |  output   |
+   |  device   |&lt;------&gt;|  (program +    |&lt;------&gt;|  device   |
+   +-----------+        |   data)        |        +-----------+
+                        +----------------+
+                               ^  |
+                               |  | address / data / control
+                               v  |
+                        +----------------+
+                        |      CPU       |
+                        |  +----------+  |
+                        |  | control  |  |
+                        |  |  unit    |  |
+                        |  +----------+  |
+                        |  |   ALU    |  |
+                        |  +----------+  |
+                        +----------------+
+
+instruction execution:  fetch -&gt; decode -&gt; execute -&gt; memory -&gt; write back
+                        PC -&gt; IR       control    ALU/reg    mem     reg
+
+timing example: f = 2 GHz, T = 0.5 ns, CPI = 4, IC = 1e6
+   CPU time = 1e6 * 4 * 0.5 ns = 2e6 ns = 2 ms
+   MIPS     = 2e9 / (4 * 1e6) = 500
+</code></pre></div>
+<p>层次结构说明"软硬件逻辑等价"：同一功能可以用硬件实现，也可以用软件模拟。</p>
+<div class="fig"><div class="mermaid" data-src="flowchart TD
+    A[&quot;应用程序&quot;] --&gt; B[&quot;语言处理程序 编译器 汇编器&quot;]
+    B --&gt; C[&quot;操作系统&quot;]
+    C --&gt; D[&quot;硬件  CPU 存储器 IO&quot;]
+    A --&gt;|&quot;高级语言&quot;| B
+    B --&gt;|&quot;机器指令&quot;| C
+    C --&gt;|&quot;微指令 控制信号&quot;| D
+">flowchart TD
+    A[&quot;应用程序&quot;] --&gt; B[&quot;语言处理程序 编译器 汇编器&quot;]
+    B --&gt; C[&quot;操作系统&quot;]
+    C --&gt; D[&quot;硬件  CPU 存储器 IO&quot;]
+    A --&gt;|&quot;高级语言&quot;| B
+    B --&gt;|&quot;机器指令&quot;| C
+    C --&gt;|&quot;微指令 控制信号&quot;| D
+</div><details><summary>查看该图 mermaid 源码</summary><pre><code>flowchart TD
+    A[&quot;应用程序&quot;] --&gt; B[&quot;语言处理程序 编译器 汇编器&quot;]
+    B --&gt; C[&quot;操作系统&quot;]
+    C --&gt; D[&quot;硬件  CPU 存储器 IO&quot;]
+    A --&gt;|&quot;高级语言&quot;| B
+    B --&gt;|&quot;机器指令&quot;| C
+    C --&gt;|&quot;微指令 控制信号&quot;| D
+</code></pre></details></div>
+</div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
+<li>认为主频越高程序一定越快：执行时间还取决于指令条数与 <code>CPI</code>，主频高但 <code>CPI</code> 大、指令多的机器可能更慢；比较性能要同时看三者。</li>
+<li>把 <code>CPI</code> 当成某条指令的固定值：<code>CPI</code> 是程序或指令流平均每条指令的时钟周期数，不同指令类型要加权平均。</li>
+<li>混淆 <code>MIPS</code> 与真实性能：<code>MIPS</code> 只反映指令吞吐，RISC 与 CISC 的指令复杂度不同，跨指令集比 <code>MIPS</code> 没有意义。</li>
+<li>单位换算错误：<code>f</code> 用 <code>GHz</code> 时 <code>1 GHz = 10^9 Hz</code>，<code>T = 1/f</code> 得到的是秒，常改写为 <code>ns</code>（<code>1 ns = 10^-9 s</code>）；<code>MIPS</code> 公式里的 <code>10^6</code> 来自"百万条"。</li>
+</ul>
+</div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
+<p class="q-stem"><span class="q-src">2020 年真题改编（选择题，2 分）</span></p>
+<p>某计算机主频为 <code>2 GHz</code>，程序共含 <code>10^6</code> 条指令，平均 <code>CPI = 4</code>。该程序在该机上的执行时间与 <code>MIPS</code> 分别为：</p>
+<p>A. <code>1 ms</code>、<code>1000</code>　B. <code>2 ms</code>、<code>500</code>　C. <code>4 ms</code>、<code>250</code>　D. <code>2 ms</code>、<code>1000</code></p>
+<blockquote>
+<p>解析：时钟周期 <code>T = 1/f = 1/(2×10^9) = 0.5 ns</code>。执行时间 <code>= IC × CPI × T = 10^6 × 4 × 0.5 ns = 2×10^6 ns = 2 ms</code>。<code>MIPS = f/(CPI×10^6) = 2×10^9/(4×10^6) = 500</code>。故选 B。注意 <code>MIPS</code> 与执行时间互为倒数关系（<code>MIPS = IC/(执行时间×10^6)</code>），两者可互相校验。</p>
+</blockquote>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-next" href="01-数据表示与运算.html"><span class="cn-dir">下一章 →</span><span class="cn-title">数据表示与运算</span></a></nav></div></main>
+</div>
+<footer class="site-footer">
+<div class="sf-inner">
+<span>原创讲解 / 图示 / 代码：CC BY-NC-SA 4.0</span>
+<span class="ft-sep">·</span>
+<a href="../README.html">数据口径与来源</a>
+<span class="ft-sep">·</span>
+<a href="../LICENSE">许可协议</a><span class="ft-sep">·</span>
+<a href="../练习.html">今日练习</a>
+<a class="ft-top" href="#">回到顶部 ↑</a>
+</div>
+</footer>
+<button class="to-top" type="button" aria-label="回到顶部">↑</button>
+<button class="theme-toggle" type="button" aria-label="切换深浅色">☾</button>
+</body></html>

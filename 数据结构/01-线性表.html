@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="../assets/site.css">
 <script src="../mermaid.min.js"></script>
 <script src="../assets/site.js"></script></head>
-<body data-prev="" data-next="02-顺序表与链表.html">
+<body data-prev="08-绪论与算法分析.html" data-next="02-顺序表与链表.html">
 <a id="top"></a>
 <div class="read-progress"></div>
 <header class="site-topbar">
@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap cur" href="01-线性表.html">线性表 <span class="tag">高频</span></a>
 <div class="tocbox">
 <a class="toclink" href="#sec-freq">考频统计</a>
@@ -34,7 +35,8 @@
 <a class="sb-chap" href="06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../计算机组成原理/07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -147,7 +149,7 @@ delete position 3 (n = 5): move a4,a5 left, count = n-i = 2
 <blockquote>
 <p>解析：取 <code>A</code>、<code>B</code> 各自的中位数 <code>a = A[midA]</code>、<code>b = B[midB]</code>（<code>mid</code> 为 <code>ceil</code> 意义上的中间位置）。若 <code>a == b</code>，该值即为所求，结束。若 <code>a &lt; b</code>，则所求中位数只可能落在 <code>A</code> 的右半段与 <code>B</code> 的左半段（<code>A</code> 左半段与 <code>B</code> 右半段分别被排除，且两段被排除的元素个数相等，故中位数位置不变），于是令 <code>A</code> 的查找范围收缩为右半段、<code>B</code> 收缩为左半段；<code>a &gt; b</code> 时对称处理。每轮两个序列的候选长度都减半，故时间复杂度 <code>O(log n)</code>；只用若干下标与临时变量，空间复杂度 <code>O(1)</code>。这就是本题的满分答案框架：<strong>折半缩小两个有序序列的候选区间</strong>。</p>
 </blockquote>
-<hr /></div></section><nav class="chapter-nav"><a class="cn-next" href="02-顺序表与链表.html"><span class="cn-dir">下一章 →</span><span class="cn-title">顺序表与链表</span></a></nav></div></main>
+<hr /></div></section><nav class="chapter-nav"><a class="cn-prev" href="08-绪论与算法分析.html"><span class="cn-dir">← 上一章</span><span class="cn-title">绪论与算法分析</span></a><a class="cn-next" href="02-顺序表与链表.html"><span class="cn-dir">下一章 →</span><span class="cn-title">顺序表与链表</span></a></nav></div></main>
 </div>
 <footer class="site-footer">
 <div class="sf-inner">

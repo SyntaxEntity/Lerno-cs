@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap cur" href="03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -34,7 +35,8 @@
 <a class="sb-chap" href="06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../计算机组成原理/07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -63,8 +65,10 @@
 
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 20 次；涉及年份：2010、2011、2013、2015、2018、2020、2022、2023、2025；分数占比约 8%；主要题型：选择题为主（表达式求值、出栈序列、循环队列）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
-<p>栈是只允许在同一端（栈顶 <code>top</code>）进行插入和删除的线性表，队列是只允许在队尾 <code>rear</code> 插入、队头 <code>front</code> 删除的线性表，二者都是操作受限的线性表。顺序栈用 <code>top</code> 指向栈顶元素（或栈顶元素的下一个位置，两种约定不可混用），判空为 <code>top == -1</code>（或 <code>top == 0</code>），栈满为 <code>top == MaxSize - 1</code>，入栈 <code>++top; data[top] = x</code>。共享栈让两个栈共用一个数组、栈底分别设在两端、栈顶向中间生长，仅当两栈顶指针相邻（<code>top0 + 1 == top1</code>）时才上溢，空间利用率更高。</p>
+<p>栈是只允许在同一端（栈顶 <code>top</code>）进行插入和删除的线性表，队列是只允许在队尾 <code>rear</code> 插入、队头 <code>front</code> 删除的线性表，二者都是操作受限的线性表。顺序栈用 <code>top</code> 指向栈顶元素（或栈顶元素的下一个位置，两种约定不可混用），判空为 <code>top == -1</code>（或 <code>top == 0</code>），栈满为 <code>top == MaxSize - 1</code>，入栈先 <code>++top</code> 再 <code>data[top] = x</code>。共享栈让两个栈共用一个数组、栈底分别设在两端、栈顶向中间生长，仅当两栈顶指针相邻（<code>top0 + 1 == top1</code>）时才上溢，空间利用率更高。</p>
 <p>循环队列把顺序队列在逻辑上首尾相接，用 <code>front == rear</code> 判空时必须另设计数 <code>size</code>、标志 <code>tag</code> 或牺牲一个单元来区分队满，否则队空与队满无法区分。栈的典型应用有括号匹配、表达式求值（中缀转后缀再求值）、递归调用与函数调用栈；中缀转后缀时，运算符栈规则是遇操作数直接输出，遇运算符先弹出栈中优先级不低于它的运算符再入栈，遇 <code>(</code> 入栈、遇 <code>)</code> 弹出至 <code>(</code>，扫描完把栈中剩余运算符全部弹出。</p>
+<p><strong>多维数组的存储</strong>按行优先（如 C）或列优先（如 Fortran）把二维数组 <code>A[m][n]</code> 拉成一维序列，设每个元素占 <code>L</code> 字节、下标从 0 开始，行优先的地址通式为 <code>LOC(a[i][j]) = LOC(a[0][0]) + (i*n + j)*L</code>，列优先为 <code>LOC(a[i][j]) = LOC(a[0][0]) + (j*m + i)*L</code>，下标从 1 开始时先把 <code>i</code>、<code>j</code> 各减 1 再代入。</p>
+<p><strong>特殊矩阵的压缩存储</strong>只存非重复或非零元素：对称矩阵只存下三角，元素个数为 <code>n(n+1)/2</code>，<code>a[i][j]</code> 与 <code>a[j][i]</code> 共用同一单元，按行优先存放时用 <code>k = i*(i+1)/2 + j</code>（<code>i &gt;= j</code>，下标从 0 起）换算成一维下标，三角矩阵存三角部分 <code>n(n+1)/2</code> 个元素再加 1 个常量单元（共 <code>n(n+1)/2 + 1</code>），稀疏矩阵用三元组 <code>(行, 列, 值)</code> 组成三元组表，链式实现用十字链表。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>n</code> 个不同元素依次入栈，合法出栈序列数为卡特兰数 <code>C(2n,n)/(n+1)</code> —— 出栈序列合法性判定用它计数，如 <code>n = 3</code> 时为 5 个，<code>n = 4</code> 时为 14 个。</li>
 <li>循环队列判满三方案 —— 牺牲一个单元：队满 <code>(rear + 1) % MaxSize == front</code>；增设 <code>size</code>：队满 <code>size == MaxSize</code>、队空 <code>size == 0</code>；增设 <code>tag</code>：<code>front == rear</code> 时 <code>tag == 1</code> 为满、<code>tag == 0</code> 为空。</li>
@@ -72,6 +76,8 @@
 <li>中缀转后缀的运算符栈规则 —— 栈内运算符优先级高于或等于当前运算符就先弹出，<code>(</code> 在栈内优先级最低、在栈外最高，保证括号配对与左结合性。</li>
 <li>后缀表达式求值 —— 遇操作数入栈，遇运算符连出两次栈，先出的是右操作数、后出的是左操作数，算完 <code>左 op 右</code> 再入栈，最终栈中唯一元素即答案。</li>
 <li>共享栈判满 —— 两栈顶指针相邻即 <code>top0 + 1 == top1</code> 时整个数组才上溢，单个栈使用不会溢出。</li>
+<li><code>行优先 LOC(a[i][j]) = LOC(a[0][0]) + (i*n + j)*L</code>，列优先换成 <code>(j*m + i)*L</code> —— <code>A[m][n]</code>、每元素 <code>L</code> 字节、下标从 0 起，从 1 起先减 1 再代入。</li>
+<li><code>对称矩阵只存下三角，共 n(n+1)/2 个元素</code>（<code>k = i*(i+1)/2 + j</code>，<code>i &gt;= j</code>）—— 三角矩阵为 <code>n(n+1)/2 + 1</code> 个，稀疏矩阵用三元组表 <code>(行, 列, 值)</code>，链式实现是十字链表。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p>循环队列在 <code>MaxSize = 7</code>（下标 0 至 6）时的三种状态，空槽留白、<code>x</code> 表示已存元素、<code>f</code> 与 <code>r</code> 分别指向 <code>front</code> 与 <code>rear</code> 所在下标：</p>
@@ -152,11 +158,38 @@ state 3  full : (rear + 1) % 7 == front
     A8 --&gt;|是| A9[弹出栈中剩余全部运算符并输出]
     A9 --&gt; A10[得到后缀表达式]
 </code></pre></details></div>
+<p><code>A[3][4]</code> 按行优先与列优先的一维展开，以及 <code>3 x 3</code> 对称矩阵下三角的存储下标（<code>n*(n+1)/2 = 6</code>）：</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>A[3][4], L = 1 byte
+
+        j=0   j=1   j=2   j=3
+      +-----+-----+-----+-----+
+i=0   | a00 | a01 | a02 | a03 |   k = 0   1   2   3
+      +-----+-----+-----+-----+
+i=1   | a10 | a11 | a12 | a13 |   k = 4   5   6   7
+      +-----+-----+-----+-----+
+i=2   | a20 | a21 | a22 | a23 |   k = 8   9  10  11
+      +-----+-----+-----+-----+
+
+row-major : k = i*n + j   (n = 4)
+col-major : k = j*m + i   (m = 3)
+
+row-major : a00 a01 a02 a03 a10 a11 a12 a13 a20 a21 a22 a23
+col-major : a00 a10 a20 a01 a11 a21 a02 a12 a22 a03 a13 a23
+
+symmetric n = 3, lower triangle, n*(n+1)/2 = 6 cells
+
+       j=0  j=1  j=2
+i=0    k=0
+i=1    k=1  k=2
+i=2    k=3  k=4  k=5
+
+k = i*(i+1)/2 + j   (0 &lt;= j &lt;= i)
+</code></pre></div>
 </div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
-<li>错在把 <code>front == rear</code> 直接当成队满。循环队列中它同时满足队空与队满条件，必须靠牺牲一个单元、<code>size</code> 计数或 <code>tag</code> 标志之一区分，选定的约定要与判空判满公式配套使用。</li>
+<li>错在把 <code>front == rear</code> 当成队满，或混用 <code>front</code> 的两种约定：前者须靠牺牲一个单元、<code>size</code> 或 <code>tag</code> 区分，后者的元素个数公式 <code>(rear - front + MaxSize) % MaxSize</code> 与 <code>(rear - front + 1 + MaxSize) % MaxSize</code> 不能互换。</li>
 <li>错在后缀表达式求值时把两个操作数的出栈顺序弄反。栈顶先弹出的是右操作数、后弹出的是左操作数，应计算 <code>左 op 右</code>；减法和除法一旦颠倒必然得到错误结果。</li>
-<li>错在混用 <code>front</code> 的两种约定。<code>front</code> 指向队头元素时元素个数为 <code>(rear - front + MaxSize) % MaxSize</code>，指向队头元素的前一个位置时改为 <code>(rear - front + 1 + MaxSize) % MaxSize</code>，两套公式与判满条件不能互换。</li>
 <li>错在只凭卡特兰数判定出栈序列合法。合法序列总数由 <code>C(2n,n)/(n+1)</code> 给出，但判定某个具体序列仍须模拟栈过程：出栈元素之后出现的、比它先入栈的小元素只能按逆序排列。</li>
+<li>错在把行优先与列优先的地址通式互换，或下标从 1 起却忘记先减 1：<code>A[m][n]</code> 行优先是 <code>i*n + j</code>、列优先是 <code>j*m + i</code>，对称矩阵只存下三角 <code>n(n+1)/2</code> 个元素，<code>a[i][j]</code> 与 <code>a[j][i]</code> 必须共用单元。</li>
 </ul>
 </div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2022 年真题改编（选择题，2 分）</span></p>

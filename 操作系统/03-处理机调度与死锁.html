@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -26,7 +27,8 @@
 <a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../计算机组成原理/07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -64,8 +66,12 @@
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010、2012、2014、2016、2018、2020、2021、2023、2025；分数占比约 16%；主要题型：选择题 + 综合应用题（调度算法计算、银行家算法）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
 <p><strong>处理机调度</strong>分三级：<strong>高级调度</strong>（作业调度）决定哪些作业从外存进入内存并建立进程，<strong>中级调度</strong>（内存调度）决定挂起的进程何时重新调入内存（对应"就绪挂起 → 就绪"），<strong>低级调度</strong>（进程调度）从就绪队列中选一个进程分配 <code>CPU</code>，是频率最高、必须高效的一级；若系统有<strong>中级调度</strong>就说明采用了<strong>虚拟内存</strong>。评价指标中，<strong>周转时间 = 完成时间 - 到达时间</strong>，<strong>带权周转时间 = 周转时间 / 服务时间</strong>（<code>&gt;= 1</code>，越接近 1 越好），<strong>等待时间</strong>是进程在就绪队列中排队的时间之和（不含执行与 <code>I/O</code> 时间），<strong>响应时间</strong>是从提交请求到首次响应的时间。</p>
-<p><strong><code>FCFS</code></strong>（先来先服务）按到达顺序调度，非抢占、对长作业有利而对短作业不利，且对 <code>I/O</code> 繁忙型作业不利。<strong><code>SJF</code>/<code>SPF</code></strong>（短作业优先）平均周转时间与平均带权周转时间最短，但必须预知运行时间，且对长作业可能造成<strong>饥饿</strong>。<strong><code>HRRN</code></strong>（高响应比优先）用 <code>响应比 = (等待时间 + 服务时间) / 服务时间</code>，兼顾等待时间与服务时间，是非抢占式的折中方案。<strong>时间片轮转 <code>RR</code></strong> 只用于进程调度、按 <code>FCFS</code> 排队并轮流执行一个时间片：时间片过大会退化为 <code>FCFS</code>，过小则切换开销过大；</p>
-<p>它对<strong>响应时间</strong>有利但不保证周转时间。<strong>优先级调度</strong>分抢占式与非抢占式，就绪队列可用<strong>静态/动态优先级</strong>。<strong>多级反馈队列</strong>设置多个优先级递减、时间片递增的队列，新进程进最高级队列，用完时间片未完成则降级，只有高优先级队列为空才调度低优先级队列，因而能较好的满足各类进程需要，是通用性最强的算法。<strong>死锁</strong>是多个进程因竞争资源而互相等待、无外力干预都无法推进的局面，产生死锁的<strong>四个必要条件</strong>是<strong>互斥、不可剥夺、请求并保持、循环等待</strong>，四者同时成立才可能死锁。<strong>死锁预防</strong>通过破坏某个必要条件实现；<strong>死锁避免</strong>在分配前用<strong>银行家算法</strong>判断系统是否处于<strong>安全状态</strong>（存在一个安全序列使所有进程都能完成）；<strong>死锁检测与解除</strong>允许死锁发生，用资源分配图化简（可完全化简则无死锁）检测，再用资源剥夺、撤销进程或进程回退来解除。</p>
+<p><strong><code>FCFS</code></strong>（先来先服务）按到达顺序调度，非抢占、对长作业有利而对短作业不利，且对 <code>I/O</code> 繁忙型作业不利；<strong><code>SJF</code>/<code>SPF</code></strong>（短作业优先）平均周转时间与平均带权周转时间最短，但必须预知运行时间，且对长作业可能造成<strong>饥饿</strong>；<strong><code>HRRN</code></strong>（高响应比优先）用 <code>响应比 = (等待时间 + 服务时间) / 服务时间</code>，兼顾等待时间与服务时间，是非抢占式的折中方案。</p>
+<p><strong>时间片轮转 <code>RR</code></strong> 只用于进程调度、按 <code>FCFS</code> 排队并轮流执行一个时间片：时间片过大会退化为 <code>FCFS</code>，过小则切换开销过大，它对<strong>响应时间</strong>有利但不保证周转时间；<strong>优先级调度</strong>分抢占式与非抢占式，就绪队列可用<strong>静态/动态优先级</strong>；<strong>多级反馈队列</strong>设置多个优先级递减、时间片递增的队列，新进程进最高级队列、用完时间片未完成则降级，只有高优先级队列为空才调度低优先级队列，因而能较好的满足各类进程需要，是通用性最强的算法。</p>
+<p><strong>死锁</strong>是多个进程因竞争资源而互相等待、无外力干预都无法推进的局面，产生死锁的<strong>四个必要条件</strong>是<strong>互斥、不可剥夺、请求并保持、循环等待</strong>，四者同时成立才可能死锁；<strong>死锁预防</strong>通过破坏某个必要条件实现；<strong>死锁避免</strong>在分配前用<strong>银行家算法</strong>判断系统是否处于<strong>安全状态</strong>（存在一个安全序列使所有进程都能完成）；<strong>死锁检测与解除</strong>允许死锁发生，用资源分配图化简（可完全化简则无死锁）检测，再用资源剥夺、撤销进程或进程回退来解除。</p>
+<p><strong>多处理机调度</strong>中<strong>负载共享</strong>是最简单的策略：所有就绪进程放在公共就绪队列里，任一空闲处理机都可以取一个来执行，负载自动均衡，但进程可能在不同处理机之间迁移、缺乏亲和性，<code>Cache</code> 与 <code>TLB</code> 的命中率会下降。</p>
+<p><strong>成组调度</strong>（gang scheduling）把同一并行程序的一组相关进程或线程<strong>同时</strong>分配到多个处理机上一起运行、一起暂停，使它们能同步推进，避免组内个别成员未获处理机而空等甚至死锁，代价是一次要预留多个处理机、调度粒度较粗。</p>
+<p><strong>上下文切换</strong>是处理机从一个进程切换到另一个进程的过程：先把当前进程的处理机现场（<code>PC</code>、通用寄存器、<code>PSW</code>、栈指针）保存到它的 <code>PCB</code>，再从被选中进程的 <code>PCB</code> 恢复现场；开销来自<strong>保存/恢复寄存器组</strong>、<strong>切换页表并刷新 <code>TLB</code></strong> 以及新进程的数据不在 <code>Cache</code> 中造成的失效，因此切换本身是纯开销；它与<strong>模式切换</strong>不同：模式切换只是用户态与核心态之间的转换（由陷入或中断引起），中断处理完返回原进程时只发生模式切换、<strong>不更换进程</strong>，只有真正换进程才需要上下文切换。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>周转时间 = 完成 - 到达</code>，<code>带权周转时间 = 周转 / 服务时间</code> —— 带权周转时间必须除以服务时间，忘除是最常见错误。</li>
 <li><code>SJF 平均周转时间最短，但需预知运行时间且长作业可能饥饿</code> —— 这是"理论最优但工程上受限"的经典结论。</li>
@@ -73,6 +79,8 @@
 <li><code>多级反馈队列：优先级递减 + 时间片递增 + 只有高优先级队列空才调度低优先级</code> —— 综合性能最好。</li>
 <li><code>死锁四个必要条件：互斥、不可剥夺、请求并保持、循环等待</code> —— 缺一不可，破坏任一即可预防。</li>
 <li><code>银行家算法：Need = Max - Allocation，找 Need &lt;= Available 的进程并回收其资源</code> —— 找得到完整序列则处于安全状态。</li>
+<li><code>多处理机：负载共享（公共就绪队列）与成组调度（同组线程同时上机）</code> —— 负载共享简单但亲和性差，成组调度避免并行程序互相空等。</li>
+<li><code>上下文切换 = 保存现场到 PCB + 恢复另一进程的现场</code> —— 开销来自寄存器、页表/<code>TLB</code>、<code>Cache</code> 失效；模式切换不等于上下文切换。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>三种调度算法的甘特图对比</strong>：同一组作业（到达时间与服务时间相同）在不同算法下的完成顺序与平均周转时间不同。</p>
@@ -109,6 +117,26 @@ RR (time slice q = 4)
    turnaround: A=12  B=6  C=5  D=11   average = 8.5
    note: RR improves response time (C finished at 9 instead of 12)
          but its average turnaround may be worse than SJF
+</code></pre></div>
+<p><strong>上下文切换与模式切换的差别</strong>：切换进程要保存并恢复现场、还要换页表，只做中断处理则只是同一进程在用户态与核心态之间往返一次。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>context switch vs mode switch
+
+   P1 user mode | P1 kernel mode | P2 user mode
+   -------------+----------------+-----------------
+      running   | save P1 ctx    |    running
+                | pick P2        |
+                | restore P2 ctx |
+                | switch page    |
+                | table, flush   |
+                | TLB            |
+                v                v
+
+   context switch:  save PC, GPRs, PSW, SP -&gt; P1.PCB
+                    load PC, GPRs, PSW, SP &lt;- P2.PCB
+                    switch page table + flush TLB  &lt;-- the real cost
+
+   mode only:  user --trap or interrupt--&gt; kernel --return--&gt; same P1
+               no PCB change, no address-space change
 </code></pre></div>
 <p><strong>银行家算法的安全性检查流程</strong>：每次试探性分配后都要重新判断是否存在安全序列，不存在则撤销本次分配。</p>
 <div class="fig"><div class="mermaid" data-src="flowchart TD
@@ -166,8 +194,8 @@ RR (time slice q = 4)
 </div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>带权周转时间忘记除以服务时间：<code>带权周转时间 = 周转时间 / 服务时间</code>，量纲是"倍数"且必然 <code>&gt;= 1</code>；只算周转时间就答题会整题失分。</li>
 <li>认为 <code>SJF</code> 一定优于其他算法：<code>SJF</code> 的"平均周转时间最短"是在<strong>所有作业同时到达</strong>的前提下证明的；若到达时间不同，抢占式 <code>SRTN</code> 才更优，且 <code>SJF</code> 会造成长作业<strong>饥饿</strong>。</li>
-<li>把死锁避免与死锁预防混为一谈：<strong>预防</strong>是破坏四个必要条件之一（静态、保守），<strong>避免</strong>是用银行家算法在每次分配前动态判断安全性（允许必要条件存在但保证不进死锁），<strong>检测与解除</strong>则是允许死锁发生后再处理。</li>
-<li>银行家算法中 <code>Need</code> 计算错误或判断条件写反：<code>Need = Max - Allocation</code> 必须先算对；寻找安全序列时判据是 <code>Need &lt;= Available</code>（当前可用量），把 <code>Available</code> 误用成 <code>Max</code> 或 <code>Allocation</code> 都会得到错误结论。</li>
+<li>把死锁预防、避免与检测解除混为一谈，或把银行家算法的判据写反：预防是静态破坏四个必要条件之一，避免是每次分配前用银行家算法判断安全性（<code>Need = Max - Allocation</code>，判据是 <code>Need &lt;= Available</code>），检测与解除则是允许死锁发生后再处理。</li>
+<li>把上下文切换与模式切换混为一谈：模式切换只是用户态与核心态之间的转换，中断处理完返回原进程并不换进程；上下文切换要保存/恢复 <code>PC</code>、寄存器与 <code>PSW</code> 到 <code>PCB</code>，还要切换页表、刷新 <code>TLB</code>，开销大得多。</li>
 </ul>
 </div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2016 年 408 第 45 题（综合应用题，7 分）</span></p>

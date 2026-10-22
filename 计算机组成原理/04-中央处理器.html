@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -26,7 +27,8 @@
 <a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -63,8 +65,12 @@
 
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 28 次；涉及年份：2011、2013、2015、2017、2018、2020、2021、2022、2024；分数占比约 18%；主要题型：选择题 + 44 题综合应用题（数据通路、流水线）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
-<p>CPU 由运算器（ALU、暂存寄存器、通用寄存器组、PSW）与控制器（PC、IR、ID、时序电路、微操作信号发生器）组成，其核心工作是按 <code>PC → IR</code> 取指、译码、执行、访存、写回的顺序，在数据通路中把一串微操作按时序节拍展开。取指周期的微操作序列固定为 <code>(PC) -&gt; MAR</code>、<code>M(MAR) -&gt; MDR</code>、<code>(MDR) -&gt; IR</code>、<code>(PC) + 1 -&gt; PC</code>，此后译码器根据 <code>IR</code> 中的操作码产生后续控制信号。数据通路按总线数目分为单总线与多总线结构：单总线结构每拍只能有一个数据流入/流出总线，完成一次 ALU 运算需 <code>取操作数1 → 暂存 → 取操作数2 → 运算 → 写回</code> 多拍；多总线（如双总线、三总线）可在一拍内同时传送两个操作数，微操作序列更短。控制器分硬布线与微程序两类：硬布线由组合逻辑直接产生微命令，速度快、不易修改，<code>RISC</code> 常用；</p>
-<p>微程序把微命令编成微指令存于控制存储器 CM，一条机器指令对应一段微程序，<code>CM 容量 = 微指令条数 × 微指令字长</code>。微指令编码方式中，水平型微指令并行能力强、字长长、微程序短，垂直型微指令一次只能完成一个微操作、字长短、微程序长，字段直接编码法与字段间接编码法用于压缩互斥微命令。流水线把指令执行划分为 <code>k</code> 个阶段，理想情况下 <code>n</code> 条指令需 <code>k + n - 1</code> 个时钟周期，吞吐率 <code>TP = n / ((k + n - 1) * T)</code>，最大吞吐率 <code>TP_max = 1 / T</code>（<code>T</code> 为最长阶段耗时，即流水线周期）。流水线存在结构冒险（资源冲突）、数据冒险（RAW 为主）、控制冒险（转移指令）三类；数据冒险可用转发（旁路）解决，但 <code>load-use</code> 必须暂停一拍，控制冒险可用分支预测、延迟槽、提前形成转移地址解决，冒险会使实际加速比与效率低于理想值。</p>
+<p>CPU 由运算器（ALU、暂存寄存器、通用寄存器组、PSW）与控制器（PC、IR、ID、时序电路、微操作信号发生器）组成，其核心工作是按 <code>PC → IR</code> 取指、译码、执行、访存、写回的顺序，在数据通路中把一串微操作按时序节拍展开；取指周期的微操作序列固定为 <code>(PC) -&gt; MAR</code>、<code>M(MAR) -&gt; MDR</code>、<code>(MDR) -&gt; IR</code>、<code>(PC) + 1 -&gt; PC</code>，此后译码器根据 <code>IR</code> 中的操作码产生后续控制信号。数据通路按总线数目分为单总线与多总线结构：单总线结构每拍只能有一个数据流入/流出总线，完成一次 ALU 运算需 <code>取操作数1 → 暂存 → 取操作数2 → 运算 → 写回</code> 多拍；多总线（如双总线、三总线）可在一拍内同时传送两个操作数，微操作序列更短。控制器分硬布线与微程序两类：硬布线由组合逻辑直接产生微命令，速度快、不易修改，<code>RISC</code> 常用；</p>
+<p>微程序把微命令编成微指令存于控制存储器 CM，一条机器指令对应一段微程序，<code>CM 容量 = 微指令条数 × 微指令字长</code>；微指令编码方式中，水平型微指令并行能力强、字长长、微程序短，垂直型微指令一次只能完成一个微操作、字长短、微程序长，字段直接编码法与字段间接编码法用于压缩互斥微命令。流水线把指令执行划分为 <code>k</code> 个阶段，理想情况下 <code>n</code> 条指令需 <code>k + n - 1</code> 个时钟周期，吞吐率 <code>TP = n / ((k + n - 1) * T)</code>，最大吞吐率 <code>TP_max = 1 / T</code>（<code>T</code> 为最长阶段耗时，即流水线周期）；流水线存在结构冒险（资源冲突）、数据冒险（RAW 为主）、控制冒险（转移指令）三类；数据冒险可用转发（旁路）解决，但 <code>load-use</code> 必须暂停一拍，控制冒险可用分支预测、延迟槽、提前形成转移地址解决，冒险会使实际加速比与效率低于理想值。</p>
+<p><strong>异常（内中断）</strong>由 CPU 执行当前指令引起、与指令<strong>同步</strong>，如除零、溢出、非法指令、缺页、断点；<strong>中断（外中断）</strong>由外部设备或时钟请求、与当前指令<strong>异步</strong>，如 <code>I/O</code> 完成、时钟中断；两者的检测时机不同——中断请求在每条指令执行结束时检测、响应也落在<strong>指令边界</strong>，异常由当前指令的执行本身引起、在该指令执行中或结束时被发现，但精确异常的断点同样落在指令边界。</p>
+<p>响应过程由硬件自动完成：保存断点 <code>PC</code> 与 <code>PSW</code>、关中断、按中断类型号取中断向量并转入 <code>ISR</code>；<strong>精确异常</strong>指发生异常时断点之前的指令全部执行完、之后的指令尚未开始（机器状态未被破坏），处理完可精确恢复执行。</p>
+<p><strong>多处理器</strong>按指令流与数据流分为 <code>SISD</code>（单处理机顺序执行）、<code>SIMD</code>（一条指令同时处理多组数据，向量处理器与 GPU 属此类）与 <code>MIMD</code>（多个处理器各执行不同指令流，<strong>多核</strong>与 <code>SMP</code> 是典型：多个对等核共享同一主存与统一地址空间）。</p>
+<p><strong>硬件多线程</strong>用线程切换掩盖访存延迟，<strong>细粒度</strong>每拍都切换线程、<strong>粗粒度</strong>只在发生长延迟事件时才切换（切换开销更小）；<strong>向量处理器</strong>用一条向量指令对一组数据流水化运算，是 <code>SIMD</code> 的经典实现。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>流水线周期 T = max(各阶段耗时)</code> —— 取最长阶段而非平均值，瓶颈段决定节拍。</li>
 <li><code>TP = n / ((k + n - 1) * T)</code>，<code>TP_max = 1 / T</code> —— <code>k</code> 是流水段数，<code>n</code> 是指令条数，两者不可混用。</li>
@@ -72,6 +78,8 @@
 <li><code>E = S / k = n / (k + n - 1)</code> —— 效率等于各段设备的时空利用率，理想值为 1。</li>
 <li><code>CM 容量 = 微指令条数 × 微指令字长</code> —— 微程序控制器容量计算，与机器指令条数无直接相等关系。</li>
 <li><code>load-use 冒险必须暂停 1 拍</code> —— 转发只能解决 ALU 结果相关，无法把访存结果提前到上一拍。</li>
+<li><code>异常：内部/同步（除零、缺页、非法指令）；中断：外部/异步（I/O 完成、时钟）</code> —— 由当前指令引起的是异常，由外部请求的是中断。</li>
+<li><code>SISD / SIMD / MIMD</code>，<code>SMP = 多核共享主存</code>；<code>硬件多线程：细粒度每拍切换、粗粒度长延迟才切换</code> —— 向量处理器属 <code>SIMD</code>。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>取指周期的固定微操作序列与数据通路</strong>：任何数据通路题都从这四步开始，<code>MAR</code>、<code>MDR</code>、<code>IR</code>、<code>PC</code> 之间的传送方向必须记牢。</p>

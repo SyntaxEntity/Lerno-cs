@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -26,7 +27,8 @@
 <a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../计算机组成原理/07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -63,16 +65,19 @@
 
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 26 次；涉及年份：2009—2025 年高频，2010、2012、2015、2017、2019、2020、2022、2024 年为典型年份；分数占比约 18%；主要题型：选择题 + 综合应用题（进程状态、PCB、线程共享、调度）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
-<p><strong>进程</strong>是程序在一个数据集合上的一次运行过程，是系统进行<strong>资源分配</strong>的基本单位；<strong>线程</strong>是进程内的一个执行流，是<strong>处理机调度</strong>的基本单位。进程由<strong>程序段、数据段、<code>PCB</code></strong> 三部分组成，其中 <strong><code>PCB</code> 是进程存在的唯一标志</strong>，内容包括进程标识符、处理机现场信息（各寄存器与 <code>PC</code> 的值）、进程控制信息（状态、优先级、队列指针、资源清单）。</p>
-<p><strong>进程映像</strong>在内存中的布局自低到高为：代码段、数据段（含已初始化的 <code>data</code> 与未初始化的 <code>bss</code>）、堆（向上增长，<code>malloc</code> 分配）、栈（向下增长，存放函数调用帧与局部变量）。进程有<strong>五种基本状态</strong>：创建态、就绪态、运行态、阻塞态、终止态。状态转换的<strong>唯一主动转换</strong>是"运行 → 阻塞"（进程自己请求 <code>I/O</code> 或申请资源），其余都是被动的：<strong>就绪 → 运行</strong>由调度程序选中引起，<strong>运行 → 就绪</strong>由时间片用完或更高优先级抢占引起，<strong>阻塞 → 就绪</strong>由 <code>I/O</code> 完成或资源可用引起。</p>
-<p><strong>阻塞态不能直接转为运行态</strong>，必须先回到就绪态。<strong>进程控制</strong>由原语完成：创建（分配 <code>PCB</code> 与资源、置为就绪）、终止（回收资源、撤销 <code>PCB</code>）、阻塞与唤醒、挂起与激活。<strong>进程通信</strong>有共享存储、消息传递、管道通信三种方式（信号 <code>signal</code> 也可视为一种通知机制）。<strong>线程</strong>与进程的本质差别是：<strong>同一进程内的各线程共享该进程的资源</strong>（代码段、数据段、堆、打开的文件、地址空间），只<strong>私有栈、寄存器现场与线程控制块 <code>TCB</code></strong>；因此线程切换不需要切换地址空间，开销远小于进程切换。<strong>用户级线程</strong>由用户库函数管理，内核不感知，故<strong>一个线程阻塞会导致整个进程阻塞</strong>、且<strong>无法利用多核并行</strong>；<strong>内核级线程</strong>由内核管理，可被独立调度到不同处理机，但切换需陷入内核、开销较大。</p>
+<p><strong>进程</strong>是程序在一个数据集合上的一次运行过程，是系统进行<strong>资源分配</strong>的基本单位；<strong>线程</strong>是进程内的一个执行流，是<strong>处理机调度</strong>的基本单位；进程由<strong>程序段、数据段、<code>PCB</code></strong> 三部分组成，其中 <strong><code>PCB</code> 是进程存在的唯一标志</strong>，内容包括进程标识符、处理机现场信息（各寄存器与 <code>PC</code> 的值）、进程控制信息（状态、优先级、队列指针、资源清单）。</p>
+<p><strong>进程映像</strong>在内存中的布局自低到高为：代码段、数据段（含已初始化的 <code>data</code> 与未初始化的 <code>bss</code>）、堆（向上增长，<code>malloc</code> 分配）、栈（向下增长，存放函数调用帧与局部变量）。进程有<strong>五种基本状态</strong>：创建态、就绪态、运行态、阻塞态、终止态。状态转换的<strong>唯一主动转换</strong>是"运行 → 阻塞"（进程自己请求 <code>I/O</code> 或申请资源），其余都是被动的：<strong>就绪 → 运行</strong>由调度程序选中引起，<strong>运行 → 就绪</strong>由时间片用完或更高优先级抢占引起，<strong>阻塞 → 就绪</strong>由 <code>I/O</code> 完成或资源可用引起；<strong>阻塞态不能直接转为运行态</strong>，必须先回到就绪态。</p>
+<p><strong>进程控制</strong>由原语完成：创建（分配 <code>PCB</code> 与资源、置为就绪）、终止（回收资源、撤销 <code>PCB</code>）、阻塞与唤醒、挂起与激活。<strong>进程间通信</strong>的常用机制各有取舍：<strong>共享内存</strong>由内核在进程的地址空间之间建立共享区、双方直接读写，速度最快，但<strong>必须自己用信号量等方式实现同步互斥</strong>；<strong>消息传递</strong>（<code>send</code>/<code>receive</code>）把消息经内核缓冲区投递，天然同步、可跨机，适合数据量小或松耦合的进程；<strong>管道</strong>是一段固定大小的内核缓冲区，按字节流半双工传送，读空或写满都会阻塞，适合有亲缘关系的进程按先进先出传送数据流；<strong>信号</strong>只传一个信号编号、用于异步事件通知（如 <code>SIGINT</code>），不能承载大量数据，由信号处理函数或默认动作响应。</p>
+<p><strong>线程</strong>与进程的本质差别是：<strong>同一进程内的各线程共享该进程的资源</strong>（代码段、数据段、堆、打开的文件、地址空间），只<strong>私有栈、寄存器现场与线程控制块 <code>TCB</code></strong>；因此线程切换不需要切换地址空间，开销远小于进程切换。<strong>用户级线程</strong>由用户库函数创建与管理、内核并不感知，线程的创建、切换与调度都在用户态完成、无需陷入内核，代价小，但<strong>一个线程执行阻塞系统调用就会让整个进程阻塞</strong>、也无法把同进程的线程真正并行到多核上；<strong>内核级线程</strong>由内核为每个线程维护 <code>TCB</code> 并单独调度，一个线程阻塞时同进程的其他线程仍可运行、也能并行到多核，代价是每次切换都要<strong>陷入内核</strong>（用户态→内核态→用户态两次模式切换）并由内核调度程序完成。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>PCB 是进程存在的唯一标志</code>；进程 = 程序段 + 数据段 + <code>PCB</code>。</li>
 <li><code>进程是资源分配单位，线程是调度单位</code> —— 线程只私有栈与寄存器现场，其余与同进程内其他线程共享。</li>
 <li><code>运行 -&gt; 阻塞 是唯一主动转换，阻塞 -&gt; 就绪 是被动转换，阻塞不能直接到运行</code> —— 五状态转换的核心结论。</li>
 <li><code>进程映像布局（低到高）：代码段 -&gt; 数据段 -&gt; 堆 -&gt; 栈</code>；堆向上增长、栈向下增长，二者相向生长。</li>
-<li><code>用户级线程阻塞则整个进程阻塞、不能并行于多核；内核级线程可独立调度</code> —— 两类线程的本质差异。</li>
+<li><code>用户级线程：切换在用户态完成、不陷入内核、代价小</code> —— 但内核只看到进程，一个线程阻塞系统调用会让整个进程阻塞，也不能多核并行。</li>
+<li><code>内核级线程：每线程有 TCB、可被独立调度到多核</code> —— 一个线程阻塞不影响同进程其他线程，代价是切换要陷入内核（两次模式切换）。</li>
 <li><code>线程切换不切换地址空间，进程切换要换页表并刷新 TLB</code> —— 这是线程切换开销更小的根本原因。</li>
+<li><code>共享内存最快但要自己同步；消息传递天然同步；管道半双工；信号只传编号</code> —— 按"是否传数据、是否跨机"选 IPC：共享内存适合大数据高频交换，信号只做异步通知。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>进程映像的内存布局</strong>：堆与栈相向增长，中间是尚未分配的空闲区；多个线程共享代码段、数据段与堆，但各自有独立的栈。</p>
@@ -101,6 +106,23 @@
    per-thread private: stack, registers, PC, TCB
    shared by threads of one process: text, data, bss, heap,
                                     open files, address space
+</code></pre></div>
+<p><strong>两类线程的实现方式与阻塞代价</strong>：用户级线程的调度由内核之上的一层用户库完成、内核按进程调度；内核级线程由内核直接调度，可分散到多个处理机。</p>
+<div class="codebox ascii"><div class="bar"><span>ASCII 示意图</span><button type="button">复制</button></div><pre><code>thread models: who schedules, and what a block costs
+
+  (1) many-to-one: user-level threads, managed by a user library
+
+      process: T1  T2  T3        created and switched in user mode
+      the kernel sees only ONE thread for the whole process
+      -&gt; runs on ONE CPU core
+      -&gt; a blocking system call by any thread blocks THE WHOLE PROCESS
+
+  (2) one-to-one: kernel-level threads, one TCB per thread
+
+      process: T1  T2  T3
+      the kernel has one thread (K1, K2, K3) for each user thread
+      -&gt; they can run on SEVERAL cores in parallel
+      -&gt; a blocked thread does NOT stop the other threads of the process
 </code></pre></div>
 <p><strong>进程五状态转换图</strong>：箭头旁标注引起转换的原因，注意"阻塞 → 运行"这条边不存在。</p>
 <div class="fig"><div class="mermaid" data-src="stateDiagram-v2
@@ -133,9 +155,9 @@
 </code></pre></details></div>
 </div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
 <li>认为阻塞态可以直接转为运行态：进程被唤醒后只能进入<strong>就绪态</strong>排队等 <code>CPU</code>，必须再经调度才能运行；画状态图时多画一条"阻塞 → 运行"是最典型的失分点。</li>
-<li>把进程与线程的资源拥有关系搞反：线程<strong>不拥有</strong>资源（除栈与寄存器等私有部分），资源属于进程；因此"线程是资源分配单位"的说法是错误的。</li>
+<li>把进程与线程的资源/调度关系搞反，并误判用户级线程的阻塞影响：线程<strong>不拥有</strong>资源（除栈与寄存器现场），进程才是资源分配单位；内核不认识用户级线程，一个用户级线程执行阻塞系统调用会让<strong>整个进程</strong>阻塞。</li>
 <li>混淆挂起状态与阻塞状态：<strong>挂起</strong>是把进程映像换出到外存（不占内存，属"静止"状态），<strong>阻塞</strong>是等待事件（仍在内存）；挂起态与阻塞态是两个不同维度，可组合为"就绪挂起""阻塞挂起"。</li>
-<li>认为用户级线程能被内核独立调度：用户级线程对内核不可见，内核只认识进程，因此<strong>一个用户级线程执行阻塞系统调用会导致整个进程阻塞</strong>，也无法在多核上真正并行。</li>
+<li>把四种 IPC 的特性记混：共享内存最快但<strong>必须自己同步</strong>（内核不替你互斥）；管道是<strong>半双工</strong>字节流、读空或写满都会阻塞；消息传递要经内核复制、天然同步但开销大；信号只传编号、用于<strong>异步通知</strong>，不能当数据通道。</li>
 </ul>
 </div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2020 年真题改编（单项选择题，2 分）</span></p>

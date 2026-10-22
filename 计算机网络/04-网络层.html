@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -26,7 +27,8 @@
 <a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../计算机组成原理/07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -63,19 +65,21 @@
 
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 30 次；涉及年份：2009—2025 年几乎年年出现，2011、2013、2015、2017、2019、2021、2022、2023、2024、2025 年为典型年份；分数占比约 32%；主要题型：选择题 + 47 题综合应用题（IP 分片、子网划分、路由聚合、路由协议）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
-<p>网络层的核心是<strong>逻辑寻址与路由转发</strong>。<code>IPv4</code> 地址长 <code>32</code> 位，传统分类地址为 <code>A</code> 类（<code>0</code> 开头，网络号 <code>8</code> 位，可用网络数 <code>2^7 - 2</code>）、<code>B</code> 类（<code>10</code> 开头，网络号 <code>16</code> 位）、<code>C</code> 类（<code>110</code> 开头，网络号 <code>24</code> 位）、<code>D</code> 类（组播）与 <code>E</code> 类（保留）；每类中<strong>主机号全 <code>0</code> 表示网络地址、全 <code>1</code> 表示广播地址</strong>，故 <code>C</code> 类网络可用主机数为 <code>2^8 - 2 = 254</code>。<strong>子网划分</strong>用子网掩码从主机号中借位，可用主机数 <code>= 2^h - 2</code>（<code>h</code> 为主机号位数）；<strong><code>CIDR</code>（无分类编址）</strong>用"<code>IP/前缀长度</code>"表示，支持<strong>路由聚合</strong>（把若干连续网络合并为一条路由）与<strong>最长前缀匹配</strong>（转发时选前缀最长即最具体的路由）。</p>
-<p><strong><code>IP</code> 数据报首部</strong>固定部分 <code>20 B</code>，关键字段有：版本、首部长度（以 <code>4 B</code> 为单位）、总长度（以 <code>1 B</code> 为单位）、标识、标志（<code>DF</code> 不允许分片、<code>MF</code> 后面还有分片）、<strong>片偏移（以 <code>8 B</code> 为单位）</strong>、生存时间 <code>TTL</code>（每经过一个路由器减 <code>1</code>，为 <code>0</code> 则丢弃）、协议、首部校验和（只校验首部）。<strong>分片计算</strong>的三条规则：每片的数据部分长度必须是 <code>8 B</code> 的整数倍、每片都带自己的 <code>IP</code> 首部、片偏移等于"该片数据在原始数据报数据部分中的位置 ÷ 8"。</p>
-<p><strong>地址解析 <code>ARP</code></strong> 在<strong>同一网段内</strong>用广播请求、单播应答把 <code>IP</code> 地址解析为 <code>MAC</code> 地址；若目的主机不在同一网段，主机解析的是<strong>默认网关的 <code>MAC</code> 地址</strong>，由路由器逐跳转发。<strong>动态主机配置 <code>DHCP</code></strong> 让主机自动获取 <code>IP</code> 地址，交互为 <code>DISCOVER → OFFER → REQUEST → ACK</code> 四步；</p>
-<p><strong>网际控制报文协议 <code>ICMP</code></strong> 用于差错报告（终点不可达、超时、参数问题等）与询问（回送请求/应答即 <code>ping</code>、时间戳请求），而 <strong><code>traceroute</code></strong> 利用逐跳递增 <code>TTL</code> 触发超时报文来发现路径。<strong>路由协议</strong>中，<strong><code>RIP</code></strong> 是基于距离向量、以<strong>跳数</strong>为度量（最大 <code>15</code> 跳，<code>16</code> 表示不可达）的内部网关协议，每 <code>30 s</code> 与相邻路由器交换<strong>整个路由表</strong>，收敛慢且存在"坏消息传得慢"的问题；<strong><code>OSPF</code></strong> 是基于链路状态、用 <code>Dijkstra</code> 算法计算最短路径的内部网关协议，用洪泛法向<strong>全网</strong>发送链路状态，收敛快、支持多路径与区域划分；</p>
-<p><strong><code>BGP</code></strong> 是外部网关协议，基于<strong>路径向量</strong>，在自治系统之间交换可达性信息，力求选择"较好的"而非"最优的"路由。<strong><code>NAT</code></strong> 让私有地址通过路由器转换成公有地址访问因特网，<code>NAPT</code> 还用端口号区分不同内部主机，从而让多台主机共享一个公网地址；<strong><code>IPv6</code></strong> 地址长 <code>128</code> 位，首部固定 <code>40 B</code>，取消了首部校验和与分片字段（分片由源主机完成）。</p>
+<p>网络层的核心是<strong>逻辑寻址与路由转发</strong>：<code>IPv4</code> 地址长 <code>32</code> 位，传统分类是 <code>A</code> 类（<code>0</code> 开头，网络号 <code>8</code> 位，可用网络数 <code>2^7 - 2</code>）、<code>B</code> 类（<code>10</code> 开头，网络号 <code>16</code> 位）、<code>C</code> 类（<code>110</code> 开头，网络号 <code>24</code> 位，可用主机数 <code>2^8 - 2 = 254</code>）、<code>D</code> 类（组播）与 <code>E</code> 类（保留），每类中<strong>主机号全 <code>0</code> 表示网络地址、全 <code>1</code> 表示广播地址</strong>。<strong>子网划分</strong>用子网掩码从主机号借位，可用主机数 <code>= 2^h - 2</code>（<code>h</code> 为主机号位数）；</p>
+<p><strong><code>CIDR</code></strong> 用"<code>IP/前缀长度</code>"表示，支持<strong>路由聚合</strong>，转发时按<strong>最长前缀匹配</strong>选取前缀最长（最具体）的匹配项；<strong>默认路由 <code>0.0.0.0/0</code></strong> 的前缀长度为 <code>0</code>、与任何目的地址都匹配，因此<strong>只有在没有更具体的匹配项时才命中默认路由</strong>，把分组交给默认网关。</p>
+<p><strong><code>IP</code> 数据报首部</strong>固定部分 <code>20 B</code>，关键字段有版本、首部长度（以 <code>4 B</code> 为单位）、总长度（以 <code>1 B</code> 为单位）、标识、标志（<code>DF</code> 不允许分片、<code>MF</code> 表示后面还有分片）、<strong>片偏移（以 <code>8 B</code> 为单位）</strong>、<code>TTL</code>（每经一个路由器减 <code>1</code>，为 <code>0</code> 则丢弃）、协议、首部校验和（只校验首部）；<strong>分片</strong>时每片的数据长度必须是 <code>8 B</code> 的整数倍、每片都带自己的 <code>20 B</code> 首部、片偏移等于"该片首字节在原始数据部分中的位置 ÷ 8"。</p>
+<p><strong>地址解析 <code>ARP</code></strong> 在<strong>同一网段内</strong>用广播请求、单播应答把 <code>IP</code> 地址解析为 <code>MAC</code> 地址，若目的主机不在同一网段，解析的是<strong>默认网关的 <code>MAC</code> 地址</strong>，再由路由器逐跳转发；<strong>动态主机配置 <code>DHCP</code></strong> 让主机自动获取 <code>IP</code> 地址，交互为 <code>DISCOVER → OFFER → REQUEST → ACK</code> 四步。</p>
+<p><strong><code>ICMP</code></strong> 用于差错报告（终点不可达、超时、参数问题等）与询问（回送请求/应答即 <code>ping</code>、时间戳请求），而 <strong><code>traceroute</code></strong> 靠逐跳递增 <code>TTL</code> 触发超时报文来发现路径。<strong>路由协议</strong>中，<strong><code>RIP</code></strong> 是基于距离向量、以<strong>跳数</strong>为度量（最大 <code>15</code> 跳，<code>16</code> 表示不可达）的内部网关协议，每 <code>30 s</code> 交换整个路由表，收敛慢且有"坏消息传得慢"的问题；<strong><code>OSPF</code></strong> 是基于链路状态、用 <code>Dijkstra</code> 算法计算最短路径的内部网关协议，洪泛链路状态、收敛快；<strong><code>BGP</code></strong> 是自治系统之间的路径向量协议；<strong><code>SDN</code>（软件定义网络）</strong> 则把<strong>控制平面与数据平面分离</strong>，路由决策集中在控制器，由控制器通过 <code>OpenFlow</code> 等南向接口向交换机下发<strong>流表</strong>，交换机只按"匹配字段 + 动作"查流表转发。</p>
+<p><strong><code>NAT</code></strong> 让私有地址经路由器转换成公有地址访问因特网，<code>NAPT</code> 还用端口号区分不同内部主机，使多台主机共享一个公网地址；<strong><code>IPv6</code></strong> 地址长 <code>128</code> 位、首部固定 <code>40 B</code>，取消了首部校验和与分片字段（分片由源主机完成）。<strong>移动 IP</strong> 给移动结点分配一个固定的<strong>家乡地址</strong>，它漫游到外地网络后从<strong>外地代理</strong>取得<strong>转交地址</strong>、并登记到<strong>家乡代理</strong>；家乡代理截获发往家乡地址的分组，用<strong>隧道</strong>把原分组封装（外层目的地址为转交地址）转发给外地代理，再由外地代理交给移动结点，整个过程对上层透明。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>可用主机数 = 2^h - 2</code>（<code>h</code> 为主机号位数） —— 减去网络地址（全 <code>0</code>）与广播地址（全 <code>1</code>）。</li>
-<li><code>路由聚合：把若干网络写成二进制取共同前缀</code>；转发时用<strong>最长前缀匹配</strong>。</li>
-<li><code>IP 首部固定 20 B、片偏移以 8 B 为单位、总长度以 1 B 为单位</code> —— 分片计算的三条单位陷阱。</li>
-<li><code>分片时每片数据长度必须是 8 B 的整数倍</code>，除最后一片外都应尽量取满 <code>MTU - 20</code>。</li>
-<li><code>ARP 只在同一网段内解析目的主机 MAC；跨网段解析默认网关的 MAC</code>。</li>
+<li><code>路由聚合取共同前缀；最长前缀匹配取最具体的一条；都不匹配才命中默认路由 0.0.0.0/0</code> —— <code>0.0.0.0/0</code> 前缀长度 <code>0</code>，与任何地址都匹配。</li>
+<li><code>IP 首部固定 20 B；总长度以 1 B、片偏移以 8 B 为单位</code> —— 每片数据长度须为 <code>8 B</code> 整数倍，除末片外取满 <code>MTU - 20</code>。</li>
+<li><code>ARP 同网段解析目的主机 MAC；跨网段解析默认网关 MAC</code>；<code>DHCP 四步 DISCOVER → OFFER → REQUEST → ACK</code>。</li>
 <li><code>RIP 距离向量、最大 15 跳；OSPF 链路状态、用 Dijkstra；BGP 路径向量</code> —— 三种路由协议的类型与算法是必考对应关系。</li>
 <li><code>TTL 每经一个路由器减 1，为 0 丢弃并发 ICMP 超时报文</code> —— 这是 <code>traceroute</code> 的原理。</li>
+<li><code>SDN：控制平面与数据平面分离，控制器经 OpenFlow 下发流表，交换机只做匹配转发</code>。</li>
+<li><code>移动 IP：家乡代理截获分组，隧道转发到外地代理/转交地址，再交给移动结点</code> —— 对上层透明。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong><code>IP</code> 数据报首部格式与分片字段变化</strong>：分片只改动与长度、标志、偏移相关的字段，标识字段在各片中保持相同。</p>
@@ -174,7 +178,7 @@ MTU = 1500 B, so max data per fragment = 1500 - 20 = 1480 B
 <li>片偏移忘记除以 <code>8</code>：<code>片偏移</code>字段的单位是 <code>8 B</code>，因此偏移值 <code>= 该片首字节在原始数据部分中的位置 / 8</code>；直接填字节位置会使偏移量放大 8 倍，是最常见的大题失分点。</li>
 <li>可用主机数忘记减 <code>2</code>：<code>2^h - 2</code> 中的 <code>2</code> 是网络地址（主机号全 <code>0</code>）与广播地址（主机号全 <code>1</code>）；只有在 <code>31</code> 位前缀的点对点链路等特殊场景才不减。</li>
 <li>跨网段时 <code>ARP</code> 解析错对象：<code>ARP</code> 只能解析<strong>同一网段内</strong>的 <code>MAC</code> 地址，跨网段时源主机解析的是<strong>默认网关</strong>的 <code>MAC</code>，而不是远端目的主机的 <code>MAC</code>（源主机根本不知道远端的 <code>MAC</code>）。</li>
-<li>三种路由协议的类型与算法张冠李戴：<code>RIP</code> 是<strong>距离向量</strong>（度量是跳数，最大 <code>15</code> 跳，<code>16</code> 为不可达），<code>OSPF</code> 是<strong>链路状态</strong>（用 <code>Dijkstra</code> 最短路径算法），<code>BGP</code> 是<strong>路径向量</strong>（用于自治系统之间）；把 <code>OSPF</code> 说成距离向量或把 <code>RIP</code> 的度量说成带宽都是错的。</li>
+<li>三种路由协议的类型与算法张冠李戴：<code>RIP</code> 是<strong>距离向量</strong>（跳数，最大 <code>15</code> 跳）、<code>OSPF</code> 是<strong>链路状态</strong>（<code>Dijkstra</code>）、<code>BGP</code> 是<strong>路径向量</strong>（自治系统之间）；另注意默认路由 <code>0.0.0.0/0</code> 的前缀长度为 <code>0</code>，与任何目的地址都匹配，但只有没有更长前缀的匹配项时才命中，不能当成优先级最高的路由。</li>
 </ul>
 </div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">
 <p class="q-stem"><span class="q-src">2018 年真题改编（综合应用题，9 分）</span></p>

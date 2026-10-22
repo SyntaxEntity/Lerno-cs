@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -26,7 +27,8 @@
 <a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -66,6 +68,7 @@
 <p><code>I/O</code> 接口（设备控制器）的作用是<strong>数据缓冲、格式转换、状态与命令寄存、地址译码</strong>，它把 CPU 的高速并行总线与设备的低速串行工作方式解耦。<code>I/O</code> 端口的编址有两种：<strong>统一编址</strong>（把端口当作主存单元，用普通访存指令访问，无需专门指令但占用主存地址空间）与<strong>独立编址</strong>（有独立的地址空间与专用 <code>IN/OUT</code> 指令，不占主存空间但指令类型增多）。<code>I/O</code> 控制方式的发展主线是<strong>CPU 干预程度逐步降低</strong>：<strong>程序查询</strong>方式下 CPU 不断读状态寄存器空转等待，CPU 与设备完全串行；</p>
 <p><strong>程序中断</strong>方式下 CPU 发出命令后继续执行原程序，设备就绪时用中断通知 CPU 在<strong>一条指令执行结束后</strong>响应，数据传送仍需 CPU 用指令搬入主存；<strong>DMA</strong> 方式由 DMA 控制器直接在主存与设备之间成块传送，数据<strong>不经过 CPU 的寄存器</strong>，每传送一个字（或一个数据块）占用一次总线（周期挪用/周期窃取），只有在传送前（初始化）与传送后（中断处理）才需要 CPU 参与；<strong>通道</strong>方式由通道处理器执行通道程序，进一步把 CPU 从 <code>I/O</code> 管理中解放出来。</p>
 <p><strong>中断系统</strong>要点：CPU 响应中断的条件是"有中断请求 + 中断允许触发器为 1 + 当前指令执行结束"；响应时由硬件自动执行<strong>中断隐指令</strong>完成三件事——<strong>关中断、保存断点（<code>PC</code>）、取中断向量</strong>；随后由中断服务程序保存现场并执行服务。</p>
+<p><strong>中断向量表</strong>位于主存固定区域，表项按<strong>中断类型号</strong>索引，每项存放对应 <code>ISR</code> 的入口地址（或入口地址的地址）；CPU 响应中断后，硬件先执行<strong>中断隐指令</strong>完成关中断、保存断点（<code>PC</code>、<code>PSW</code>），再按中断控制器送来的中断类型号查表、把取出的入口地址送入 <code>PC</code> 转入 <code>ISR</code>，此后保存现场、执行中断服务、恢复现场才由 <code>ISR</code>（软件）完成。</p>
 <p><strong>多重中断</strong>（中断嵌套）靠<strong>中断屏蔽字</strong>控制：屏蔽字中某位为 <code>1</code> 表示屏蔽（禁止）对应的中断源，因此优先级越高的中断源，其屏蔽字中"1"的位数越多。<strong>磁盘</strong>的性能指标是存取时间，<code>存取时间 = 寻道时间 + 旋转延迟 + 传输时间</code>，其中平均旋转延迟为旋转半圈的时间 <code>60 / (2 × 转速)</code>（转速单位 <code>rpm</code>）；数据传输率与位密度、转速（线速度）相关，<code>数据传输率 = 每条磁道的容量 / 旋转一圈的时间</code>。固态硬盘 <code>SSD</code> 基于闪存，无机械寻道与旋转延迟，随机访问快，但存在<strong>写放大</strong>、<strong>擦除次数受限</strong>（寿命）的问题。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>四种 I/O 方式 CPU 干预程度：程序查询 &gt; 程序中断 &gt; DMA &gt; 通道</code> —— 判据是"CPU 是否需要在传送过程中持续参与"。</li>
@@ -74,6 +77,8 @@
 <li><code>中断响应时机：一条指令执行结束后</code> —— 而不是任意时刻，也不是一个时钟周期后。</li>
 <li><code>屏蔽字为 1 表示屏蔽，优先级越高屏蔽的位数越多</code> —— 多重中断靠它实现嵌套。</li>
 <li><code>磁盘存取时间 = 寻道 + 旋转延迟 + 传输</code>，<code>平均旋转延迟 = 60 / (2 × 转速)</code> 秒 —— 旋转延迟取半圈。</li>
+<li><code>中断向量表：表项按中断类型号索引，存放 ISR 入口地址（或入口地址的地址）</code> —— 响应时硬件用类型号查表，把入口地址送入 <code>PC</code>。</li>
+<li><code>向量地址 = 表项地址（由类型号换算），表项内容才是 ISR 入口</code> —— 间接向量时内容是入口地址的地址，需再取一次。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>四种 I/O 控制方式的数据通路与 CPU 参与程度</strong>：从程序查询到通道，CPU 的角色从"全程搬运工"逐步退化为"发起与善后"。</p>

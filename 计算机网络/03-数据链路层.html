@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -26,7 +27,8 @@
 <a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="../计算机组成原理/07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../计算机组成原理/03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -63,19 +65,23 @@
 
 <section class="sec sec-freq" id="sec-freq"><div class="sec-h"><span class="ic" aria-hidden="true">📊</span><h2 class="tt">考频统计</h2><span class="hint">历年考察次数与题型</span></div><div class="box"><b>考频</b>　考察次数 22 次；涉及年份：2010—2025 年高频，2011、2013、2015、2017、2019、2020、2022、2024 年为典型年份；分数占比约 20%；主要题型：选择题 + 综合应用题（滑动窗口、CSMA/CD、以太网帧）。</p>
 </div></section><section class="sec sec-core" id="sec-core"><div class="sec-h"><span class="ic" aria-hidden="true">📖</span><h2 class="tt">核心讲解</h2><span class="hint">逐个考点讲清</span></div><div class="box">
-<p>数据链路层的三个基本功能是<strong>封装成帧（组帧）、差错控制、流量控制</strong>。<strong>组帧</strong>常用四种方法：字符计数法（用计数字段标明帧长，一旦计数出错就全盘失步）、<strong>字符填充法</strong>（用 <code>SOH</code>/<code>EOT</code> 定界，数据中出现的 <code>SOH</code>/<code>EOT</code> 前插入转义字符 <code>ESC</code>，接收方删除转义）、<strong>零比特填充法</strong>（<code>HDLC</code> 使用：在标志字段 <code>01111110</code> 之外的数据中，每出现 <strong>5 个连续 <code>1</code> 就填入一个 <code>0</code></strong>，接收方每见 5 个连续 <code>1</code> 就删除其后的 <code>0</code>）、<strong>违规编码法</strong>（如曼彻斯特编码中的非法电平组合），后两种是"透明传输"的标准做法。<strong>差错控制</strong>中，<strong>奇偶校验</strong>只能检出奇数个错误；</p>
-<p><strong>循环冗余校验 <code>CRC</code></strong> 用生成多项式做<strong>模 2 除法</strong>求余数作为 <code>FCS</code>，能检出所有单比特错、所有奇数个错以及长度不超过生成多项式阶数的突发错；<strong>海明码</strong>通过 <code>2^r &gt;= k + r + 1</code> 确定所需的<strong>校验位数 <code>r</code></strong>（<code>k</code> 为数据位数），校验位放在 <code>2^i</code> 位置（第 1、2、4、8… 位），可实现<strong>一位纠错</strong>（配合总校验位可做到"纠一位、检两位"）。<strong>流量控制与可靠传输</strong>三种协议必须分清：<strong>停止-等待</strong>发送窗口为 <code>1</code>、每发一帧等一个确认，信道利用率 <code>= T_d / (T_d + RTT + T_a)</code>（<code>T_d</code> 为发送时延、<code>T_a</code> 为确认发送时延）；</p>
-<p><strong>后退 <code>N</code> 帧 <code>GBN</code></strong> 用累计确认，接收窗口为 <code>1</code>，出错后重传从出错帧开始的全部帧，<strong>发送窗口上限为 <code>2^n - 1</code></strong>（<code>n</code> 为序号位数）；<strong>选择重传 <code>SR</code></strong> 逐帧确认、接收方缓存乱序帧，只重传出错帧，<strong>发送窗口与接收窗口上限均为 <code>2^(n-1)</code></strong>，即窗口之和不超过 <code>2^n</code>。<strong>介质访问控制</strong>分三类：<strong>信道划分</strong>（频分 <code>FDM</code>、时分 <code>TDM</code>、码分 <code>CDM</code>，各站点固定分配、无冲突）、<strong>随机访问</strong>（<code>ALOHA</code>、<code>CSMA</code>、<code>CSMA/CD</code>、<code>CSMA/CA</code>）、<strong>轮询访问</strong>（令牌传递）。</p>
-<p><strong><code>CSMA/CD</code></strong> 的工作是"<strong>先听后发、边听边发、冲突停发、随机重发</strong>"：站点发送前先监听信道，发送中继续监听，一旦检测到冲突就立即停止并发送<strong>人为干扰信号</strong>，然后按<strong>截断二进制指数退避</strong>算法等待重发（第 <code>i</code> 次冲突后从 <code>{0, 1, ..., 2^k - 1}</code> 中随机取 <code>r</code>，<code>k = min(i, 10)</code>，等待 <code>r</code> 倍争用期）。<strong>最小帧长</strong>的依据是"发送时延必须不小于往返传播时延（争用期 <code>2τ</code>）"，否则发送方在冲突信号返回前已发完帧而无法检测冲突：<code>最小帧长 = 2 × 传播时延 × 数据率 = 争用期 × 数据率</code>，以太网取 <code>2τ = 51.2 μs</code>、<code>10 Mb/s</code>，故最小帧长 <code>512 bit = 64 B</code>。</p>
-<p><strong>以太网帧</strong>的 <code>MAC</code> 地址为 <code>48</code> 位，帧格式为"目的地址（6 <code>B</code>）+ 源地址（6 <code>B</code>）+ 类型（2 <code>B</code>）+ 数据（46—1500 <code>B</code>）+ <code>FCS</code>（4 <code>B</code>）"，故最小帧 <code>64 B</code>、最大帧 <code>1518 B</code>。<strong>交换机</strong>工作在数据链路层，通过<strong>自学习</strong>建立"<code>MAC</code> 地址 → 端口"的转发表，能隔离冲突域但不能隔离广播域。</p>
+<p>数据链路层的三个基本功能是<strong>封装成帧（组帧）、差错控制、流量控制</strong>；<strong>组帧</strong>常用<strong>字符计数法</strong>（计数字段出错即全盘失步）、<strong>字符填充法</strong>（用 <code>SOH</code>/<code>EOT</code> 定界，数据中出现的定界符前插转义字符 <code>ESC</code>，接收方再删除）、<strong>零比特填充法</strong>（<code>HDLC</code> 使用：标志字段为 <code>01111110</code>，数据中每出现 <strong>5 个连续 <code>1</code> 就填入一个 <code>0</code></strong>，接收方每见 5 个连续 <code>1</code> 就删除其后的 <code>0</code>）与<strong>违规编码法</strong>（如曼彻斯特编码中的非法电平组合），后两者是"透明传输"的标准做法。</p>
+<p><strong>差错控制</strong>中，<strong>奇偶校验</strong>只能检出奇数个错误；<strong>循环冗余校验 <code>CRC</code></strong> 用生成多项式做<strong>模 2 除法</strong>，把余数作为 <code>FCS</code>，能检出全部单比特错、全部奇数个错以及长度不超过生成多项式阶数的突发错；<strong>海明码</strong>由 <code>2^r &gt;= k + r + 1</code>（<code>k</code> 为数据位数）确定校验位数 <code>r</code>，校验位放在第 1、2、4、8… 位，可<strong>纠正一位错</strong>（配合总校验位还可"纠一位、检两位"）。</p>
+<p><strong>流量控制与可靠传输</strong>的三种协议必须分清：<strong>停止-等待</strong>发送窗口为 <code>1</code>、每发一帧等一个确认，信道利用率 <code>= T_d / (T_d + RTT + T_a)</code>（<code>T_d</code> 为发送时延、<code>T_a</code> 为确认发送时延）；<strong>后退 <code>N</code> 帧 <code>GBN</code></strong> 用累计确认、接收窗口恒为 <code>1</code>、发送窗口上限 <code>2^n - 1</code>；<strong>选择重传 <code>SR</code></strong> 逐帧确认并缓存乱序帧、只重传出错帧，收发窗口上限均为 <code>2^(n-1)</code>，即窗口之和不超过 <code>2^n</code>。</p>
+<p><strong>介质访问控制</strong>分<strong>信道划分</strong>、<strong>随机访问</strong>与<strong>轮询访问</strong>三类：<strong>频分 <code>FDM</code></strong> 把频带划成互不重叠的子频段，各站同时占用不同频段；<strong>时分 <code>TDM</code></strong> 把时间划分成等长的 TDM 帧、帧内再分成时隙，每站固定占用一个时隙轮流发送，需严格的时间同步、本站无数据时时隙也被浪费；<strong>波分 <code>WDM</code></strong> 在光纤中按波长划分，本质是光的频分；<strong>码分 <code>CDM</code></strong> 给每站分配互不相同的<strong>正交码片序列</strong>，发 <code>1</code> 发码片本身、发 <code>0</code> 发其反码，各站同时同频发送，接收方用该站码片做规格化内积即可恢复数据。</p>
+<p><strong><code>CSMA/CD</code></strong> 的工作是"<strong>先听后发、边听边发、冲突停发、随机重发</strong>"：站点发送前先监听，发送中继续监听，检测到冲突立即停止并发送<strong>人为干扰信号</strong>，再按<strong>截断二进制指数退避</strong>等待重发（第 <code>i</code> 次冲突后从 <code>{0, 1, ..., 2^k - 1}</code> 中随机取 <code>r</code>，<code>k = min(i, 10)</code>，等待 <code>r</code> 倍争用期）。<strong>最小帧长</strong>的依据是"发送时延必须不小于往返传播时延（争用期 <code>2τ</code>）"，否则发送方在冲突信号返回前已发完帧而无法检测冲突：<code>最小帧长 = 2τ × 数据率</code>，以太网取 <code>2τ = 51.2 μs</code>、数据率 <code>10 Mb/s</code>，故最小帧长 <code>512 bit = 64 B</code>。</p>
+<p><strong>IEEE 802.11 无线局域网</strong>用 <strong><code>CSMA/CA</code></strong> 而不是 <code>CSMA/CD</code>：无线站点<strong>不能边发边听</strong>（发射时自身信号比收到的微弱信号强几个数量级、收发共用天线时无法同时接收，且存在隐藏站使冲突检测不可靠），只能"先听后发 + 随机退避 + 发送后等 <code>ACK</code>"地<strong>避免冲突</strong>，收到 <code>ACK</code> 才算成功、超时重传；可选的 <strong><code>RTS</code>/<code>CTS</code></strong> 由发送方先发 <code>RTS</code>、接收方回 <code>CTS</code>，其余听到的站点按其中通告的持续时间推迟发送（设置 <code>NAV</code>），以此缓解隐藏站问题，并用短控制帧的冲突代替长数据帧的冲突以降低代价。</p>
+<p><strong>以太网帧</strong>为"目的地址（6 <code>B</code>）+ 源地址（6 <code>B</code>）+ 类型（2 <code>B</code>）+ 数据（46—1500 <code>B</code>）+ <code>FCS</code>（4 <code>B</code>）"，故最小帧 <code>64 B</code>、最大帧 <code>1518 B</code>；<strong>交换机</strong>靠<strong>自学习</strong>建立"<code>MAC</code> 地址 → 端口"的转发表，能隔离冲突域但不隔离广播域；</p>
+<p>广域网常用的 <strong><code>PPP</code></strong> 由三部分组成：<strong>把 <code>IP</code> 数据报封装到串行链路的方法</strong>、链路控制协议 <strong><code>LCP</code></strong>（建立、配置和测试数据链路）与网络控制协议 <strong><code>NCP</code></strong>（每个网络层协议一个，如 <code>IPCP</code> 协商 <code>IP</code> 地址），其帧格式为标志 <code>7E</code> + 地址 <code>FF</code> + 控制 <code>03</code> + <strong>协议（2 <code>B</code>，如 <code>0x0021</code> 表示承载 <code>IP</code>）</strong> + 信息（不超过 1500 <code>B</code>）+ <code>FCS</code>（2 <code>B</code>）+ 标志 <code>7E</code>，异步链路用字节填充、同步链路用零比特填充来保证透明；PPP 与以太网帧的关键差异是<strong>没有源/目的 <code>MAC</code> 地址</strong>（点对点链路只有两端）、用协议字段而非类型字段标识上层、<code>FCS</code> 只有 <code>2 B</code>，并且只检错不重传、不要求最小帧长。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
-<li><code>零比特填充：发送方每 5 个连续 1 后插 0，接收方每 5 个连续 1 后删 0</code> —— 保证数据对标志字段 <code>01111110</code> 透明。</li>
-<li><code>海明码校验位数：2^r &gt;= k + r + 1</code>（<code>k</code> 数据位、<code>r</code> 校验位） —— 校验位位于第 1、2、4、8… 位。</li>
-<li><code>CRC 用模 2 除法求余数作为 FCS</code> —— 生成多项式最高次为 <code>r</code> 则余数取 <code>r</code> 位，且模 2 运算不产生进位。</li>
-<li><code>GBN 发送窗口 &lt;= 2^n - 1，接收窗口 = 1</code>；<code>SR 收发窗口均 &lt;= 2^(n-1)</code> —— 序号位数 <code>n</code> 决定窗口上限。</li>
-<li><code>CSMA/CD：先听后发、边听边发、冲突停发、随机重发</code>；<code>最小帧长 = 争用期 × 数据率</code>。</li>
-<li><code>以太网最小帧 64 B、最大帧 1518 B、数据字段 46—1500 B</code> —— 小于 46 <code>B</code> 需填充。</li>
-<li><code>交换机隔离冲突域但不隔离广播域</code> —— 隔离广播域要靠路由器或 <code>VLAN</code>。</li>
+<li><code>零比特填充：发送方每出现 5 个连续 1 就插入一个 0，接收方每 5 个连续 1 删去其后的 0</code> —— 保证数据对标志字段 <code>01111110</code> 透明。</li>
+<li><code>海明码 2^r &gt;= k + r + 1 可纠一位；CRC 用模 2 除法求余数作 FCS</code> —— 校验位在第 1、2、4、8… 位，CRC 余数取生成多项式最高次 <code>r</code> 位且模 2 运算无进位。</li>
+<li><code>GBN 发送窗口 &lt;= 2^n - 1、接收窗口 = 1</code>；<code>SR 收发窗口均 &lt;= 2^(n-1)</code> —— 序号位数 <code>n</code> 决定窗口上限。</li>
+<li><code>CSMA/CD：先听后发、边听边发、冲突停发、随机重发</code>；<code>最小帧长 = 争用期 × 数据率</code> —— 以太网最小帧为 <code>64 B</code>。</li>
+<li><code>以太网最小帧 64 B、最大帧 1518 B、数据字段 46—1500 B</code> —— 小于 46 <code>B</code> 需填充，交换机隔离冲突域但不隔离广播域。</li>
+<li><code>信道划分：FDM 分频段、TDM 分时隙、WDM 分波长、CDM 分正交码片</code> —— 固定分配、各站无冲突，代价是低负载时浪费信道。</li>
+<li><code>802.11 用 CSMA/CA：无线不能边发边听，靠 ACK 确认成功、RTS/CTS 预约信道并缓解隐藏站</code> —— 与 <code>CSMA/CD</code> 相反，不检测冲突。</li>
+<li><code>PPP = 封装方法 + LCP（建链）+ NCP（网络层参数）</code>；帧无 <code>MAC</code> 地址、有 2 <code>B</code> 协议字段与 2 <code>B</code> FCS —— 面向字节、只检错不重传，区别于以太网帧。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>最小帧长的推导与以太网争用期</strong>：发送方必须在冲突信号返回之前仍在发送，否则无法检测到冲突。</p>
@@ -160,9 +166,9 @@ ethernet frame format (DIX Ethernet V2)
     C12 --&gt; C1
 </code></pre></details></div>
 </div></section><section class="sec sec-err" id="sec-err"><div class="sec-h"><span class="ic" aria-hidden="true">⚠️</span><h2 class="tt">易错点</h2><span class="hint">踩过的坑</span></div><div class="box"><ul class="errs">
-<li><code>GBN</code> 与 <code>SR</code> 的窗口上限记反：<code>GBN</code> 的发送窗口上限是 <code>2^n - 1</code>（接收窗口恒为 <code>1</code>），<code>SR</code> 的发送与接收窗口上限都是 <code>2^(n-1)</code>；把两者对调或用 <code>2^n</code> 做上限都会导致序号歧义。</li>
+<li><code>GBN</code> 与 <code>SR</code> 的窗口上限记反：<code>GBN</code> 的发送窗口上限是 <code>2^n - 1</code>（接收窗口恒为 <code>1</code>），<code>SR</code> 的发送与接收窗口上限都是 <code>2^(n-1)</code>；同理海明码公式是 <code>2^r &gt;= k + r + 1</code>，右边要<strong>加上校验位 <code>r</code> 本身</strong>，漏掉会把校验位数算小。</li>
 <li>最小帧长漏乘 <code>2</code>：<code>最小帧长 = 2τ × 数据率</code>，其中 <code>2τ</code> 是<strong>往返</strong>传播时延（争用期）；只乘单程传播时延会把最小帧长算小一半，进而误判"该帧能否被检测到冲突"。</li>
-<li>海明码校验位数公式记错：正确式子是 <code>2^r &gt;= k + r + 1</code>（<code>k</code> 为数据位数），注意不等号右边要<strong>加上 <code>r</code> 本身</strong>（表示"校验位也要被校验"）；漏掉 <code>r</code> 会得到偏小的校验位数。</li>
+<li>把无线局域网的 <code>CSMA/CA</code> 当成 <code>CSMA/CD</code>：无线站点发射时无法同时接收，也检测不到隐藏站造成的冲突，故 802.11 用随机退避 + <code>ACK</code> 确认实现<strong>冲突避免</strong>，<code>RTS</code>/<code>CTS</code> 只是可选的抑制隐藏站手段；说"无线靠冲突检测退避"即错。</li>
 <li>混淆交换机与路由器的隔离能力：交换机工作在数据链路层，能隔离<strong>冲突域</strong>但<strong>不隔离广播域</strong>（广播帧会被转发到所有端口）；隔离广播域必须用路由器或划分 <code>VLAN</code>。</li>
 </ul>
 </div></section><section class="sec sec-real" id="sec-real"><div class="sec-h"><span class="ic" aria-hidden="true">✍️</span><h2 class="tt">真题示例</h2><span class="hint">自测用</span></div><div class="box">

@@ -741,6 +741,201 @@
    "tags": [
     "静态链表"
    ]
+  },
+  {
+   "id": "ds-43",
+   "subject": "ds",
+   "topic": "06-查找",
+   "stem": "KMP 算法在模式串第 j 个字符处失配时，通常如何移动？",
+   "options": [
+    "文本指针 i 回退到本次匹配起点，模式串从头开始",
+    "文本指针 i 不回退，模式串指针 j 回退到 next[j]",
+    "文本指针 i 前进一位，模式串指针 j 归零",
+    "模式串整体右移一位，文本指针 i 回退一位"
+   ],
+   "answer": 1,
+   "explanation": "KMP 的核心是利用模式串的最长相等前后缀，失配时文本指针不回退，只把模式串指针移到 next[j]，从而避免重复比较。",
+   "source": "改编",
+   "credit": "拾阶 408（授权）",
+   "difficulty": 2,
+   "tags": [
+    "KMP"
+   ]
+  },
+  {
+   "id": "ds-44",
+   "subject": "ds",
+   "topic": "06-查找",
+   "stem": "KMP 算法相对于朴素模式匹配算法的主要改进是：",
+   "options": [
+    "文本指针不回退，利用模式串自身的前后缀信息",
+    "把模式串压缩成哈希值",
+    "每次比较两个字符而不是一个字符",
+    "先把文本串排序再匹配"
+   ],
+   "answer": 0,
+   "explanation": "KMP 在失配时只回退模式串指针，文本指针不回退，因此最坏时间复杂度从 O(mn) 降为 O(m+n)。",
+   "source": "改编",
+   "credit": "拾阶 408（授权）",
+   "difficulty": 1,
+   "tags": [
+    "KMP 对比"
+   ]
+  },
+  {
+   "id": "ds-45",
+   "subject": "ds",
+   "topic": "06-查找",
+   "stem": "朴素模式匹配算法在最坏情况下的时间复杂度是：",
+   "options": [
+    "O(m+n)",
+    "O(mn)",
+    "O(m log n)",
+    "O(n²)"
+   ],
+   "answer": 1,
+   "explanation": "最坏情况下文本串每个起点都要比较接近 m 个字符，总比较次数为 O(mn)；KMP 可降到 O(m+n)。",
+   "source": "改编",
+   "credit": "拾阶 408（授权）",
+   "difficulty": 1,
+   "tags": [
+    "朴素匹配"
+   ]
+  },
+  {
+   "id": "ds-46",
+   "subject": "ds",
+   "topic": "06-查找",
+   "stem": "KMP 中 next[j] 的常见含义是：",
+   "options": [
+    "模式串第 j 个字符在文本串中的位置",
+    "模式串前 j 个字符的最长相等前后缀长度",
+    "文本串前 j 个字符的哈希值",
+    "模式串中第 j 个字符出现的次数"
+   ],
+   "answer": 1,
+   "explanation": "next[j] 记录失配后模式串应回退到的位置，本质是模式串前 j 个字符的最长相等前后缀长度。不同教材下标约定可能整体差 1。",
+   "source": "改编",
+   "credit": "拾阶 408（授权）",
+   "difficulty": 2,
+   "tags": [
+    "next 数组"
+   ]
+  },
+  {
+   "id": "ds-47",
+   "subject": "ds",
+   "topic": "06-查找",
+   "stem": "KMP 的 nextval 数组相对于 next 数组进一步优化了什么？",
+   "options": [
+    "减少模式串存储空间",
+    "避免模式串中相同字符的重复比较",
+    "让文本指针可以回退",
+    "把匹配复杂度降为 O(1)"
+   ],
+   "answer": 1,
+   "explanation": "nextval 在 next 的基础上，如果回退后的字符仍与当前失配字符相同，就继续回退，避免对相同字符做无效比较。",
+   "source": "改编",
+   "credit": "拾阶 408（授权）",
+   "difficulty": 3,
+   "tags": [
+    "nextval"
+   ]
+  },
+  {
+   "id": "ds-48",
+   "subject": "ds",
+   "topic": "08-绪论与算法分析",
+   "stem": "下列程序段的时间复杂度是：\n\nint i = 1;\nwhile (i <= n) {\n    i = i * 3;\n}",
+   "options": [
+    "O(1)",
+    "O(log n)",
+    "O(n)",
+    "O(n^2)"
+   ],
+   "answer": 1,
+   "explanation": "i 依次取 1、3、9、…、3^k，循环条件是 3^k <= n，执行次数约为 log3 n，与 n 的对数同阶，故选 O(log n)。底数不影响渐进量级。",
+   "source": "自编",
+   "difficulty": 1,
+   "tags": [
+    "复杂度分析"
+   ]
+  },
+  {
+   "id": "ds-49",
+   "subject": "ds",
+   "topic": "08-绪论与算法分析",
+   "stem": "下列程序段的时间复杂度是：\n\nint s = 0;\nfor (int i = 1; i <= n; i++)\n    for (int j = 1; j <= i; j++)\n        s += j;",
+   "options": [
+    "O(n)",
+    "O(n log n)",
+    "O(n^2)",
+    "O(n^3)"
+   ],
+   "answer": 2,
+   "explanation": "内层循环执行 i 次，总次数为 1+2+…+n = n(n+1)/2，是 n 的二次函数，故选 O(n^2)。内层上界依赖外层变量时，要按求和而不是按 n×n 直接估算。",
+   "source": "自编",
+   "difficulty": 2,
+   "tags": [
+    "复杂度分析"
+   ]
+  },
+  {
+   "id": "ds-50",
+   "subject": "ds",
+   "topic": "08-绪论与算法分析",
+   "stem": "某递归算法满足 T(n) = T(n-1) + n（n > 1），T(1) = 1，其时间复杂度为：",
+   "options": [
+    "O(n)",
+    "O(n log n)",
+    "O(n^2)",
+    "O(2^n)"
+   ],
+   "answer": 2,
+   "explanation": "展开得 T(n) = n + (n-1) + … + 1 = n(n+1)/2，是 n 的二次函数，故选 O(n^2)。若递推式为 T(n) = T(n-1) + 1，则退化为 O(n)。",
+   "source": "自编",
+   "difficulty": 2,
+   "tags": [
+    "复杂度分析"
+   ]
+  },
+  {
+   "id": "ds-51",
+   "subject": "ds",
+   "topic": "08-绪论与算法分析",
+   "stem": "递归计算阶乘 Fact(n) = n * Fact(n-1)（Fact(0) = 1）的辅助空间复杂度是：",
+   "options": [
+    "O(1)",
+    "O(log n)",
+    "O(n)",
+    "O(n^2)"
+   ],
+   "answer": 2,
+   "explanation": "递归深度为 n，系统要为每一层调用保存返回地址与局部变量，调用栈占 O(n) 辅助空间，故选 O(n)。原地算法才要求辅助空间 O(1)。",
+   "source": "自编",
+   "difficulty": 1,
+   "tags": [
+    "复杂度分析"
+   ]
+  },
+  {
+   "id": "ds-52",
+   "subject": "ds",
+   "topic": "08-绪论与算法分析",
+   "stem": "下列函数按增长速度从慢到快排列，正确的是：",
+   "options": [
+    "O(log n) < O(n) < O(n log n) < O(2^n)",
+    "O(n) < O(log n) < O(n log n) < O(2^n)",
+    "O(log n) < O(n log n) < O(n) < O(2^n)",
+    "O(n log n) < O(n) < O(log n) < O(2^n)"
+   ],
+   "answer": 0,
+   "explanation": "常见量级的增速顺序是 1 < log n < n < n log n < n^2 < … < 2^n < n!，因此 log n 慢于 n、n 慢于 n log n、多项式慢于指数，选第一项。",
+   "source": "自编",
+   "difficulty": 2,
+   "tags": [
+    "复杂度分析"
+   ]
   }
  ]
 }

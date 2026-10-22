@@ -17,7 +17,8 @@
 <div class="site-body">
 <nav class="site-sidebar"><div class="sb-head"><span class="sb-title">408 速成复习资料</span><a class="sb-home" href="../index.html">全科合集</a></div>
 <input class="sb-filter" type="search" placeholder="筛选章节（输入即过滤）" aria-label="筛选章节">
-<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 7 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">数据结构（45 分 · 8 个知识点）</div>
+<a class="sb-chap" href="../数据结构/08-绪论与算法分析.html">绪论与算法分析 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/01-线性表.html">线性表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/02-顺序表与链表.html">顺序表与链表 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/03-栈与队列.html">栈与队列 <span class="tag">高频</span></a>
@@ -26,7 +27,8 @@
 <a class="sb-chap" href="../数据结构/06-查找.html">查找 <span class="tag">高频</span></a>
 <a class="sb-chap" href="../数据结构/07-排序.html">排序 <span class="tag">高频</span></a>
 </div>
-<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 6 个知识点）</div>
+<div class="sb-group"><div class="sb-group-t">计算机组成原理（45 分 · 7 个知识点）</div>
+<a class="sb-chap" href="07-计算机系统概述.html">计算机系统概述 <span class="tag">高频</span></a>
 <a class="sb-chap" href="01-数据表示与运算.html">数据表示与运算 <span class="tag">高频</span></a>
 <a class="sb-chap" href="02-存储系统.html">存储系统 <span class="tag">高频</span></a>
 <a class="sb-chap cur" href="03-指令系统.html">指令系统 <span class="tag">高频</span></a>
@@ -66,6 +68,8 @@
 <p>一条指令由<strong>操作码字段</strong>与<strong>地址码字段</strong>构成。定长指令字中操作码位数固定，可表示 <code>2^k</code> 条指令；<strong>变长指令字</strong>中常用<strong>扩展操作码</strong>技术：把操作码按长度分层，短操作码不能再作为长操作码的前缀，因此设计时必须保证"<strong>短码不是任何长码的前缀</strong>"。以 4 位为基础操作码、需要扩展到 8 位为例，若 4 位编码 0000—1110 分配给 15 条三地址指令，则剩下 1111 作为扩展标志可产生 16 个 8 位编码，用于二地址指令，依此类推。<strong>寻址方式</strong>决定操作数的来源与有效地址 <code>EA</code> 的计算：立即寻址的地址字段就是操作数本身；直接寻址 <code>EA = A</code>；间接寻址 <code>EA = (A)</code>（需访存两次取数，三次含取指）；</p>
 <p>寄存器寻址的操作数在寄存器中，不访存；寄存器间接寻址 <code>EA = (R)</code>；<strong>相对寻址 <code>EA = (PC) + A</code></strong>，其中 <code>PC</code> 已是<strong>取下一条指令后的值</strong>（即已自增）；基址寻址 <code>EA = (BR) + A</code>，基址寄存器由操作系统设定、面向整个程序，用于<strong>程序重定位</strong>；</p>
 <p>变址寻址 <code>EA = (IX) + A</code>，变址寄存器由用户改变、面向数组，用于<strong>数组元素的顺序访问</strong>；堆栈寻址的操作数隐含在栈顶。<code>CISC</code> 与 <code>RISC</code> 的分野在于：<code>RISC</code> 采用<strong>定长指令字、指令条数少且格式规整、只有 Load/Store 访存、通用寄存器多、采用硬布线控制与流水线</strong>，而 <code>CISC</code> 指令变长、寻址方式多、以微程序控制为主。汇编层面必须能读懂"取数—运算—存数"的三段式，重点掌握 <code>mov</code>、<code>add/sub</code>、<code>cmp</code> 与条件转移 <code>jmp/jcc</code>、以及 <code>push/pop</code> 对栈指针的改变。</p>
+<p><strong>大小端</strong>指多字节数据的字节存放顺序：<strong>大端</strong>把最高有效字节放在低地址，<code>0x12345678</code> 依次存为 <code>12 34 56 78</code>；<strong>小端</strong>把最低有效字节放在低地址，同一数据存为 <code>78 56 34 12</code>，<code>x86</code> 用小端、网络字节序用大端。</p>
+<p><strong>边界对齐</strong>要求 <code>k</code> 字节数据的地址是 <code>k</code> 的整数倍、结构体总长度补齐到最大成员大小的整数倍，编译器因此在成员之间和结构体末尾插入填充字节，用空间换取"每次访存都落在存储字边界上"；对齐后字与半字不会跨存储字，取指与访存可按字边界一次完成，未对齐则要多访存一次并由硬件拼接。</p>
 </div></section><section class="sec sec-key" id="sec-key"><div class="sec-h"><span class="ic" aria-hidden="true">🔑</span><h2 class="tt">关键结论速记</h2><span class="hint">考前扫读</span></div><div class="box"><ul class="facts">
 <li><code>扩展操作码约束：短码不得是长码的前缀</code> —— 否则译码时无法判断指令长度。</li>
 <li><code>相对寻址 EA = (PC) + A，PC 已自增到下一条指令</code> —— 这是 408 反复考查的细节，忘记自增会整体偏移。</li>
@@ -73,6 +77,8 @@
 <li><code>一次间接寻址取操作数需访存 2 次（含取指共 3 次）</code> —— 访存次数是间接寻址的标志性代价。</li>
 <li><code>RISC：定长指令 + 只有 Load/Store 访存 + 多通用寄存器 + 硬布线 + 流水线</code> —— 与 CISC 的对比是固定选择题考点。</li>
 <li><code>指令字长可以小于机器字长，也可以大于机器字长</code> —— 半字长、双字长指令都允许，按字节编址时需注意取指访存次数。</li>
+<li><code>大端：高字节在低地址；小端：低字节在低地址</code> —— <code>0x12345678</code> 大端存 <code>12 34 56 78</code>、小端存 <code>78 56 34 12</code>。</li>
+<li><code>边界对齐：k 字节数据的地址是 k 的倍数，结构体总长补齐到最大成员大小</code> —— 填充字节换来一次访存取完数据。</li>
 </ul>
 </div></section><section class="sec sec-fig" id="sec-fig"><div class="sec-h"><span class="ic" aria-hidden="true">🗺</span><h2 class="tt">示意图</h2><span class="hint">结构 / 流程</span></div><div class="box">
 <p><strong>扩展操作码的编码树</strong>：短操作码保留一个（或若干个）编码作为"扩展出口"，不把编码空间用尽；下图用 4 位基础码扩展一次到 8 位为例。</p>
